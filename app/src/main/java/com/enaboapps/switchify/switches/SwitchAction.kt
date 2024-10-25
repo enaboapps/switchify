@@ -74,7 +74,7 @@ data class SwitchAction(
 
     fun getActionDescription(): String = when (id) {
         ACTION_NONE -> "Do nothing"
-        ACTION_SELECT -> "Select the current item"
+        ACTION_SELECT -> "Select the current item or start auto scan if it is being used"
         ACTION_STOP_SCANNING -> "Stop scanning"
         ACTION_CHANGE_SCANNING_DIRECTION -> "Change the scanning direction"
         ACTION_MOVE_TO_NEXT_ITEM -> "Move to the next item"
