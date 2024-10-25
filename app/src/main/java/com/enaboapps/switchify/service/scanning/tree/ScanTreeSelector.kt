@@ -56,6 +56,7 @@ class ScanTreeSelector(
      * @return True if a selection was made, false otherwise.
      */
     private fun performSequentialSelection(): Boolean {
+        println("performSequentialSelection for currentColumn: ${navigator.currentColumn}")
         val currentNode = flattenedNodes.getOrNull(navigator.currentColumn) ?: return false
         currentNode.select()
         if (stopScanningOnSelect) {
