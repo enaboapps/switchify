@@ -1,22 +1,34 @@
 package com.enaboapps.switchify.screens
 
+import android.app.Activity
+import android.content.Context
 import android.content.Intent
 import android.net.Uri
+import android.util.Log
+import android.widget.Toast
+import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.IntentSenderRequest
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import com.enaboapps.switchify.auth.AuthManager
@@ -29,6 +41,13 @@ import com.enaboapps.switchify.switches.SwitchEventStore
 import com.enaboapps.switchify.widgets.NavBar
 import com.enaboapps.switchify.widgets.NavBarAction
 import com.enaboapps.switchify.widgets.NavRouteLink
+import com.google.android.play.core.appupdate.AppUpdateManager
+import com.google.android.play.core.appupdate.AppUpdateManagerFactory
+import com.google.android.play.core.appupdate.AppUpdateOptions
+import com.google.android.play.core.install.InstallStateUpdatedListener
+import com.google.android.play.core.install.model.AppUpdateType
+import com.google.android.play.core.install.model.InstallStatus
+import com.google.android.play.core.install.model.UpdateAvailability
 
 @Composable
 fun HomeScreen(navController: NavController, serviceUtils: ServiceUtils = ServiceUtils()) {
@@ -48,6 +67,76 @@ fun HomeScreen(navController: NavController, serviceUtils: ServiceUtils = Servic
     LaunchedEffect(isSetupComplete) {
         if (!isSetupComplete) {
             navController.navigate(NavigationRoute.Setup.name)
+        }
+    }
+
+    var showUpdateDialog by remember { mutableStateOf(false) }
+    val appUpdateManager = remember { AppUpdateManagerFactory.create(context) }
+    val installStateUpdatedListener = remember {
+        InstallStateUpdatedListener { state ->
+            when (state.installStatus()) {
+                InstallStatus.DOWNLOADED -> {
+                    Log.d("HomeScreen", "Update downloaded")
+                    showUpdateDialog = true
+                }
+
+                InstallStatus.FAILED -> {
+                    Log.e("HomeScreen", "Update failed! State: ${state.installErrorCode()}")
+                }
+
+                InstallStatus.INSTALLED -> {
+                    Log.d("HomeScreen", "Update installed successfully")
+                }
+
+                else -> {
+                    Log.d("HomeScreen", "Install Status: ${state.installStatus()}")
+                }
+            }
+        }
+    }
+
+    val updateResultLauncher = rememberLauncherForActivityResult(
+        contract = ActivityResultContracts.StartIntentSenderForResult()
+    ) { result ->
+        when (result.resultCode) {
+            Activity.RESULT_OK -> {
+                Log.d("HomeScreen", "Update flow started successfully")
+                Toast.makeText(
+                    context,
+                    "Downloading update...",
+                    Toast.LENGTH_SHORT
+                ).show()
+            }
+
+            Activity.RESULT_CANCELED -> {
+                Log.d("HomeScreen", "Update cancelled by user")
+                Toast.makeText(
+                    context,
+                    "Update cancelled",
+                    Toast.LENGTH_SHORT
+                ).show()
+            }
+
+            else -> {
+                Log.e("HomeScreen", "Update flow failed! Result code: ${result.resultCode}")
+                Toast.makeText(
+                    context,
+                    "Update failed to start",
+                    Toast.LENGTH_SHORT
+                ).show()
+            }
+        }
+    }
+
+    LaunchedEffect(Unit) {
+        appUpdateManager.registerListener(installStateUpdatedListener)
+        checkForUpdates(context, appUpdateManager, updateResultLauncher)
+        checkForDownloadedUpdate(appUpdateManager) { showUpdateDialog = it }
+    }
+
+    DisposableEffect(Unit) {
+        onDispose {
+            appUpdateManager.unregisterListener(installStateUpdatedListener)
         }
     }
 
@@ -120,8 +209,84 @@ fun HomeScreen(navController: NavController, serviceUtils: ServiceUtils = Servic
             }
         }
     }
+
+    if (showUpdateDialog) {
+        AlertDialog(
+            onDismissRequest = { showUpdateDialog = false },
+            title = { Text("Update Available") },
+            text = { Text("A new version has been downloaded. Restart now to complete the installation?") },
+            confirmButton = {
+                TextButton(
+                    onClick = {
+                        showUpdateDialog = false
+                        appUpdateManager.completeUpdate()
+                    }
+                ) {
+                    Text("Restart")
+                }
+            },
+            dismissButton = {
+                TextButton(
+                    onClick = { showUpdateDialog = false }
+                ) {
+                    Text("Later")
+                }
+            }
+        )
+    }
 }
 
+private fun checkForUpdates(
+    context: Context,
+    appUpdateManager: AppUpdateManager,
+    updateResultLauncher: androidx.activity.result.ActivityResultLauncher<IntentSenderRequest>
+) {
+    appUpdateManager.appUpdateInfo
+        .addOnSuccessListener { appUpdateInfo ->
+            if (appUpdateInfo.updateAvailability() == UpdateAvailability.UPDATE_AVAILABLE &&
+                appUpdateInfo.isUpdateTypeAllowed(AppUpdateType.FLEXIBLE)
+            ) {
+                try {
+                    val updateOptions =
+                        AppUpdateOptions.newBuilder(AppUpdateType.FLEXIBLE).build()
+                    appUpdateManager.startUpdateFlowForResult(
+                        appUpdateInfo,
+                        updateResultLauncher,
+                        updateOptions
+                    )
+                    Log.d("HomeScreen", "Update available. Requesting update.")
+                } catch (e: Exception) {
+                    Log.e("HomeScreen", "Error starting update flow", e)
+                    Toast.makeText(
+                        context,
+                        "Failed to start update process",
+                        Toast.LENGTH_SHORT
+                    ).show()
+                }
+            } else {
+                Log.d("HomeScreen", "No update available or update type not allowed")
+            }
+        }
+        .addOnFailureListener { exception ->
+            Log.e("HomeScreen", "Failed to check for updates", exception)
+            Toast.makeText(
+                context,
+                "Failed to check for updates",
+                Toast.LENGTH_SHORT
+            ).show()
+        }
+}
+
+private fun checkForDownloadedUpdate(
+    appUpdateManager: AppUpdateManager,
+    callback: (Boolean) -> Unit
+) {
+    appUpdateManager.appUpdateInfo.addOnSuccessListener { info ->
+        if (info.installStatus() == InstallStatus.DOWNLOADED) {
+            callback(true)
+        }
+    }
+}
 
 /**
  * Account card
