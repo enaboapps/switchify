@@ -40,6 +40,9 @@ class ScanTree(
     /** The scheduler for automatic scanning. */
     private var scanningScheduler: ScanningScheduler? = null
 
+    /** The flag to track if manual scanning is active. */
+    private var isManualScanActive = false
+
     init {
         initializeComponents()
     }
@@ -63,10 +66,21 @@ class ScanTree(
         tree.clear()
         tree.addAll(builder.buildTree(nodes, itemThreshold))
         initializeComponents() // Reinitialize components with the new tree
-        if (scanSettings.isManualScanMode()) {
+    }
+
+    /**
+     * Checks if the manual scan setup is valid.
+     *
+     * @return True if the manual scan setup is valid, false otherwise.
+     */
+    private fun checkManualScanSetup(): Boolean {
+        if (scanSettings.isManualScanMode() && !isManualScanActive) {
+            isManualScanActive = true
             highlighter.unhighlightAll()
             highlightCurrent()
+            return true
         }
+        return false
     }
 
     /**
@@ -75,6 +89,10 @@ class ScanTree(
      */
     override fun performSelectionAction() {
         try {
+            if (checkManualScanSetup()) {
+                return
+            }
+
             if (scanSettings.isAutoScanMode()) {
                 setup()
             }
@@ -158,6 +176,10 @@ class ScanTree(
      * This method is used for manual navigation through the tree.
      */
     override fun stepForward() {
+        if (checkManualScanSetup()) {
+            return
+        }
+
         unhighlightCurrent()
         val movementSuccessful = navigator.moveSelectionToNext()
         if (highlightEscape(!movementSuccessful)) {
@@ -171,6 +193,10 @@ class ScanTree(
      * This method is used for manual navigation through the tree.
      */
     override fun stepBackward() {
+        if (checkManualScanSetup()) {
+            return
+        }
+
         unhighlightCurrent()
         val movementSuccessful = navigator.moveSelectionToPrevious()
         if (highlightEscape(!movementSuccessful)) {
@@ -301,6 +327,7 @@ class ScanTree(
         stopScanning()
         highlighter.unhighlightAll()
         navigator.reset()
+        isManualScanActive = false
     }
 
     /**
