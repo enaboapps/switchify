@@ -63,6 +63,10 @@ class ScanTree(
         tree.clear()
         tree.addAll(builder.buildTree(nodes, itemThreshold))
         initializeComponents() // Reinitialize components with the new tree
+        if (scanSettings.isManualScanMode()) {
+            highlighter.unhighlightAll()
+            highlightCurrent()
+        }
     }
 
     /**
@@ -71,8 +75,11 @@ class ScanTree(
      */
     override fun performSelectionAction() {
         try {
-            setup()
-            if (scanningScheduler?.isScanning() == false) {
+            if (scanSettings.isAutoScanMode()) {
+                setup()
+            }
+
+            if (scanningScheduler?.isScanning() == false && scanSettings.isAutoScanMode()) {
                 startScanning()
                 Log.d("ScanTree", "Scanning started")
                 return
