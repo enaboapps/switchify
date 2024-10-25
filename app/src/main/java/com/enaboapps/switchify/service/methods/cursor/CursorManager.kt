@@ -371,7 +371,7 @@ class CursorManager(private val context: Context) : ScanMethodBase, GesturePoint
      */
     override fun stepForward() {
         if (isReset()) {
-            setupXQuadrant()
+            determineCursorModeSetup()
             startAutoScanIfEnabled()
             return
         }
@@ -389,7 +389,7 @@ class CursorManager(private val context: Context) : ScanMethodBase, GesturePoint
      */
     override fun stepBackward() {
         if (isReset()) {
-            setupXQuadrant()
+            determineCursorModeSetup()
             startAutoScanIfEnabled()
             return
         }
@@ -406,20 +406,15 @@ class CursorManager(private val context: Context) : ScanMethodBase, GesturePoint
      * Performs the selection action.
      */
     override fun performSelectionAction() {
-        setup()
-        stopScanning()
+        if (scanSettings.isAutoScanMode()) {
+            setup()
+            stopScanning()
 
-        if (isSetupRequired()) return // Failsafe in case setup was not successful
+            if (isSetupRequired()) return // Failsafe in case setup was not successful
+        }
 
         if (isReset()) {
-            if (CursorMode.isBlockMode()) {
-                setupXQuadrant()
-            } else {
-                isInQuadrant = true
-                setQuadrantInfo(0, CursorBounds.X_MIN, CursorBounds.width(context))
-                GesturePoint.x = CursorBounds.X_MIN
-                setupXCursorLine()
-            }
+            determineCursorModeSetup()
             startAutoScanIfEnabled()
             return
         }
@@ -465,6 +460,20 @@ class CursorManager(private val context: Context) : ScanMethodBase, GesturePoint
                     performFinalAction()
                 }
             }
+        }
+    }
+
+    /**
+     * Determines the cursor mode setup based on the current cursor mode.
+     */
+    private fun determineCursorModeSetup() {
+        if (CursorMode.isBlockMode()) {
+            setupXQuadrant()
+        } else {
+            isInQuadrant = true
+            setQuadrantInfo(0, CursorBounds.X_MIN, CursorBounds.width(context))
+            GesturePoint.x = CursorBounds.X_MIN
+            setupXCursorLine()
         }
     }
 
