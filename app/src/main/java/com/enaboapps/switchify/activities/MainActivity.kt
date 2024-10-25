@@ -7,13 +7,20 @@ import android.widget.Toast
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.result.contract.ActivityResultContracts
-import androidx.compose.material3.SnackbarDuration
-import androidx.compose.material3.SnackbarHost
-import androidx.compose.material3.SnackbarHostState
-import androidx.compose.material3.SnackbarResult
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.padding
+import androidx.compose.material3.AlertDialog
+import androidx.compose.material3.Scaffold
+import androidx.compose.material3.Surface
+import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
+import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.setValue
+import androidx.compose.ui.Modifier
 import androidx.navigation.compose.rememberNavController
 import com.enaboapps.switchify.activities.ui.theme.SwitchifyTheme
 import com.enaboapps.switchify.nav.NavGraph
@@ -25,30 +32,29 @@ import com.google.android.play.core.install.InstallStateUpdatedListener
 import com.google.android.play.core.install.model.AppUpdateType
 import com.google.android.play.core.install.model.InstallStatus
 import com.google.android.play.core.install.model.UpdateAvailability
-import kotlinx.coroutines.launch
 
 class MainActivity : ComponentActivity() {
     private lateinit var appUpdateManager: AppUpdateManager
     private lateinit var preferenceManager: PreferenceManager
+    private var showUpdateDialog by mutableStateOf(false)
 
     companion object {
         private const val TAG = "MainActivity"
     }
 
-    // Install state listener for tracking update status
     private val installStateUpdatedListener = InstallStateUpdatedListener { state ->
         when (state.installStatus()) {
             InstallStatus.DOWNLOADED -> {
-                // Show the snackbar to complete the update
-                Toast.makeText(
-                    this,
-                    "Update downloaded. Restart to install.",
-                    Toast.LENGTH_LONG
-                ).show()
+                Log.d(TAG, "Update downloaded")
+                showUpdateDialog = true
             }
 
             InstallStatus.FAILED -> {
                 Log.e(TAG, "Update failed! State: ${state.installErrorCode()}")
+            }
+
+            InstallStatus.INSTALLED -> {
+                Log.d(TAG, "Update installed successfully")
             }
 
             else -> {
@@ -57,7 +63,6 @@ class MainActivity : ComponentActivity() {
         }
     }
 
-    // Register the ActivityResultLauncher for the update flow
     private val updateResultLauncher = registerForActivityResult(
         ActivityResultContracts.StartIntentSenderForResult()
     ) { result ->
@@ -73,6 +78,11 @@ class MainActivity : ComponentActivity() {
 
             Activity.RESULT_CANCELED -> {
                 Log.d(TAG, "Update cancelled by user")
+                Toast.makeText(
+                    this,
+                    "Update cancelled",
+                    Toast.LENGTH_SHORT
+                ).show()
             }
 
             else -> {
@@ -88,34 +98,62 @@ class MainActivity : ComponentActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-
-        // Initialize managers
         initializeManagers()
 
         setContent {
             val navController = rememberNavController()
-            val snackbarHostState = remember { SnackbarHostState() }
-            val scope = rememberCoroutineScope()
 
             SwitchifyTheme {
-                SnackbarHost(hostState = snackbarHostState)
-                NavGraph(navController = navController)
+                Surface(
+                    modifier = Modifier.fillMaxSize()
+                ) {
+                    Scaffold { paddingValues ->
+                        Box(
+                            modifier = Modifier
+                                .fillMaxSize()
+                                .padding(paddingValues)
+                        ) {
+                            NavGraph(
+                                navController = navController
+                            )
 
-                // Handle update completion
-                LaunchedEffect(Unit) {
-                    appUpdateManager.appUpdateInfo.addOnSuccessListener { info ->
-                        if (info.installStatus() == InstallStatus.DOWNLOADED) {
-                            scope.launch {
-                                val result = snackbarHostState.showSnackbar(
-                                    message = "An update has been downloaded",
-                                    actionLabel = "RESTART",
-                                    duration = SnackbarDuration.Indefinite
+                            if (showUpdateDialog) {
+                                AlertDialog(
+                                    onDismissRequest = { showUpdateDialog = false },
+                                    title = { Text("Update Available") },
+                                    text = { Text("A new version has been downloaded. Restart now to complete the installation?") },
+                                    confirmButton = {
+                                        TextButton(
+                                            onClick = {
+                                                showUpdateDialog = false
+                                                appUpdateManager.completeUpdate()
+                                            }
+                                        ) {
+                                            Text("Restart")
+                                        }
+                                    },
+                                    dismissButton = {
+                                        TextButton(
+                                            onClick = { showUpdateDialog = false }
+                                        ) {
+                                            Text("Later")
+                                        }
+                                    }
                                 )
-                                if (result == SnackbarResult.ActionPerformed) {
-                                    appUpdateManager.completeUpdate()
-                                }
                             }
                         }
+                    }
+                }
+
+                // Check for downloaded updates
+                LaunchedEffect(Unit) {
+                    checkForDownloadedUpdate()
+                }
+
+                // Cleanup listener when the composable is disposed
+                DisposableEffect(Unit) {
+                    onDispose {
+                        appUpdateManager.unregisterListener(installStateUpdatedListener)
                     }
                 }
             }
@@ -145,7 +183,6 @@ class MainActivity : ComponentActivity() {
                     appUpdateInfo.isUpdateTypeAllowed(AppUpdateType.FLEXIBLE)
                 ) {
                     try {
-                        // Request the update
                         val updateOptions =
                             AppUpdateOptions.newBuilder(AppUpdateType.FLEXIBLE).build()
                         appUpdateManager.startUpdateFlowForResult(
@@ -176,23 +213,21 @@ class MainActivity : ComponentActivity() {
             }
     }
 
-    override fun onResume() {
-        super.onResume()
-        // Check if an update has been downloaded but not installed
+    private fun checkForDownloadedUpdate() {
         appUpdateManager.appUpdateInfo.addOnSuccessListener { info ->
             if (info.installStatus() == InstallStatus.DOWNLOADED) {
-                Toast.makeText(
-                    this,
-                    "Update downloaded. Restart to install.",
-                    Toast.LENGTH_LONG
-                ).show()
+                showUpdateDialog = true
             }
         }
     }
 
+    override fun onResume() {
+        super.onResume()
+        checkForDownloadedUpdate()
+    }
+
     override fun onDestroy() {
         super.onDestroy()
-        // Clean up the listener
         appUpdateManager.unregisterListener(installStateUpdatedListener)
     }
 }
