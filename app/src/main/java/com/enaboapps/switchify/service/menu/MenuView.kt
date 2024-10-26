@@ -12,7 +12,6 @@ import com.enaboapps.switchify.service.gestures.GesturePoint
 import com.enaboapps.switchify.service.menu.menus.BaseMenu
 import com.enaboapps.switchify.service.scanning.ScanningManager
 import com.enaboapps.switchify.service.scanning.tree.ScanTree
-import com.enaboapps.switchify.service.window.SwitchifyAccessibilityWindow
 
 /**
  * Interface for listening to menu view closure events.
@@ -39,10 +38,6 @@ class MenuView(
 ) {
     /** Listener for menu view events */
     var menuViewListener: MenuViewListener? = null
-
-    /** Instance of SwitchifyAccessibilityWindow for managing window display */
-    private val switchifyAccessibilityWindow: SwitchifyAccessibilityWindow =
-        SwitchifyAccessibilityWindow.instance
 
     /** Base layout for the menu */
     private var baseLayout = LinearLayout(context)
@@ -185,18 +180,6 @@ class MenuView(
     }
 
     /**
-     * Adds the menu view to the accessibility window.
-     * It is initially off screen to ensure the menu is properly sized.
-     */
-    private fun addToWindow() {
-        switchifyAccessibilityWindow.addView(
-            baseLayout,
-            Int.MAX_VALUE,
-            Int.MAX_VALUE
-        )
-    }
-
-    /**
      * Resizes and repositions the menu on the screen.
      * This method ensures the menu is properly sized,
      * handling both larger and smaller page transitions.
@@ -219,7 +202,7 @@ class MenuView(
                 gesturePoint.y
             }
 
-            switchifyAccessibilityWindow.updateViewLayout(
+            MenuViewHandler.instance.updateView(
                 baseLayout,
                 x.toInt(),
                 y.toInt(),
@@ -238,7 +221,8 @@ class MenuView(
     fun open(scanningManager: ScanningManager) {
         scanningManager.setMenuType()
         createLinearLayout()
-        addToWindow()
+        MenuViewHandler.instance.setup(context)
+        MenuViewHandler.instance.addViewOffScreen(baseLayout)
         inflateMenu()
     }
 
@@ -249,7 +233,7 @@ class MenuView(
      */
     fun close() {
         baseLayout.removeAllViews()
-        switchifyAccessibilityWindow.removeView(baseLayout)
+        MenuViewHandler.instance.kill()
         scanTree.shutdown()
         menuViewListener?.onMenuViewClosed()
         maxWidth = 0

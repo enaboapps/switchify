@@ -179,4 +179,16 @@ class SwitchifyAccessibilityWindow {
             }
         }
     }
+
+    fun removeView(id: Int) {
+        mainHandler.post {
+            try {
+                baseLayout?.findViewById<ViewGroup>(id)?.let { view ->
+                    baseLayout?.removeView(view)
+                }
+            } catch (e: Exception) {
+                Log.e(TAG, "Error in removeView: ${e.message}", e)
+            }
+        }
+    }
 }
