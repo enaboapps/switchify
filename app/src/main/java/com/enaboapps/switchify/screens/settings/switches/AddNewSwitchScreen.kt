@@ -45,6 +45,7 @@ fun AddNewSwitchScreen(navController: NavController) {
     val verticalScrollState = rememberScrollState()
     val shouldSave by addNewSwitchScreenModel.shouldSave.observeAsState()
     val isValid by addNewSwitchScreenModel.isValid.observeAsState()
+    val allowLongPress by addNewSwitchScreenModel.allowLongPress.observeAsState()
     Scaffold(
         topBar = {
             NavBar(title = "Add New Switch", navController = navController)
@@ -68,7 +69,7 @@ fun AddNewSwitchScreen(navController: NavController) {
                         .padding(16.dp), horizontalAlignment = Alignment.CenterHorizontally
                 ) {
                     Text(text = "Switch captured", style = MaterialTheme.typography.labelMedium)
-                    SwitchActionSection(addNewSwitchScreenModel)
+                    SwitchActionSection(addNewSwitchScreenModel, allowLongPress!!)
                     FullWidthButton(text = "Save", enabled = isValid!!, onClick = {
                         addNewSwitchScreenModel.save()
                         navController.popBackStack()
@@ -119,42 +120,46 @@ fun SwitchName(name: MutableLiveData<String>) {
 
 @Composable
 fun SwitchActionSection(
-    viewModel: AddNewSwitchScreenModel
+    viewModel: AddNewSwitchScreenModel,
+    allowLongPress: Boolean
 ) {
     val observeLongPressActions = viewModel.longPressActions.observeAsState()
+    val context = LocalContext.current
     Column {
         SwitchActionPicker(
             title = "Press Action",
             switchAction = viewModel.pressAction.value!!,
             onChange = {
-                viewModel.setPressAction(it)
+                viewModel.setPressAction(it, context)
             }
         )
 
         Spacer(modifier = Modifier.padding(16.dp))
 
-        Text(
-            text = "Each switch can have multiple actions for long press. " +
-                    "You can add or remove actions below. " +
-                    "The actions will be executed in the order they are listed based on the duration of the long press.",
-            style = MaterialTheme.typography.bodyMedium,
-            modifier = Modifier.padding(horizontal = 20.dp)
-        )
-
-        observeLongPressActions.value?.forEach { action ->
-            SwitchActionPicker(
-                title = "Long Press Action ${observeLongPressActions.value!!.indexOf(action) + 1}",
-                switchAction = action,
-                onChange = { newAction ->
-                    viewModel.updateLongPressAction(action, newAction)
-                },
-                onDelete = {
-                    viewModel.removeLongPressAction(action)
-                }
+        if (allowLongPress) {
+            Text(
+                text = "Each switch can have multiple actions for long press. " +
+                        "You can add or remove actions below. " +
+                        "The actions will be executed in the order they are listed based on the duration of the long press.",
+                style = MaterialTheme.typography.bodyMedium,
+                modifier = Modifier.padding(horizontal = 20.dp)
             )
+
+            observeLongPressActions.value?.forEach { action ->
+                SwitchActionPicker(
+                    title = "Long Press Action ${observeLongPressActions.value!!.indexOf(action) + 1}",
+                    switchAction = action,
+                    onChange = { newAction ->
+                        viewModel.updateLongPressAction(action, newAction)
+                    },
+                    onDelete = {
+                        viewModel.removeLongPressAction(action)
+                    }
+                )
+            }
+            FullWidthButton(text = "Add Long Press Action", onClick = {
+                viewModel.addLongPressAction(SwitchAction(SwitchAction.ACTION_SELECT))
+            })
         }
-        FullWidthButton(text = "Add Long Press Action", onClick = {
-            viewModel.addLongPressAction(SwitchAction(SwitchAction.ACTION_SELECT))
-        })
     }
 }

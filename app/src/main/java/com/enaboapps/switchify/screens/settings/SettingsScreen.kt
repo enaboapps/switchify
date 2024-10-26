@@ -98,6 +98,7 @@ fun ScanningSettingsTab(settingsScreenModel: SettingsScreenModel, navController:
         ScanModeSelectionSection()
         TimingAndScanningSection(settingsScreenModel, navController)
         ItemScanSection(settingsScreenModel)
+        ManualScanSection(settingsScreenModel)
         CursorSection(navController)
     }
 }
@@ -271,6 +272,30 @@ private fun ItemScanSection(screenModel: SettingsScreenModel) {
                 screenModel.setGroupScan(it)
             }
         )
+    }
+}
+
+@Composable
+private fun ManualScanSection(screenModel: SettingsScreenModel) {
+    Section(title = "Manual Scan") {
+        PreferenceSwitch(
+            title = "Move Repeat",
+            summary = "Hold down a switch to move repeatedly",
+            checked = screenModel.moveRepeat.value == true,
+            onCheckedChange = {
+                screenModel.setMoveRepeat(it)
+            }
+        )
+        PreferenceTimeStepper(
+            value = screenModel.moveRepeatDelay.value ?: 0,
+            title = "Move Repeat Delay",
+            summary = "The delay before repeating the last move action",
+            min = 100,
+            max = 100000,
+            step = 100
+        ) {
+            screenModel.setMoveRepeatDelay(it)
+        }
     }
 }
 

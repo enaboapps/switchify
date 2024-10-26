@@ -14,6 +14,8 @@ class PreferenceManager(context: Context) {
         const val PREFERENCE_KEY_CURSOR_BLOCK_SCAN_RATE = "cursor_block_scan_rate"
         const val PREFERENCE_KEY_RADAR_SCAN_RATE = "radar_scan_rate"
         const val PREFERENCE_KEY_SWITCH_HOLD_TIME = "switch_hold_time"
+        const val PREFERENCE_KEY_MOVE_REPEAT = "move_repeat"
+        const val PREFERENCE_KEY_MOVE_REPEAT_DELAY = "move_repeat_delay"
         const val PREFERENCE_KEY_AUTOMATICALLY_START_SCAN_AFTER_SELECTION =
             "automatically_start_scan_after_selection"
         const val PREFERENCE_KEY_PAUSE_ON_FIRST_ITEM = "pause_on_first_item"
@@ -122,6 +124,9 @@ class PreferenceManager(context: Context) {
     }
 
     fun getMenuItemVisibility(menuItemId: String, defaultValue: Boolean = true): Boolean {
-        return getBooleanValue(PREFERENCE_KEY_MENU_ITEM_VISIBILITY_PREFIX + menuItemId, defaultValue)
+        return getBooleanValue(
+            PREFERENCE_KEY_MENU_ITEM_VISIBILITY_PREFIX + menuItemId,
+            defaultValue
+        )
     }
 }

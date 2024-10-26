@@ -1,7 +1,9 @@
 package com.enaboapps.switchify.screens.settings.switches.models
 
+import android.content.Context
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
+import com.enaboapps.switchify.service.scanning.ScanSettings
 import com.enaboapps.switchify.switches.SwitchAction
 import com.enaboapps.switchify.switches.SwitchEvent
 import com.enaboapps.switchify.switches.SwitchEventStore
@@ -15,6 +17,7 @@ class EditSwitchScreenModel(
     val pressAction = MutableLiveData(SwitchAction(SwitchAction.ACTION_SELECT))
     val longPressActions = MutableLiveData<List<SwitchAction>>(emptyList())
     val isValid = MutableLiveData(false)
+    val allowLongPress = MutableLiveData(true)
 
     init {
         val event = store.find(code)
@@ -31,8 +34,11 @@ class EditSwitchScreenModel(
         completion()
     }
 
-    fun setPressAction(action: SwitchAction) {
-        pressAction.value = action
+    fun setPressAction(action: SwitchAction, context: Context) {
+        val settings = ScanSettings(context)
+        if (settings.isMoveRepeatEnabled() && (action.id == SwitchAction.ACTION_MOVE_TO_NEXT_ITEM || action.id == SwitchAction.ACTION_MOVE_TO_PREVIOUS_ITEM)) {
+            allowLongPress.value = false
+        }
         isValid.value = store.validateSwitchEvent(buildSwitchEvent())
     }
 

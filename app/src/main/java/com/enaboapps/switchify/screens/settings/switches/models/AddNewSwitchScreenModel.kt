@@ -7,6 +7,7 @@ import androidx.compose.ui.input.key.Key
 import androidx.compose.ui.input.key.nativeKeyCode
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
+import com.enaboapps.switchify.service.scanning.ScanSettings
 import com.enaboapps.switchify.switches.SwitchAction
 import com.enaboapps.switchify.switches.SwitchEvent
 import com.enaboapps.switchify.switches.SwitchEventStore
@@ -23,6 +24,7 @@ class AddNewSwitchScreenModel(private val store: SwitchEventStore) : ViewModel()
 
     val shouldSave = MutableLiveData(false)
     val isValid = MutableLiveData(false)
+    val allowLongPress = MutableLiveData(true)
 
     // Actions for press and long press
     val pressAction = MutableLiveData(SwitchAction(SwitchAction.ACTION_SELECT))
@@ -67,8 +69,11 @@ class AddNewSwitchScreenModel(private val store: SwitchEventStore) : ViewModel()
         isValid.value = store.validateSwitchEvent(buildSwitchEvent())
     }
 
-    fun setPressAction(action: SwitchAction) {
-        pressAction.value = action
+    fun setPressAction(action: SwitchAction, context: Context) {
+        val settings = ScanSettings(context)
+        if (settings.isMoveRepeatEnabled() && (action.id == SwitchAction.ACTION_MOVE_TO_NEXT_ITEM || action.id == SwitchAction.ACTION_MOVE_TO_PREVIOUS_ITEM)) {
+            allowLongPress.value = false
+        }
         isValid.value = store.validateSwitchEvent(buildSwitchEvent())
     }
 
