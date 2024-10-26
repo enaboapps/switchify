@@ -48,6 +48,9 @@ class MenuHierarchy(
         getTopMenu()?.close()
         tree = mutableListOf()
 
+        // remove the menu view
+        MenuViewHandler.instance.kill()
+
         // reset the scanning manager state
         MenuManager.getInstance().resetScanMethodType()
     }
