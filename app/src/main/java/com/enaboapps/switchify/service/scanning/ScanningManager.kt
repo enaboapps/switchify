@@ -38,6 +38,8 @@ class ScanningManager(
     private val radarManager = RadarManager(context)
     private val nodeScanner = NodeScanner()
 
+    private val moveRepeatManager = MoveRepeatManager(context)
+
     // Scan settings
     private val scanSettings = ScanSettings(context)
 
@@ -208,6 +210,42 @@ class ScanningManager(
      */
     fun resumeScanning() {
         currentScanMethod.resumeScanning()
+    }
+
+    /**
+     * Starts the move repeat functionality.
+     *
+     * @param action The action to be performed when the move repeat is triggered.
+     * @return True if the move repeat was started, false otherwise.
+     */
+    fun startMoveRepeat(action: SwitchAction): Boolean {
+        if (scanSettings.isMoveRepeatEnabled()) {
+            if (action.id == SwitchAction.ACTION_MOVE_TO_NEXT_ITEM) {
+                moveRepeatManager.setNextAction {
+                    performAction(SwitchAction(SwitchAction.ACTION_MOVE_TO_NEXT_ITEM))
+                }
+                return moveRepeatManager.start()
+            } else if (action.id == SwitchAction.ACTION_MOVE_TO_PREVIOUS_ITEM) {
+                moveRepeatManager.setPreviousAction {
+                    performAction(SwitchAction(SwitchAction.ACTION_MOVE_TO_PREVIOUS_ITEM))
+                }
+                return moveRepeatManager.start()
+            }
+        }
+        return false
+    }
+
+    /**
+     * Stops the move repeat functionality.
+     *
+     * @return True if the move repeat was stopped, false otherwise.
+     */
+    fun stopMoveRepeat(): Boolean {
+        if (scanSettings.isMoveRepeatEnabled()) {
+            moveRepeatManager.stop()
+            return true
+        }
+        return false
     }
 
     /**

@@ -70,6 +70,17 @@ class SettingsScreenModel(context: Context) : ViewModel() {
     val automaticallyStartScanAfterSelection: LiveData<Boolean> =
         _automaticallyStartScanAfterSelection
 
+    private val _moveRepeat = MutableLiveData<Boolean>().apply {
+        value = preferenceManager.getBooleanValue(PreferenceManager.Keys.PREFERENCE_KEY_MOVE_REPEAT)
+    }
+    val moveRepeat: LiveData<Boolean> = _moveRepeat
+
+    private val _moveRepeatDelay = MutableLiveData<Long>().apply {
+        value =
+            preferenceManager.getLongValue(PreferenceManager.Keys.PREFERENCE_KEY_MOVE_REPEAT_DELAY)
+    }
+    val moveRepeatDelay: LiveData<Long> = _moveRepeatDelay
+
 
     // Update methods now update MutableLiveData which in turn updates the UI
     fun setScanRate(rate: Long) {
@@ -165,6 +176,26 @@ class SettingsScreenModel(context: Context) : ViewModel() {
                 groupScan
             )
             _groupScan.postValue(groupScan)
+        }
+    }
+
+    fun setMoveRepeat(moveRepeat: Boolean) {
+        viewModelScope.launch {
+            preferenceManager.setBooleanValue(
+                PreferenceManager.Keys.PREFERENCE_KEY_MOVE_REPEAT,
+                moveRepeat
+            )
+            _moveRepeat.postValue(moveRepeat)
+        }
+    }
+
+    fun setMoveRepeatDelay(delay: Long) {
+        viewModelScope.launch {
+            preferenceManager.setLongValue(
+                PreferenceManager.Keys.PREFERENCE_KEY_MOVE_REPEAT_DELAY,
+                delay
+            )
+            _moveRepeatDelay.postValue(delay)
         }
     }
 }

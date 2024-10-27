@@ -124,6 +124,10 @@ class SwitchListener(
         val pauseEnabled = isPauseEnabled()
 
         return when {
+            scanningManager.startMoveRepeat(switchEvent.pressAction) -> {
+                true
+            }
+
             switchEvent.holdActions.isEmpty() && !pauseEnabled -> {
                 handleImmediatePressAction(switchEvent)
                 true
@@ -168,6 +172,7 @@ class SwitchListener(
         switchEvent: SwitchEvent,
         absorbedAction: AbsorbedSwitchAction
     ) {
+        if (scanningManager.stopMoveRepeat()) return
         SwitchLongPressHandler.stopLongPress(scanningManager)
 
         val timeElapsed = System.currentTimeMillis() - absorbedAction.time

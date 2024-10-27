@@ -137,4 +137,21 @@ class ScanSettings(context: Context) {
         println("isPauseScanOnSwitchHoldRequired: $result")
         return result
     }
+
+    /**
+     * Check if the move repeat is enabled
+     * @return true if the move repeat is enabled, false otherwise
+     */
+    fun isMoveRepeatEnabled(): Boolean {
+        return preferenceManager.getBooleanValue(PreferenceManager.Keys.PREFERENCE_KEY_MOVE_REPEAT) == true &&
+                isManualScanMode()
+    }
+
+    /**
+     * Get the move repeat delay
+     * @return The move repeat delay if enabled, 0 otherwise
+     */
+    fun getMoveRepeatDelay(): Long {
+        return preferenceManager.getLongValue(PreferenceManager.Keys.PREFERENCE_KEY_MOVE_REPEAT_DELAY)
+    }
 }
