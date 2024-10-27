@@ -70,6 +70,7 @@ class AddNewSwitchScreenModel(private val store: SwitchEventStore) : ViewModel()
     }
 
     fun setPressAction(action: SwitchAction, context: Context) {
+        pressAction.value = action
         val settings = ScanSettings(context)
         if (settings.isMoveRepeatEnabled() && (action.id == SwitchAction.ACTION_MOVE_TO_NEXT_ITEM || action.id == SwitchAction.ACTION_MOVE_TO_PREVIOUS_ITEM)) {
             allowLongPress.value = false
