@@ -21,8 +21,7 @@ import com.enaboapps.switchify.screens.settings.menu.MenuItemCustomizationScreen
 import com.enaboapps.switchify.screens.settings.prediction.PredictionLanguageScreen
 import com.enaboapps.switchify.screens.settings.scanning.CursorSettingsScreen
 import com.enaboapps.switchify.screens.settings.scanning.ScanColorSelectionScreen
-import com.enaboapps.switchify.screens.settings.switches.AddNewSwitchScreen
-import com.enaboapps.switchify.screens.settings.switches.EditSwitchScreen
+import com.enaboapps.switchify.screens.settings.switches.AddEditSwitchScreen
 import com.enaboapps.switchify.screens.settings.switches.SwitchStabilityScreen
 import com.enaboapps.switchify.screens.settings.switches.SwitchesScreen
 import com.enaboapps.switchify.screens.setup.SetupScreen
@@ -73,14 +72,14 @@ fun NavGraph(navController: NavHostController) {
             SwitchesScreen(navController)
         }
         composable(NavigationRoute.AddNewSwitch.name) {
-            AddNewSwitchScreen(navController)
+            AddEditSwitchScreen(navController)
         }
         composable(NavigationRoute.TestSwitches.name) {
             TestSwitchesScreen(navController)
         }
         composable("${NavigationRoute.EditSwitch.name}/{code}") {
             it.arguments?.getString("code")?.let { code ->
-                EditSwitchScreen(navController, code)
+                AddEditSwitchScreen(navController, code)
             }
         }
         composable(NavigationRoute.MenuItemCustomization.name) {
