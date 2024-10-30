@@ -16,33 +16,48 @@ import com.enaboapps.switchify.switches.SwitchAction.Companion.ACTION_MOVE_TO_PR
 import com.enaboapps.switchify.switches.SwitchEvent
 import com.enaboapps.switchify.switches.SwitchEventStore
 
-class AddEditSwitchScreenModel(
-    private val store: SwitchEventStore,
-    private val code: String? = null
-) : ViewModel() {
+class AddEditSwitchScreenModel() : ViewModel() {
 
     companion object {
         private const val TAG = "AddEditSwitchScreenModel"
     }
 
-    val name = MutableLiveData(
-        if (code == null) "Switch ${store.getCount() + 1}" else store.find(code)?.name ?: ""
-    )
+    private var code: String? = null
+    private lateinit var store: SwitchEventStore
 
-    val switchCaptured = MutableLiveData(code != null)
+    val name = MutableLiveData("")
 
-    val shouldSave = MutableLiveData(code != null)
+    val switchCaptured = MutableLiveData(false)
+
+    val shouldSave = MutableLiveData(false)
     val isValid = MutableLiveData(false)
     val allowLongPress = MutableLiveData(true)
     val refreshingLongPressActions = MutableLiveData(false)
 
     // Actions for press and long press
-    val pressAction = MutableLiveData(
-        if (code == null) SwitchAction(SwitchAction.ACTION_SELECT) else store.find(code)?.pressAction
-    )
-    val longPressActions = MutableLiveData(
-        if (code == null) emptyList() else store.find(code)?.holdActions ?: emptyList()
-    )
+    val pressAction = MutableLiveData(SwitchAction(SwitchAction.ACTION_SELECT))
+    val longPressActions = MutableLiveData<List<SwitchAction>>(emptyList())
+
+    fun init(code: String?, store: SwitchEventStore, context: Context) {
+        this.code = code
+        this.store = store
+        if (code != null) {
+            val event = store.find(code)
+            name.value = event?.name
+            pressAction.value = event?.pressAction
+            longPressActions.value =
+                event?.holdActions ?: listOf() // Initialize with multiple long press actions
+            updateAllowLongPress(context)
+            shouldSave.value = true
+            switchCaptured.value = true
+        } else {
+            name.value = "Switch ${store.getCount() + 1}"
+            pressAction.value = SwitchAction(SwitchAction.ACTION_SELECT)
+            longPressActions.value = emptyList()
+            updateAllowLongPress(context)
+        }
+        validate()
+    }
 
     fun processKeyCode(key: Key, context: Context) {
         Log.d(TAG, "processKeyCode: ${key.nativeKeyCode}")
@@ -54,7 +69,10 @@ class AddEditSwitchScreenModel(
             return
         }
 
-        validate(key.nativeKeyCode.toString())
+        code = key.nativeKeyCode.toString()
+
+        validate()
+
         shouldSave.value = true
         switchCaptured.value = true
     }
@@ -97,7 +115,7 @@ class AddEditSwitchScreenModel(
         validate()
     }
 
-    fun updateAllowLongPress(context: Context) {
+    private fun updateAllowLongPress(context: Context) {
         val settings = ScanSettings(context)
         val next = ACTION_MOVE_TO_NEXT_ITEM
         val previous = ACTION_MOVE_TO_PREVIOUS_ITEM
@@ -108,14 +126,14 @@ class AddEditSwitchScreenModel(
         println("Allow long press: ${allowLongPress.value}, isMoveRepeat: $isMoveRepeat, isMoveAction: $isMoveAction")
     }
 
-    fun validate(newCode: String? = code) {
-        isValid.value = store.validateSwitchEvent(buildSwitchEvent(newCode))
+    private fun validate() {
+        isValid.value = store.validateSwitchEvent(buildSwitchEvent())
     }
 
-    private fun buildSwitchEvent(newCode: String? = code): SwitchEvent {
+    private fun buildSwitchEvent(): SwitchEvent {
         return SwitchEvent(
             name = name.value!!,
-            code = newCode ?: "",
+            code = code ?: "",
             pressAction = pressAction.value!!,
             holdActions = longPressActions.value!!
         )
