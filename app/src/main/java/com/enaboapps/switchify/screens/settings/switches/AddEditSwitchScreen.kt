@@ -43,7 +43,9 @@ fun AddEditSwitchScreen(navController: NavController, code: String? = null) {
     val context = LocalContext.current
     val switchEventStore = SwitchEventStore(context)
     val addEditSwitchScreenModel = remember {
-        AddEditSwitchScreenModel(switchEventStore, code)
+        AddEditSwitchScreenModel().apply {
+            init(code, switchEventStore, context)
+        }
     }
     val verticalScrollState = rememberScrollState()
     val shouldSave by addEditSwitchScreenModel.shouldSave.observeAsState()
@@ -52,11 +54,6 @@ fun AddEditSwitchScreen(navController: NavController, code: String? = null) {
     val captured by addEditSwitchScreenModel.switchCaptured.observeAsState()
     val screenTitle = if (editing) "Edit Switch" else "Add New Switch"
     val showDeleteConfirmation = remember { mutableStateOf(false) }
-
-    LaunchedEffect(Unit) {
-        addEditSwitchScreenModel.updateAllowLongPress(context)
-        addEditSwitchScreenModel.validate()
-    }
 
     Scaffold(
         topBar = {

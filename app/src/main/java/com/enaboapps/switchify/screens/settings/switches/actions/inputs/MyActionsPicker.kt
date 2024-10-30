@@ -5,6 +5,7 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.platform.LocalContext
+import com.enaboapps.switchify.service.custom.actions.store.Action
 import com.enaboapps.switchify.service.custom.actions.store.ActionStore
 import com.enaboapps.switchify.switches.SwitchAction
 import com.enaboapps.switchify.switches.SwitchActionExtra
@@ -18,7 +19,7 @@ fun MyActionsPicker(
     val context = LocalContext.current
     val actionStore = ActionStore(context)
     val actions = actionStore.getActions()
-    val selectedAction = remember { mutableStateOf(actions.firstOrNull()) }
+    val selectedAction = remember { mutableStateOf<Action?>(null) }
 
     val createAction: (String, String) -> SwitchAction = { id, text ->
         SwitchAction(
@@ -31,10 +32,8 @@ fun MyActionsPicker(
     }
 
     LaunchedEffect(Unit) {
-        val action = currentAction.extra?.myActionsId
-        if (action != null) {
-            selectedAction.value = actions.firstOrNull { it.id == action }
-            onChange(createAction(action, selectedAction.value?.text ?: ""))
+        currentAction.extra?.myActionsId?.let { id ->
+            selectedAction.value = actions.firstOrNull { it.id == id }
         }
     }
 

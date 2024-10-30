@@ -78,6 +78,8 @@ class SwitchEventStore(private val context: Context) {
             }
         }
 
+        println("Switch event validation - hasName: $hasName, hasCode: $hasCode")
+
         return hasName && hasCode
     }
 
