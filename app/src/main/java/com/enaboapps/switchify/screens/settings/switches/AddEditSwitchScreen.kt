@@ -1,7 +1,6 @@
 package com.enaboapps.switchify.screens.settings.switches
 
 import androidx.compose.foundation.focusable
-import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -20,6 +19,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.FocusRequester
@@ -29,7 +29,6 @@ import androidx.compose.ui.input.key.key
 import androidx.compose.ui.input.key.onKeyEvent
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
-import androidx.lifecycle.MutableLiveData
 import androidx.navigation.NavController
 import com.enaboapps.switchify.screens.settings.switches.actions.SwitchActionPicker
 import com.enaboapps.switchify.screens.settings.switches.models.AddEditSwitchScreenModel
@@ -37,6 +36,7 @@ import com.enaboapps.switchify.switches.SwitchAction
 import com.enaboapps.switchify.switches.SwitchEventStore
 import com.enaboapps.switchify.widgets.FullWidthButton
 import com.enaboapps.switchify.widgets.NavBar
+import com.enaboapps.switchify.widgets.TextArea
 
 @Composable
 fun AddEditSwitchScreen(navController: NavController, code: String? = null) {
@@ -66,7 +66,9 @@ fun AddEditSwitchScreen(navController: NavController, code: String? = null) {
                 .padding(it)
                 .padding(all = 16.dp),
         ) {
-            SwitchName(name = addEditSwitchScreenModel.name)
+            SwitchName(name = addEditSwitchScreenModel.name, onNameChange = {
+                addEditSwitchScreenModel.updateName(it)
+            })
             if (!captured!!) {
                 SwitchListener(onKeyEvent = { keyEvent: KeyEvent ->
                     addEditSwitchScreenModel.processKeyCode(keyEvent.key, context)
@@ -149,14 +151,27 @@ fun SwitchListener(onKeyEvent: (KeyEvent) -> Unit) {
 }
 
 @Composable
-fun SwitchName(name: MutableLiveData<String>) {
+fun SwitchName(
+    name: String = "",
+    onNameChange: (String) -> Unit
+) {
+    var name by remember { mutableStateOf(name) }
+
     Row(
         modifier = Modifier
             .padding(16.dp)
-            .fillMaxWidth(),
-        horizontalArrangement = Arrangement.Start
+            .fillMaxWidth()
     ) {
-        Text(text = name.value!!, style = MaterialTheme.typography.titleMedium)
+        TextArea(
+            value = name,
+            onValueChange = {
+                name = it
+                onNameChange(it)
+            },
+            label = "Switch Name",
+            isError = name.isBlank(),
+            supportingText = "Switch name is required"
+        )
     }
 }
 
