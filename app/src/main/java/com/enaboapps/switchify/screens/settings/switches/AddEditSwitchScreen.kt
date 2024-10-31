@@ -1,6 +1,7 @@
 package com.enaboapps.switchify.screens.settings.switches
 
 import androidx.compose.foundation.focusable
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -55,25 +56,25 @@ fun AddEditSwitchScreen(navController: NavController, code: String? = null) {
     val screenTitle = if (editing) "Edit Switch" else "Add New Switch"
     val showDeleteConfirmation = remember { mutableStateOf(false) }
 
-    Scaffold(
-        topBar = {
-            NavBar(title = screenTitle, navController = navController)
-        }
-    ) {
-        Column(
-            modifier = Modifier
-                .verticalScroll(verticalScrollState)
-                .padding(it)
-                .padding(all = 16.dp),
+    if (!captured!!) {
+        SwitchListener(navController = navController, onKeyEvent = { keyEvent: KeyEvent ->
+            addEditSwitchScreenModel.processKeyCode(keyEvent.key, context)
+        })
+    } else {
+        Scaffold(
+            topBar = {
+                NavBar(title = screenTitle, navController = navController)
+            }
         ) {
-            SwitchName(name = addEditSwitchScreenModel.name, onNameChange = {
-                addEditSwitchScreenModel.updateName(it)
-            })
-            if (!captured!!) {
-                SwitchListener(onKeyEvent = { keyEvent: KeyEvent ->
-                    addEditSwitchScreenModel.processKeyCode(keyEvent.key, context)
+            Column(
+                modifier = Modifier
+                    .verticalScroll(verticalScrollState)
+                    .padding(it)
+                    .padding(all = 16.dp),
+            ) {
+                SwitchName(name = addEditSwitchScreenModel.name, onNameChange = {
+                    addEditSwitchScreenModel.updateName(it)
                 })
-            } else {
                 Column(
                     modifier = Modifier
                         .fillMaxWidth()
@@ -125,7 +126,7 @@ fun AddEditSwitchScreen(navController: NavController, code: String? = null) {
 }
 
 @Composable
-fun SwitchListener(onKeyEvent: (KeyEvent) -> Unit) {
+fun SwitchListener(navController: NavController, onKeyEvent: (KeyEvent) -> Unit) {
     val requester = remember { FocusRequester() }
     Column(modifier = Modifier
         .padding(16.dp)
@@ -136,14 +137,23 @@ fun SwitchListener(onKeyEvent: (KeyEvent) -> Unit) {
         .fillMaxWidth()
         .focusRequester(requester)
         .focusable(),
-        horizontalAlignment = Alignment.CenterHorizontally) {
-        Text(text = "Activate your switch", style = MaterialTheme.typography.titleMedium)
+        horizontalAlignment = Alignment.CenterHorizontally,
+        verticalArrangement = Arrangement.Center) {
+        Text(
+            text = "Press the switch that you want to use",
+            style = MaterialTheme.typography.titleMedium
+        )
+        Spacer(modifier = Modifier.padding(8.dp))
         Text(
             text = "Is your switch not working? " +
                     "If you are using a USB switch, please make sure that you have it plugged in and that it is turned on. " +
                     "If you are using a Bluetooth switch, please make sure that it is paired with your device.",
             style = MaterialTheme.typography.bodyMedium
         )
+        Spacer(modifier = Modifier.padding(16.dp))
+        FullWidthButton(text = "Cancel", onClick = {
+            navController.popBackStack()
+        })
     }
     LaunchedEffect(requester) {
         requester.requestFocus()
