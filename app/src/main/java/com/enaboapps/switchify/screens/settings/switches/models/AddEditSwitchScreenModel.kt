@@ -25,7 +25,7 @@ class AddEditSwitchScreenModel() : ViewModel() {
     private var code: String? = null
     private lateinit var store: SwitchEventStore
 
-    val name = MutableLiveData("")
+    var name = ""
 
     val switchCaptured = MutableLiveData(false)
 
@@ -43,7 +43,7 @@ class AddEditSwitchScreenModel() : ViewModel() {
         this.store = store
         if (code != null) {
             val event = store.find(code)
-            name.value = event?.name
+            name = event?.name ?: ""
             pressAction.value = event?.pressAction
             longPressActions.value =
                 event?.holdActions ?: listOf() // Initialize with multiple long press actions
@@ -51,7 +51,7 @@ class AddEditSwitchScreenModel() : ViewModel() {
             shouldSave.value = true
             switchCaptured.value = true
         } else {
-            name.value = "Switch ${store.getCount() + 1}"
+            name = "Switch ${store.getCount() + 1}"
             pressAction.value = SwitchAction(SwitchAction.ACTION_SELECT)
             longPressActions.value = emptyList()
             updateAllowLongPress(context)
@@ -115,6 +115,11 @@ class AddEditSwitchScreenModel() : ViewModel() {
         validate()
     }
 
+    fun updateName(name: String) {
+        this.name = name
+        validate()
+    }
+
     private fun updateAllowLongPress(context: Context) {
         val settings = ScanSettings(context)
         val next = ACTION_MOVE_TO_NEXT_ITEM
@@ -132,7 +137,7 @@ class AddEditSwitchScreenModel() : ViewModel() {
 
     private fun buildSwitchEvent(): SwitchEvent {
         return SwitchEvent(
-            name = name.value!!,
+            name = name.trim(),
             code = code ?: "",
             pressAction = pressAction.value!!,
             holdActions = longPressActions.value!!
