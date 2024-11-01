@@ -154,7 +154,7 @@ class ActionStore(private val context: Context) {
                             id = data["id"] as? String ?: return@mapNotNull null,
                             action = data["action"] as? String ?: return@mapNotNull null,
                             text = data["text"] as? String ?: return@mapNotNull null,
-                            extra = data["extra"] as? ActionExtra
+                            extra = ActionExtra.fromFirestore(data)
                         )
                     } catch (e: Exception) {
                         Log.e(tag, "Error parsing remote action: ${e.message}")
