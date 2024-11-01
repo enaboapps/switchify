@@ -30,6 +30,7 @@ import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import com.enaboapps.switchify.auth.AuthManager
 import com.enaboapps.switchify.preferences.PreferenceManager
+import com.enaboapps.switchify.service.custom.actions.store.ActionStore
 import com.enaboapps.switchify.widgets.FullWidthButton
 import com.enaboapps.switchify.widgets.NavBar
 import com.enaboapps.switchify.widgets.TextArea
@@ -125,6 +126,10 @@ fun SignUpScreen(navController: NavController) {
 
                                 // Start listening for changes to the user's settings
                                 preferenceManager.preferenceSync.listenForSettingsChangesOnRemote()
+
+                                // Push actions to Firestore
+                                val actionStore = ActionStore(context)
+                                actionStore.pushActionsToFirestore()
                             },
                             onFailure = { exception ->
                                 errorMessage = exception.localizedMessage
