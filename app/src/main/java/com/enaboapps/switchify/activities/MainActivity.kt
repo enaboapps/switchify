@@ -7,9 +7,11 @@ import androidx.navigation.compose.rememberNavController
 import com.enaboapps.switchify.activities.ui.theme.SwitchifyTheme
 import com.enaboapps.switchify.nav.NavGraph
 import com.enaboapps.switchify.preferences.PreferenceManager
+import com.enaboapps.switchify.service.custom.actions.store.ActionStore
 
 class MainActivity : ComponentActivity() {
     private lateinit var preferenceManager: PreferenceManager
+    private lateinit var actionStore: ActionStore
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -31,5 +33,9 @@ class MainActivity : ComponentActivity() {
             retrieveSettingsFromFirestore()
             listenForSettingsChangesOnRemote()
         }
+
+        // Initialize ActionStore
+        actionStore = ActionStore(this)
+        actionStore.pullActionsFromFirestore()
     }
 }
