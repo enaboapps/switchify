@@ -16,6 +16,20 @@ data class ActionExtra(
     companion object {
         fun fromJson(json: String): ActionExtra =
             Gson().fromJson(json, ActionExtra::class.java)
+
+        fun fromFirestore(document: Map<String, Any>): ActionExtra {
+            val data = document["extra"] as? Map<*, *> ?: return ActionExtra()
+            return ActionExtra(
+                appName = data["appName"] as? String ?: "",
+                appPackage = data["appPackage"] as? String ?: "",
+                textToCopy = data["textToCopy"] as? String ?: "",
+                numberToCall = data["numberToCall"] as? String ?: "",
+                linkUrl = data["linkUrl"] as? String ?: "",
+                numberToSend = data["numberToSend"] as? String ?: "",
+                message = data["message"] as? String ?: "",
+                emailAddress = data["emailAddress"] as? String ?: ""
+            )
+        }
     }
 
     fun toJson(): String = Gson().toJson(this)
