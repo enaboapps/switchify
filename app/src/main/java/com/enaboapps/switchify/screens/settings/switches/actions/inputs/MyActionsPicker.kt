@@ -2,6 +2,7 @@ package com.enaboapps.switchify.screens.settings.switches.actions.inputs
 
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.platform.LocalContext
@@ -18,7 +19,7 @@ fun MyActionsPicker(
 ) {
     val context = LocalContext.current
     val actionStore = ActionStore(context)
-    val actions = actionStore.getActions()
+    val actions = remember { mutableStateListOf<Action>() }
     val selectedAction = remember { mutableStateOf<Action?>(null) }
 
     val createAction: (String, String) -> SwitchAction = { id, text ->
@@ -32,6 +33,8 @@ fun MyActionsPicker(
     }
 
     LaunchedEffect(Unit) {
+        actions.clear()
+        actions.addAll(actionStore.getActions())
         currentAction.extra?.myActionsId?.let { id ->
             selectedAction.value = actions.firstOrNull { it.id == id }
         }
@@ -39,15 +42,13 @@ fun MyActionsPicker(
 
     Picker(
         title = "Select My Action",
-        selectedItem = currentAction,
-        items = actions.map { action ->
-            createAction(action.id, action.text)
+        selectedItem = selectedAction.value,
+        items = actions,
+        onItemSelected = { action ->
+            selectedAction.value = action
+            onChange(createAction(action.id, action.text))
         },
-        onItemSelected = { newAction ->
-            selectedAction.value = actions.firstOrNull { it.id == newAction.extra?.myActionsId }
-            onChange(newAction)
-        },
-        itemToString = { selectedAction.value?.text ?: "" },
-        itemDescription = { "Perform this action" }
+        itemToString = { it.text },
+        itemDescription = { "Perform this action" },
     )
 }
