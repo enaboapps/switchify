@@ -15,13 +15,10 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
-import com.enaboapps.switchify.service.custom.actions.store.ActionStore
-import com.enaboapps.switchify.switches.SwitchAction
-import com.enaboapps.switchify.switches.SwitchActionExtra
-import com.enaboapps.switchify.widgets.Picker
 import com.enaboapps.switchify.screens.settings.switches.actions.inputs.MyActionsPicker
+import com.enaboapps.switchify.switches.SwitchAction
+import com.enaboapps.switchify.widgets.Picker
 
 @Composable
 fun SwitchActionPicker(
@@ -64,7 +61,10 @@ fun SwitchActionPicker(
                 when (currentAction.id) {
                     SwitchAction.ACTION_PERFORM_USER_ACTION -> MyActionsPicker(
                         currentAction = currentAction,
-                        onChange = onChange
+                        onChange = {
+                            currentAction = it
+                            onChange(it)
+                        }
                     )
                 }
 
