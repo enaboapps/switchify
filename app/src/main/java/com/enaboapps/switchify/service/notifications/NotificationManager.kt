@@ -27,6 +27,7 @@ class NotificationManager(private val accessibilityService: AccessibilityService
     private var currentNotification: NotificationInfo? = null
     private val handler = Handler(Looper.getMainLooper())
     private val isNotificationActive = AtomicBoolean(false)
+    private var lastNotificationTime: Long = 0
 
     // Configurable timeout duration in milliseconds
     var timeoutDuration: Long = 5000 // Default 5 seconds
@@ -44,6 +45,11 @@ class NotificationManager(private val accessibilityService: AccessibilityService
 
     fun handleAccessibilityEvent(event: AccessibilityEvent) {
         if (event.eventType == AccessibilityEvent.TYPE_NOTIFICATION_STATE_CHANGED) {
+            val currentTime = System.currentTimeMillis()
+            if (currentTime - lastNotificationTime < 500) {
+                return
+            }
+
             val notification = event.parcelableData as? Notification ?: return
             val packageName = event.packageName?.toString() ?: return
 
@@ -60,6 +66,7 @@ class NotificationManager(private val accessibilityService: AccessibilityService
             startNotificationTimeout()
 
             listener?.onNotificationReceived(notificationInfo)
+            lastNotificationTime = currentTime
         }
     }
 
