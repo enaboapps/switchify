@@ -68,12 +68,19 @@ class GestureManager private constructor() {
 
     /**
      * Performs a tap gesture at the current point.
+     *
+     * @param x The x coordinate of the tap gesture. If null, the current point will be used.
+     * @param y The y coordinate of the tap gesture. If null, the current point will be used.
      */
-    fun performTap() {
+    fun performTap(x: Int? = null, y: Int? = null) {
         try {
             accessibilityService?.let {
                 val path = Path()
-                val point = getAssistedCurrentPoint()
+                var point = if (x != null && y != null) {
+                    PointF(x.toFloat(), y.toFloat())
+                } else {
+                    getAssistedCurrentPoint()
+                }
                 val gestureDrawing = GestureDrawing(it)
                 gestureDrawing.drawCircleAndRemove(
                     point.x.toInt(),
