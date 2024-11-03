@@ -126,6 +126,14 @@ class ScanSettings(context: Context) {
     }
 
     /**
+     * Check if open notifications on switch press is enabled
+     * @return true if open notifications on switch press is enabled, false otherwise
+     */
+    fun isOpenNotificationsOnSwitchPressEnabled(): Boolean {
+        return preferenceManager.getBooleanValue(PreferenceManager.Keys.PREFERENCE_KEY_OPEN_NOTIFICATIONS_ON_SWITCH_PRESS)
+    }
+
+    /**
      * Check if the pause scan on switch hold is required
      * @return true if the rates are <= 0.4 seconds, false otherwise
      */
