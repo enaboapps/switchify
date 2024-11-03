@@ -5,7 +5,8 @@ import android.app.Notification
 import android.os.Handler
 import android.os.Looper
 import android.view.accessibility.AccessibilityEvent
-import android.view.accessibility.AccessibilityNodeInfo
+import com.enaboapps.switchify.service.gestures.GestureManager
+import com.enaboapps.switchify.service.utils.ScreenUtils
 import java.util.concurrent.atomic.AtomicBoolean
 
 class NotificationManager(private val accessibilityService: AccessibilityService) {
@@ -82,34 +83,19 @@ class NotificationManager(private val accessibilityService: AccessibilityService
         return if (isNotificationActive.get()) currentNotification else null
     }
 
-    fun openNotification(notification: NotificationInfo) {
-        try {
-            // Try using PendingIntent first
-            notification.notification.contentIntent?.send()
-            cancelTimeout() // Cancel timeout after successful opening
-        } catch (e: Exception) {
-            println("Failed to open notification using PendingIntent: ${e.message}")
-            try {
-                // Fallback to accessibility action if PendingIntent fails
-                val rootNode = accessibilityService.rootInActiveWindow
-                rootNode?.findAccessibilityNodeInfosByText(notification.title)?.firstOrNull()
-                    ?.let { node ->
-                        val success = node.performAction(AccessibilityNodeInfo.ACTION_CLICK)
-                        if (success) {
-                            cancelTimeout() // Cancel timeout after successful opening
-                        } else {
-                            println("Failed to open notification")
-                        }
-                    }
-            } catch (e: Exception) {
-                println("Failed to open notification: ${e.message}")
-            }
-        }
+    fun openNotification() {
+        val screenWidth = ScreenUtils.getWidth(accessibilityService)
+        // Calculate the center point of the notification roughly
+        val centerX = screenWidth / 2
+        val centerY = ScreenUtils.dpToPx(accessibilityService, 80)
+        GestureManager.getInstance().performTap(centerX, centerY)
+
+        cancelTimeout() // Cancel timeout after successful opening
     }
 
     fun handleSwitch() {
         getCurrentNotification()?.let { notification ->
-            openNotification(notification)
+            openNotification()
         }
     }
 }
