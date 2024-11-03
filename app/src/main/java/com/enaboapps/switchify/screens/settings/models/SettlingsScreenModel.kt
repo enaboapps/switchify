@@ -81,6 +81,12 @@ class SettingsScreenModel(context: Context) : ViewModel() {
     }
     val moveRepeatDelay: LiveData<Long> = _moveRepeatDelay
 
+    private val _openNotificationsOnSwitchPress = MutableLiveData<Boolean>().apply {
+        value =
+            preferenceManager.getBooleanValue(PreferenceManager.Keys.PREFERENCE_KEY_OPEN_NOTIFICATIONS_ON_SWITCH_PRESS)
+    }
+    val openNotificationsOnSwitchPress: LiveData<Boolean> = _openNotificationsOnSwitchPress
+
 
     // Update methods now update MutableLiveData which in turn updates the UI
     fun setScanRate(rate: Long) {
@@ -196,6 +202,16 @@ class SettingsScreenModel(context: Context) : ViewModel() {
                 delay
             )
             _moveRepeatDelay.postValue(delay)
+        }
+    }
+
+    fun setOpenNotificationsOnSwitchPress(value: Boolean) {
+        viewModelScope.launch {
+            preferenceManager.setBooleanValue(
+                PreferenceManager.Keys.PREFERENCE_KEY_OPEN_NOTIFICATIONS_ON_SWITCH_PRESS,
+                value
+            )
+            _openNotificationsOnSwitchPress.postValue(value)
         }
     }
 }

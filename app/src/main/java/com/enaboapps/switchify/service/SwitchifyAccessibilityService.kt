@@ -6,12 +6,15 @@ import android.view.accessibility.AccessibilityEvent
 import com.enaboapps.switchify.preferences.PreferenceManager
 import com.enaboapps.switchify.service.gestures.GestureManager
 import com.enaboapps.switchify.service.methods.nodes.NodeExaminer
+import com.enaboapps.switchify.service.notifications.NotificationManager
 import com.enaboapps.switchify.service.scanning.ScanMethod
+import com.enaboapps.switchify.service.scanning.ScanSettings
 import com.enaboapps.switchify.service.scanning.ScanningManager
 import com.enaboapps.switchify.service.selection.SelectionHandler
 import com.enaboapps.switchify.service.switches.SwitchListener
 import com.enaboapps.switchify.service.utils.KeyboardBridge
 import com.enaboapps.switchify.service.utils.ScreenWatcher
+import com.enaboapps.switchify.service.window.ServiceMessageHUD
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.SupervisorJob
@@ -20,12 +23,16 @@ import kotlinx.coroutines.launch
 /**
  * This is the main service class for the Switchify application.
  * It extends the AccessibilityService class to provide accessibility features.
+ * It also implements the NotificationListener interface to handle notification events.
  */
-class SwitchifyAccessibilityService : AccessibilityService() {
+class SwitchifyAccessibilityService : AccessibilityService(),
+    NotificationManager.NotificationListener {
 
     private lateinit var scanningManager: ScanningManager
     private lateinit var switchListener: SwitchListener
     private lateinit var screenWatcher: ScreenWatcher
+    private lateinit var notificationManager: NotificationManager
+    private lateinit var scanSettings: ScanSettings
     private val serviceScope = CoroutineScope(SupervisorJob() + Dispatchers.Main)
 
     /**
@@ -39,6 +46,7 @@ class SwitchifyAccessibilityService : AccessibilityService() {
             }
         }
         KeyboardBridge.updateKeyboardState(windows, this)
+        event?.let { notificationManager.handleAccessibilityEvent(it) }
     }
 
     override fun onInterrupt() {}
@@ -67,6 +75,11 @@ class SwitchifyAccessibilityService : AccessibilityService() {
         GestureManager.getInstance().setup(this)
         SelectionHandler.init(this)
 
+        notificationManager = NotificationManager(this)
+        notificationManager.setListener(this)
+
+        scanSettings = ScanSettings(this)
+
         rootInActiveWindow?.let { rootNode ->
             serviceScope.launch {
                 NodeExaminer.findNodes(rootNode, this@SwitchifyAccessibilityService, this)
@@ -82,15 +95,34 @@ class SwitchifyAccessibilityService : AccessibilityService() {
         }
     }
 
-    /**
-     * This method is called when a key event is fired.
-     * It handles switch press and release events.
-     */
     override fun onKeyEvent(event: KeyEvent?): Boolean {
-        return when (event?.action) {
+        event?.let { handleSwitchEvent(it) }
+        return true
+    }
+
+    /**
+     * This method handles switch press events.
+     * It performs different actions based on the type of the key event.
+     */
+    private fun handleSwitchEvent(event: KeyEvent): Boolean {
+        if (scanSettings.isOpenNotificationsOnSwitchPressEnabled() && notificationManager.isNotificationWaiting()) {
+            notificationManager.handleSwitch()
+            return true
+        }
+
+        return when (event.action) {
             KeyEvent.ACTION_DOWN -> switchListener.onSwitchPressed(event.keyCode)
             KeyEvent.ACTION_UP -> switchListener.onSwitchReleased(event.keyCode)
             else -> false
+        }
+    }
+
+    override fun onNotificationReceived(notification: NotificationManager.NotificationInfo) {
+        if (scanSettings.isOpenNotificationsOnSwitchPressEnabled()) {
+            ServiceMessageHUD.instance.showMessage(
+                "Press any switch to open notification",
+                ServiceMessageHUD.MessageType.DISAPPEARING
+            )
         }
     }
 }
