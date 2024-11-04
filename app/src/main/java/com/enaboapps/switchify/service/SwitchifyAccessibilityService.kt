@@ -14,7 +14,6 @@ import com.enaboapps.switchify.service.selection.SelectionHandler
 import com.enaboapps.switchify.service.switches.SwitchListener
 import com.enaboapps.switchify.service.utils.KeyboardBridge
 import com.enaboapps.switchify.service.utils.ScreenWatcher
-import com.enaboapps.switchify.service.window.ServiceMessageHUD
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.SupervisorJob
@@ -23,10 +22,8 @@ import kotlinx.coroutines.launch
 /**
  * This is the main service class for the Switchify application.
  * It extends the AccessibilityService class to provide accessibility features.
- * It also implements the NotificationListener interface to handle notification events.
  */
-class SwitchifyAccessibilityService : AccessibilityService(),
-    NotificationManager.NotificationListener {
+class SwitchifyAccessibilityService : AccessibilityService() {
 
     private lateinit var scanningManager: ScanningManager
     private lateinit var switchListener: SwitchListener
@@ -70,15 +67,14 @@ class SwitchifyAccessibilityService : AccessibilityService(),
         )
         screenWatcher.register(this)
 
-        switchListener = SwitchListener(this, scanningManager)
+        notificationManager = NotificationManager(this)
+
+        scanSettings = ScanSettings(this)
+
+        switchListener = SwitchListener(this, scanningManager, notificationManager, scanSettings)
 
         GestureManager.getInstance().setup(this)
         SelectionHandler.init(this)
-
-        notificationManager = NotificationManager(this)
-        notificationManager.setListener(this)
-
-        scanSettings = ScanSettings(this)
 
         rootInActiveWindow?.let { rootNode ->
             serviceScope.launch {
@@ -114,15 +110,6 @@ class SwitchifyAccessibilityService : AccessibilityService(),
             KeyEvent.ACTION_DOWN -> switchListener.onSwitchPressed(event.keyCode)
             KeyEvent.ACTION_UP -> switchListener.onSwitchReleased(event.keyCode)
             else -> false
-        }
-    }
-
-    override fun onNotificationReceived(notification: NotificationManager.NotificationInfo) {
-        if (scanSettings.isOpenNotificationsOnSwitchPressEnabled()) {
-            ServiceMessageHUD.instance.showMessage(
-                "Press any switch to open notification",
-                ServiceMessageHUD.MessageType.DISAPPEARING
-            )
         }
     }
 }
