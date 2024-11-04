@@ -8,6 +8,7 @@ import com.enaboapps.switchify.activities.ui.theme.SwitchifyTheme
 import com.enaboapps.switchify.nav.NavGraph
 import com.enaboapps.switchify.preferences.PreferenceManager
 import com.enaboapps.switchify.service.custom.actions.store.ActionStore
+import com.enaboapps.switchify.utils.Logger
 
 class MainActivity : ComponentActivity() {
     private lateinit var preferenceManager: PreferenceManager
@@ -16,6 +17,8 @@ class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         initializeManagers()
+
+        Logger.log(this, "Launched Switchify")
 
         setContent {
             val navController = rememberNavController()
