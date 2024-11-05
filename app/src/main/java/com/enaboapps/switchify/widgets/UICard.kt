@@ -20,16 +20,22 @@ import androidx.compose.ui.unit.dp
 
 @Composable
 fun UICard(
+    modifier: Modifier = Modifier
+        .fillMaxWidth(),
     title: String,
     description: String,
     rightIcon: ImageVector? = null,
-    onClick: () -> Unit
+    onClick: () -> Unit,
+    enabled: Boolean? = true
 ) {
     Card(
-        modifier = Modifier
-            .fillMaxWidth()
+        modifier = modifier
             .padding(horizontal = 20.dp)
-            .clickable(onClick = onClick)
+            .clickable(onClick = {
+                if (enabled == true) {
+                    onClick()
+                }
+            })
     ) {
         Row(
             verticalAlignment = Alignment.CenterVertically,

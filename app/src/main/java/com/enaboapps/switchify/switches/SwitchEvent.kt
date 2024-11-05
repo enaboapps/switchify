@@ -11,6 +11,13 @@ data class SwitchEvent(
 ) {
     fun toJson(): String = Gson().toJson(this)
 
+    fun toMap(): Map<String, Any> = mapOf(
+        "name" to name,
+        "code" to code,
+        "press_action" to pressAction.toMap(),
+        "hold_actions" to holdActions.map { it.toMap() }
+    )
+
     fun log() {
         println("SwitchEvent: $name, $code, ${pressAction.id}, ${holdActions.joinToString(separator = ";") { it.id.toString() }}")
     }

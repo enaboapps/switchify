@@ -1,19 +1,34 @@
 package com.enaboapps.switchify.switches
 
-import com.google.gson.Gson
 import com.google.gson.annotations.SerializedName
 
 data class SwitchActionExtra(
     @SerializedName("my_actions_id") val myActionsId: String? = null,
     @SerializedName("my_action_name") val myActionName: String? = null
-)
+) {
+    fun toMap(): Map<String, Any?> = mapOf(
+        "my_actions_id" to myActionsId,
+        "my_action_name" to myActionName
+    )
+}
 
 data class SwitchAction(
     @SerializedName("id") val id: Int,
     @SerializedName("extra") val extra: SwitchActionExtra? = null
 ) {
     companion object {
-        fun fromJson(json: String): SwitchAction = Gson().fromJson(json, SwitchAction::class.java)
+        fun fromMap(map: Map<String, Any>): SwitchAction {
+            val id = map["id"] as Int
+            val extra = map["extra"] as Map<*, *>?
+            return SwitchAction(
+                id,
+                extra?.let {
+                    SwitchActionExtra(
+                        it["my_actions_id"] as String,
+                        it["my_action_name"] as String
+                    )
+                })
+        }
 
         val actions: List<SwitchAction> = listOf(
             ACTION_NONE, ACTION_SELECT, ACTION_STOP_SCANNING, ACTION_CHANGE_SCANNING_DIRECTION,
@@ -38,7 +53,10 @@ data class SwitchAction(
         const val ACTION_PERFORM_USER_ACTION = 13
     }
 
-    fun toJson(): String = Gson().toJson(this)
+    fun toMap(): Map<String, Any?> = mapOf(
+        "id" to id,
+        "extra" to extra?.toMap()
+    )
 
     fun hasExtra(): Boolean = extra != null
 

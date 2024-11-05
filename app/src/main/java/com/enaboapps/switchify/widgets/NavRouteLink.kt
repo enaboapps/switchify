@@ -15,8 +15,8 @@ fun NavRouteLink(
     UICard(
         title = title.uppercase(),
         description = summary,
-        rightIcon = Icons.AutoMirrored.Filled.ArrowForward
-    ) {
-        navController.navigate(route)
-    }
+        rightIcon = Icons.AutoMirrored.Filled.ArrowForward,
+        onClick = {
+            navController.navigate(route)
+        })
 }
