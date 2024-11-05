@@ -71,19 +71,24 @@ private fun LanguageRow(
         UICard(
             title = language.locale,
             description = if (downloaded) "Downloaded" else "Not downloaded",
-        ) {
-            // Download language
-            if (!downloaded) {
-                predictionLanguageManager.downloadLanguage(language) { success ->
-                    if (success) {
-                        onDownloaded()
-                        Toast.makeText(context, "Language downloaded", Toast.LENGTH_SHORT).show()
-                    } else {
-                        Toast.makeText(context, "Failed to download language", Toast.LENGTH_SHORT)
-                            .show()
+            onClick = {
+                // Download language
+                if (!downloaded) {
+                    predictionLanguageManager.downloadLanguage(language) { success ->
+                        if (success) {
+                            onDownloaded()
+                            Toast.makeText(context, "Language downloaded", Toast.LENGTH_SHORT)
+                                .show()
+                        } else {
+                            Toast.makeText(
+                                context,
+                                "Failed to download language",
+                                Toast.LENGTH_SHORT
+                            )
+                                .show()
+                        }
                     }
                 }
-            }
-        }
+            })
     }
 }
