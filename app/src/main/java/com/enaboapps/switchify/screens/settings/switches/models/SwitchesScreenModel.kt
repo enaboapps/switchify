@@ -41,7 +41,6 @@ class SwitchesScreenModel(private val store: SwitchEventStore) : ViewModel() {
                 }
                 .onFailure { error ->
                     _uiState.value = _uiState.value.copy(
-                        error = error.message ?: "Failed to load remote switches",
                         isLoading = false
                     )
                 }
@@ -65,7 +64,6 @@ class SwitchesScreenModel(private val store: SwitchEventStore) : ViewModel() {
                 }
                 .onFailure { error ->
                     _uiState.value = _uiState.value.copy(
-                        error = error.message ?: "Failed to import switch",
                         importingSwitch = null
                     )
                 }
@@ -77,9 +75,6 @@ class SwitchesScreenModel(private val store: SwitchEventStore) : ViewModel() {
      */
     fun deleteRemoteSwitch(remoteSwitch: RemoteSwitchInfo) {
         viewModelScope.launch {
-            _uiState.value = _uiState.value.copy(
-                error = null
-            )
             store.removeRemote(remoteSwitch.code)
                 .onSuccess {
                     updateLocalSwitches()
@@ -87,7 +82,6 @@ class SwitchesScreenModel(private val store: SwitchEventStore) : ViewModel() {
                 }
                 .onFailure { error ->
                     _uiState.value = _uiState.value.copy(
-                        error = error.message ?: "Failed to delete switch",
                         importingSwitch = null
                     )
                 }
@@ -102,13 +96,6 @@ class SwitchesScreenModel(private val store: SwitchEventStore) : ViewModel() {
             localSwitches = store.getSwitchEvents()
         )
     }
-
-    /**
-     * Clears the current error message.
-     */
-    fun clearError() {
-        _uiState.value = _uiState.value.copy(error = null)
-    }
 }
 
 /**
@@ -118,6 +105,5 @@ data class SwitchesUiState(
     val localSwitches: Set<SwitchEvent> = emptySet(),
     val remoteSwitches: List<RemoteSwitchInfo> = emptyList(),
     val isLoading: Boolean = false,
-    val importingSwitch: String? = null,
-    val error: String? = null
+    val importingSwitch: String? = null
 )
