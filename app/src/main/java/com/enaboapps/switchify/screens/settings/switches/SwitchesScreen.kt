@@ -87,19 +87,6 @@ fun SwitchesScreen(navController: NavController) {
                 }
             }
 
-            uiState.error != null -> {
-                Box(
-                    modifier = Modifier.fillMaxSize(),
-                    contentAlignment = Alignment.Center
-                ) {
-                    Text(
-                        text = uiState.error!!,
-                        style = MaterialTheme.typography.bodyLarge,
-                        color = MaterialTheme.colorScheme.error
-                    )
-                }
-            }
-
             else -> {
                 Column(
                     modifier = Modifier
