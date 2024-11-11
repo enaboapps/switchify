@@ -10,6 +10,7 @@ activity-compose = "1.9.3"
 navigation-compose = "2.8.3"
 compose-runtime-livedata = "1.7.5"
 firebase-bom = "33.5.1"
+play-services-auth = "20.5.0"
 gson = "2.11.0"
 fleksylib = "1.2.0"
 junit = "4.13.2"
@@ -44,6 +45,7 @@ compose-ui-test-junit4 = { group = "androidx.compose.ui", name = "ui-test-junit4
 compose-ui-tooling = { group = "androidx.compose.ui", name = "ui-tooling", version.ref = "compose" }
 compose-ui-test-manifest = { group = "androidx.compose.ui", name = "ui-test-manifest", version.ref = "compose-runtime-livedata" }
 app-update = { group = "com.google.android.play", name = "app-update-ktx", version.ref = "app-update" }
+play-services-auth = { group = "com.google.android.gms", name = "play-services-auth", version.ref = "play-services-auth" }
 
 [plugins]
 compose-compiler = { id = "org.jetbrains.kotlin.plugin.compose", version.ref = "kotlin" }

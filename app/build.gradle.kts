@@ -108,6 +108,7 @@ dependencies {
     implementation(libs.fleksylib)
     implementation(libs.androidx.material3.android)
     implementation(libs.app.update)
+    implementation(libs.play.services.auth)
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.test.ext.junit)
     androidTestImplementation(libs.espresso.core)
