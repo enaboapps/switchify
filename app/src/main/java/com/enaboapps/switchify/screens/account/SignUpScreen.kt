@@ -24,16 +24,22 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
+import com.enaboapps.switchify.R
 import com.enaboapps.switchify.auth.AuthManager
+import com.enaboapps.switchify.auth.rememberFirebaseAuthLauncher
 import com.enaboapps.switchify.preferences.PreferenceManager
 import com.enaboapps.switchify.service.custom.actions.store.ActionStore
 import com.enaboapps.switchify.widgets.FullWidthButton
 import com.enaboapps.switchify.widgets.NavBar
 import com.enaboapps.switchify.widgets.TextArea
+import com.google.android.gms.auth.api.signin.GoogleSignIn
+import com.google.android.gms.auth.api.signin.GoogleSignInOptions
+
 
 @Composable
 fun SignUpScreen(navController: NavController) {
@@ -44,6 +50,38 @@ fun SignUpScreen(navController: NavController) {
     val authManager = AuthManager.instance
     val verticalScrollState = rememberScrollState()
     val context = LocalContext.current
+
+    val onSignUp = {
+        // Go to the first screen
+        navController.popBackStack(
+            navController.graph.startDestinationId,
+            false
+        )
+
+        // Upload the user's settings to Firestore
+        val preferenceManager = PreferenceManager(context)
+        preferenceManager.preferenceSync.uploadSettingsToFirestore()
+
+        // Start listening for changes to the user's settings
+        preferenceManager.preferenceSync.listenForSettingsChangesOnRemote()
+
+        // Push actions to Firestore
+        val actionStore = ActionStore(context)
+        actionStore.pushActionsToFirestore()
+    }
+
+    val authLauncher = rememberFirebaseAuthLauncher(
+        onAuthComplete = { authResult ->
+            if (authResult.user != null) {
+                onSignUp()
+            } else {
+                errorMessage = "Sign up failed"
+            }
+        },
+        onAuthError = { e ->
+            errorMessage = e.message
+        }
+    )
 
     Scaffold(topBar = {
         NavBar(
@@ -114,22 +152,7 @@ fun SignUpScreen(navController: NavController) {
                     if (errorMessage == null) {
                         authManager.createUserWithEmailAndPassword(email, password,
                             onSuccess = {
-                                // Go to the first screen
-                                navController.popBackStack(
-                                    navController.graph.startDestinationId,
-                                    false
-                                )
-
-                                // Upload the user's settings to Firestore
-                                val preferenceManager = PreferenceManager(context)
-                                preferenceManager.preferenceSync.uploadSettingsToFirestore()
-
-                                // Start listening for changes to the user's settings
-                                preferenceManager.preferenceSync.listenForSettingsChangesOnRemote()
-
-                                // Push actions to Firestore
-                                val actionStore = ActionStore(context)
-                                actionStore.pushActionsToFirestore()
+                                onSignUp()
                             },
                             onFailure = { exception ->
                                 errorMessage = exception.localizedMessage
@@ -138,7 +161,24 @@ fun SignUpScreen(navController: NavController) {
                     }
                 }
             )
-            Spacer(modifier = Modifier.height(8.dp))
+            Spacer(modifier = Modifier.height(16.dp))
+            Text("or")
+            Spacer(modifier = Modifier.height(16.dp))
+            val token = stringResource(id = R.string.default_web_client_id)
+            FullWidthButton(
+                text = "Sign up with Google",
+                onClick = {
+                    val googleSignIn = GoogleSignIn.getClient(
+                        context,
+                        GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
+                            .requestIdToken(token)
+                            .requestEmail()
+                            .build()
+                    )
+                    authLauncher.launch(googleSignIn.signInIntent)
+                }
+            )
+            Spacer(modifier = Modifier.height(16.dp))
             val urlLauncher =
                 rememberLauncherForActivityResult(contract = ActivityResultContracts.StartActivityForResult()) {
                     // Handle the result

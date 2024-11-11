@@ -24,17 +24,22 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
+import com.enaboapps.switchify.R
 import com.enaboapps.switchify.auth.AuthManager
+import com.enaboapps.switchify.auth.rememberFirebaseAuthLauncher
 import com.enaboapps.switchify.nav.NavigationRoute
 import com.enaboapps.switchify.preferences.PreferenceManager
 import com.enaboapps.switchify.service.custom.actions.store.ActionStore
 import com.enaboapps.switchify.widgets.FullWidthButton
 import com.enaboapps.switchify.widgets.NavBar
 import com.enaboapps.switchify.widgets.TextArea
+import com.google.android.gms.auth.api.signin.GoogleSignIn
+import com.google.android.gms.auth.api.signin.GoogleSignInOptions
 
 @Composable
 fun SignInScreen(navController: NavController) {
@@ -43,6 +48,33 @@ fun SignInScreen(navController: NavController) {
     var errorMessage by remember { mutableStateOf<String?>(null) }
     val verticalScrollState = rememberScrollState()
     val context = LocalContext.current
+
+    val onSignIn = {
+        // Download user settings from Firestore
+        val preferenceManager = PreferenceManager(context)
+        preferenceManager.preferenceSync.retrieveSettingsFromFirestore()
+
+        // Listen for changes to user settings
+        preferenceManager.preferenceSync.listenForSettingsChangesOnRemote()
+
+        // Pull actions from Firestore
+        val actionStore = ActionStore(context)
+        actionStore.pullActionsFromFirestore()
+    }
+
+    val authLauncher = rememberFirebaseAuthLauncher(
+        onAuthComplete = { authResult ->
+            if (authResult.user != null) {
+                navController.popBackStack()
+                onSignIn()
+            } else {
+                errorMessage = "Sign in failed"
+            }
+        },
+        onAuthError = { e ->
+            errorMessage = e.message
+        }
+    )
 
     Scaffold(topBar = {
         NavBar(
@@ -97,17 +129,7 @@ fun SignInScreen(navController: NavController) {
                             email, password,
                             onSuccess = {
                                 navController.popBackStack()
-
-                                // Download user settings from Firestore
-                                val preferenceManager = PreferenceManager(context)
-                                preferenceManager.preferenceSync.retrieveSettingsFromFirestore()
-
-                                // Listen for changes to user settings
-                                preferenceManager.preferenceSync.listenForSettingsChangesOnRemote()
-
-                                // Pull actions from Firestore
-                                val actionStore = ActionStore(context)
-                                actionStore.pullActionsFromFirestore()
+                                onSignIn()
                             },
                             onFailure = { exception ->
                                 errorMessage = exception.localizedMessage
@@ -125,7 +147,24 @@ fun SignInScreen(navController: NavController) {
                     navController.navigate(NavigationRoute.SignUp.name)
                 }
             )
-            Spacer(modifier = Modifier.height(8.dp))
+            Spacer(modifier = Modifier.height(16.dp))
+            Text("or")
+            Spacer(modifier = Modifier.height(16.dp))
+            val token = stringResource(id = R.string.default_web_client_id)
+            FullWidthButton(
+                text = "Sign in with Google",
+                onClick = {
+                    val googleSignIn = GoogleSignIn.getClient(
+                        context,
+                        GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
+                            .requestIdToken(token)
+                            .requestEmail()
+                            .build()
+                    )
+                    authLauncher.launch(googleSignIn.signInIntent)
+                }
+            )
+            Spacer(modifier = Modifier.height(16.dp))
             TextButton(onClick = {
                 navController.navigate(NavigationRoute.ForgotPassword.name)
             }) {
