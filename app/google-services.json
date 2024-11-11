@@ -12,7 +12,20 @@
           "package_name": "com.enaboapps.switchify"
         }
       },
-      "oauth_client": [],
+      "oauth_client": [
+        {
+          "client_id": "289954852459-s4t23rm5e6dmagr3ujl8rt8rb96d7bsm.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.enaboapps.switchify",
+            "certificate_hash": "f56e4b182b55fabbe34a25bcc35a3a9153faedfd"
+          }
+        },
+        {
+          "client_id": "289954852459-921s53m457c9a9p9jm49qho0500del59.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
       "api_key": [
         {
           "current_key": "AIzaSyCKO9lE7CvtatATFPxd8895OTj3tdMbnuw"
@@ -20,7 +33,12 @@
       ],
       "services": {
         "appinvite_service": {
-          "other_platform_oauth_client": []
+          "other_platform_oauth_client": [
+            {
+              "client_id": "289954852459-921s53m457c9a9p9jm49qho0500del59.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
         }
       }
     }
