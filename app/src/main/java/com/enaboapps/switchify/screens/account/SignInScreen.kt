@@ -176,12 +176,14 @@ fun SignInScreen(navController: NavController) {
                     // Handle the result
                 }
             val privacyPolicyUrl = "https://www.enaboapps.com/switchify-privacy-policy"
-            TextButton(onClick = {
-                // Open the privacy policy in the system browser
-                urlLauncher.launch(Intent(Intent.ACTION_VIEW, Uri.parse(privacyPolicyUrl)))
-            }) {
-                Text("Privacy Policy")
-            }
+            FullWidthButton(
+                text = "Privacy Policy",
+                onClick = {
+                    // Open the privacy policy in the system browser
+                    urlLauncher.launch(Intent(Intent.ACTION_VIEW, Uri.parse(privacyPolicyUrl)))
+                },
+                isTextButton = true
+            )
         }
     }
 }
