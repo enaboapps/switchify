@@ -15,7 +15,6 @@ import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
-import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -184,12 +183,14 @@ fun SignUpScreen(navController: NavController) {
                     // Handle the result
                 }
             val privacyPolicyUrl = "https://www.enaboapps.com/switchify-privacy-policy"
-            TextButton(onClick = {
-                // Open the privacy policy in the system browser
-                urlLauncher.launch(Intent(Intent.ACTION_VIEW, Uri.parse(privacyPolicyUrl)))
-            }) {
-                Text("Privacy Policy")
-            }
+            FullWidthButton(
+                text = "Privacy Policy",
+                onClick = {
+                    // Open the privacy policy in the system browser
+                    urlLauncher.launch(Intent(Intent.ACTION_VIEW, Uri.parse(privacyPolicyUrl)))
+                },
+                isTextButton = true
+            )
         }
     }
 }
