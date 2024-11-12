@@ -28,5 +28,46 @@ jobs:
         echo "fleksy.apiKey=your_api_key" >> local.properties
         echo "fleksy.apiSecret=your_api_secret" >> local.properties
 
+    - name: Create placeholder google-services.json
+      run: |
+        mkdir -p app
+        echo '{
+          "project_info": {
+            "project_number": "1234567890",
+            "project_id": "your_project_id"
+          },
+          "client": [
+            {
+              "client_info": {
+                "mobilesdk_app_id": "1:1234567890:android:abcdef123456",
+                "android_client_info": {
+                  "package_name": "com.enaboapps.switchify"
+                }
+              },
+              "oauth_client": [
+                {
+                  "client_id": "1234567890-abcdef123456.apps.googleusercontent.com",
+                  "client_type": 1,
+                  "android_info": {
+                    "package_name": "com.enaboapps.switchify",
+                    "certificate_hash": "ABCDEF1234567890ABCDEF1234567890ABCDEF12"
+                  }
+                }
+              ],
+              "api_key": [
+                {
+                  "current_key": "your_api_key"
+                }
+              ],
+              "services": {
+                "appinvite_service": {
+                  "other_platform_oauth_client": []
+                }
+              }
+            }
+          ],
+          "configuration_version": "1"
+        }' > app/google-services.json
+
     - name: Build with Gradle
       run: ./gradlew build
