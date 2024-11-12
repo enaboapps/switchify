@@ -69,5 +69,10 @@ jobs:
           "configuration_version": "1"
         }' > app/google-services.json
 
+    - name: Add default_web_client_id to strings.xml
+      run: |
+        mkdir -p app/src/main/res/values
+        echo '<resources><string name="default_web_client_id">your_default_web_client_id</string></resources>' > app/src/main/res/values/strings.xml
+
     - name: Build with Gradle
       run: ./gradlew build
