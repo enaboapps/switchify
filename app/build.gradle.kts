@@ -109,6 +109,8 @@ dependencies {
     implementation(libs.androidx.material3.android)
     implementation(libs.app.update)
     implementation(libs.play.services.auth)
+    implementation(libs.credentials)
+    implementation(libs.google.id)
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.test.ext.junit)
     androidTestImplementation(libs.espresso.core)
