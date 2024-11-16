@@ -321,7 +321,7 @@ fun AboutSection() {
 
     val websiteUrl = "https://switchifyapp.com"
     val repositoryUrl = "https://github.com/enaboapps/switchify"
-    val privacyPolicyUrl = "https://www.enaboapps.com/switchify-privacy-policy"
+    val privacyPolicyUrl = "https://www.switchifyapp.com/privacy"
 
     Column(
         modifier = Modifier
