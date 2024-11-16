@@ -172,7 +172,7 @@ fun SignInScreen(navController: NavController) {
                 // Handle the result
             }
 
-            val privacyPolicyUrl = "https://www.enaboapps.com/switchify-privacy-policy"
+            val privacyPolicyUrl = "https://www.switchifyapp.com/privacy"
 
             FullWidthButton(
                 text = "Privacy Policy",
