@@ -139,6 +139,7 @@ fun SwitchListener(navController: NavController, onKeyEvent: (KeyEvent) -> Unit)
         .focusable(),
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.Center) {
+        Spacer(modifier = Modifier.weight(1f))
         Text(
             text = "Press the switch that you want to use",
             style = MaterialTheme.typography.titleMedium
@@ -154,6 +155,7 @@ fun SwitchListener(navController: NavController, onKeyEvent: (KeyEvent) -> Unit)
         FullWidthButton(text = "Cancel", onClick = {
             navController.popBackStack()
         })
+        Spacer(modifier = Modifier.weight(1f))
     }
     LaunchedEffect(requester) {
         requester.requestFocus()
