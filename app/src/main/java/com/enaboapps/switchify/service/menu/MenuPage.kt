@@ -10,6 +10,7 @@ import com.enaboapps.switchify.service.methods.nodes.Node
  * This class represents a page of the menu
  * @property context The context of the menu page
  * @property rowsOfMenuItems The rows of menu items
+ * @property showNavMenuItems Whether to show navigation menu items
  * @property navRowItems The navigation row items
  * @property pageIndex The index of the page
  * @property maxPageIndex The maximum index of the page
@@ -18,6 +19,7 @@ import com.enaboapps.switchify.service.methods.nodes.Node
 class MenuPage(
     val context: Context,
     private val rowsOfMenuItems: List<List<MenuItem>>,
+    private val showNavMenuItems: Boolean,
     private val navRowItems: List<MenuItem>,
     private val pageIndex: Int,
     private val maxPageIndex: Int,
@@ -45,7 +47,9 @@ class MenuPage(
                 menuItems.add(menuItem)
             }
         }
-        menuItems.addAll(navRowItems)
+        if (showNavMenuItems) {
+            menuItems.addAll(navRowItems)
+        }
         menuChangeBtn?.let { menuItems.add(it) }
         return menuItems
     }
@@ -79,23 +83,25 @@ class MenuPage(
             baseLayout.addView(rowLayout)
         }
 
-        val navButtonView = createNavButtonView()
-        navRowItems.forEach { menuItem ->
-            menuItem.inflate(navButtonView, 75, 65)
-        }
+        if (showNavMenuItems) {
+            val navButtonView = createNavButtonView()
+            navRowItems.forEach { menuItem ->
+                menuItem.inflate(navButtonView, 75, 65)
+            }
 
-        if (maxPageIndex > 0) {
-            menuChangeBtn = MenuItem(
-                id = "change_page",
-                drawableId = R.drawable.ic_change_menu_page,
-                drawableDescription = "Change page",
-                closeOnSelect = false,
-                action = { changePage() }
-            )
-            menuChangeBtn?.inflate(navButtonView, 75, 65)
-        }
+            if (maxPageIndex > 0) {
+                menuChangeBtn = MenuItem(
+                    id = "change_page",
+                    drawableId = R.drawable.ic_change_menu_page,
+                    drawableDescription = "Change page",
+                    closeOnSelect = false,
+                    action = { changePage() }
+                )
+                menuChangeBtn?.inflate(navButtonView, 75, 65)
+            }
 
-        baseLayout.addView(navButtonView)
+            baseLayout.addView(navButtonView)
+        }
 
         return baseLayout
     }

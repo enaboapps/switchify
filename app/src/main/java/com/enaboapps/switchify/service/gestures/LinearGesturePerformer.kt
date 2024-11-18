@@ -96,6 +96,13 @@ class LinearGesturePerformer(
     }
 
     /**
+     * Cancels the current gesture.
+     */
+    fun cancelGesture() {
+        resetGestureState()
+    }
+
+    /**
      * Resets the gesture state to its initial values.
      */
     private fun resetGestureState() {

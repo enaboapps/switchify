@@ -264,6 +264,13 @@ class GestureManager private constructor() {
     }
 
     /**
+     * Cancels a linear gesture.
+     */
+    fun cancelLinearGesture() {
+        linearGesturePerformer.cancelGesture()
+    }
+
+    /**
      * Checks if a linear gesture is currently being performed.
      *
      * @return True if a linear gesture is being performed, false otherwise.

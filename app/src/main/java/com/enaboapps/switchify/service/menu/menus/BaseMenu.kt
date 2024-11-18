@@ -9,10 +9,14 @@ import com.enaboapps.switchify.service.menu.structure.MenuStructureHolder
  * This class represents a base menu
  * @property accessibilityService The accessibility service
  * @property items The menu items
+ * @property showSystemNavItems Whether to show system navigation items
+ * @property showNavMenuItems Whether to show navigation menu items
  */
 open class BaseMenu(
     private val accessibilityService: SwitchifyAccessibilityService,
-    private val items: List<MenuItem>
+    private val items: List<MenuItem>,
+    private val showSystemNavItems: Boolean = true,
+    private val showNavMenuItems: Boolean = true
 ) {
     /**
      * Get the menu items
@@ -20,6 +24,22 @@ open class BaseMenu(
      */
     fun getMenuItems(): List<MenuItem> {
         return items
+    }
+
+    /**
+     * Determine whether to show system navigation items
+     * @return true if system navigation items should be shown, false otherwise
+     */
+    fun shouldShowSystemNavItems(): Boolean {
+        return showSystemNavItems
+    }
+
+    /**
+     * Determine whether to show navigation menu items
+     * @return true if navigation menu items should be shown, false otherwise
+     */
+    fun shouldShowNavMenuItems(): Boolean {
+        return showNavMenuItems
     }
 
     /**

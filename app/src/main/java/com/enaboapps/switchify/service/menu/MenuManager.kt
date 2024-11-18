@@ -3,6 +3,7 @@ package com.enaboapps.switchify.service.menu
 import com.enaboapps.switchify.service.SwitchifyAccessibilityService
 import com.enaboapps.switchify.service.menu.menus.custom.MyActionsMenu
 import com.enaboapps.switchify.service.menu.menus.edit.EditMenu
+import com.enaboapps.switchify.service.menu.menus.gestures.CustomGestureConfirmationMenu
 import com.enaboapps.switchify.service.menu.menus.gestures.GesturesMenu
 import com.enaboapps.switchify.service.menu.menus.gestures.SwipeGesturesMenu
 import com.enaboapps.switchify.service.menu.menus.gestures.TapGesturesMenu
@@ -173,6 +174,14 @@ class MenuManager {
     fun openMyActionsMenu() {
         val myActionsMenu = MyActionsMenu(accessibilityService!!)
         openMenu(myActionsMenu.build())
+    }
+
+    /**
+     * This function opens the custom gesture confirmation menu
+     */
+    fun openCustomGestureConfirmationMenu() {
+        val customGestureConfirmationMenu = CustomGestureConfirmationMenu(accessibilityService!!)
+        openMenu(customGestureConfirmationMenu.build())
     }
 
     /**
