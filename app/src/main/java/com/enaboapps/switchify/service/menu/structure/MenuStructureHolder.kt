@@ -540,4 +540,30 @@ class MenuStructureHolder(private val accessibilityService: SwitchifyAccessibili
             }
         )
     }
+
+    /**
+     * The menu for confirming, reselecting, and cancelling custom gestures
+     */
+    val customGestureConfirmationMenuObject = MenuStructure(
+        id = "custom_gesture_confirmation_menu",
+        items = listOf(
+            MenuItem(
+                id = "confirm",
+                text = "Confirm",
+                action = { GestureManager.getInstance().endLinearGesture() }
+            ),
+            MenuItem(
+                id = "reselect",
+                text = "Reselect",
+                action = {
+                    // Do nothing for reselect action
+                }
+            ),
+            MenuItem(
+                id = "cancel",
+                text = "Cancel",
+                action = { GestureManager.getInstance().cancelLinearGesture() }
+            )
+        )
+    )
 }

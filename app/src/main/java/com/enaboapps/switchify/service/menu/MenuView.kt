@@ -88,7 +88,10 @@ class MenuView(
             val navRowItems = menu.buildNavMenuItems()
             val systemNavItems = menu.buildSystemNavItems()
 
-            val rows = mutableListOf(systemNavItems)
+            val rows = mutableListOf<List<MenuItem>>()
+            if (menu.shouldShowSystemNavItems()) {
+                rows.add(systemNavItems)
+            }
             pageItems.chunked(3).forEach { rowItems ->
                 rows.add(rowItems)
             }
@@ -97,6 +100,7 @@ class MenuView(
                 MenuPage(
                     context,
                     rows,
+                    menu.shouldShowNavMenuItems(),
                     navRowItems,
                     i,
                     numOfPages - 1,

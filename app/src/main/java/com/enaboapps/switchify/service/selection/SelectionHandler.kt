@@ -71,7 +71,7 @@ object SelectionHandler {
     fun performSelectionAction() {
         // Check if a linear gesture is in progress
         if (GestureManager.getInstance().isPerformingLinearGesture()) {
-            GestureManager.getInstance().endLinearGesture()
+            MenuManager.getInstance().openCustomGestureConfirmationMenu()
             return
         }
 
