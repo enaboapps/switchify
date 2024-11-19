@@ -159,6 +159,7 @@ class MenuStructureHolder(private val accessibilityService: SwitchifyAccessibili
                 MenuItem(
                     id = "my_actions",
                     text = "My Actions",
+                    isLinkToMenu = true,
                     action = {
                         MenuManager.getInstance().openMyActionsMenu()
                     }
