@@ -7,6 +7,7 @@ import android.graphics.PointF
 import com.enaboapps.switchify.service.SwitchifyAccessibilityService
 import com.enaboapps.switchify.service.gestures.data.GestureData
 import com.enaboapps.switchify.service.gestures.data.GestureType
+import com.enaboapps.switchify.service.gestures.visuals.CurrentPointVisual
 import com.enaboapps.switchify.service.gestures.visuals.GestureDrawing
 import com.enaboapps.switchify.service.utils.ScreenUtils
 import com.enaboapps.switchify.service.window.ServiceMessageHUD
@@ -36,6 +37,11 @@ class LinearGesturePerformer(
          */
         private const val VISUAL_FEEDBACK_DURATION_MS = 500L
     }
+
+    /**
+     * The current point visual
+     */
+    private val currentPointVisual = CurrentPointVisual(accessibilityService)
 
     /**
      * Represents the current state of a gesture.
@@ -76,6 +82,7 @@ class LinearGesturePerformer(
 
         showGestureMessage(type)
         gestureLockManager.informCannotLockGesture(type)
+        currentPointVisual.showCurrentPoint()
     }
 
     /**
@@ -93,6 +100,7 @@ class LinearGesturePerformer(
         gestureLockManager.setLockedGestureData(GestureData(gestureType, startPoint, endPoint))
 
         resetGestureState()
+        currentPointVisual.hideCurrentPoint()
     }
 
     /**
