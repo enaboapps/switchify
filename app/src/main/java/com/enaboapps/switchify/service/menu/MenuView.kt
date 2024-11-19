@@ -194,16 +194,17 @@ class MenuView(
             val screenWidth = context.resources.displayMetrics.widthPixels
             val screenHeight = context.resources.displayMetrics.heightPixels
 
+            val offset = 50
             val gesturePoint = GesturePoint.getPoint()
-            val x = if (gesturePoint.x + maxWidth > screenWidth) {
-                screenWidth - maxWidth.toFloat()
+            val x = if (gesturePoint.x + maxWidth + offset > screenWidth) {
+                screenWidth - maxWidth.toFloat() - offset
             } else {
-                gesturePoint.x
+                gesturePoint.x + offset
             }
-            val y = if (gesturePoint.y + maxHeight > screenHeight) {
-                screenHeight - maxHeight.toFloat()
+            val y = if (gesturePoint.y + maxHeight + offset > screenHeight) {
+                GesturePoint.y - maxHeight.toFloat() - offset
             } else {
-                gesturePoint.y
+                gesturePoint.y + offset
             }
 
             MenuViewHandler.instance.updateView(

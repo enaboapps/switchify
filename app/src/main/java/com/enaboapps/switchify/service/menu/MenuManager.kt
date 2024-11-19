@@ -1,6 +1,7 @@
 package com.enaboapps.switchify.service.menu
 
 import com.enaboapps.switchify.service.SwitchifyAccessibilityService
+import com.enaboapps.switchify.service.gestures.visuals.CurrentPointVisual
 import com.enaboapps.switchify.service.menu.menus.custom.MyActionsMenu
 import com.enaboapps.switchify.service.menu.menus.edit.EditMenu
 import com.enaboapps.switchify.service.menu.menus.gestures.CustomGestureConfirmationMenu
@@ -35,6 +36,11 @@ class MenuManager {
     }
 
     /**
+     * The current point visual
+     */
+    private lateinit var currentPointVisual: CurrentPointVisual
+
+    /**
      * The scanning manager
      */
     private var scanningManager: ScanningManager? = null
@@ -66,6 +72,7 @@ class MenuManager {
         this.scanningManager = scanningManager
         menuHierarchy = MenuHierarchy(scanningManager)
         this.accessibilityService = accessibilityService
+        currentPointVisual = CurrentPointVisual(accessibilityService)
     }
 
     /**
@@ -94,6 +101,9 @@ class MenuManager {
     fun openMainMenu() {
         val mainMenu = MainMenu(accessibilityService!!)
         openMenu(mainMenu.build())
+
+        // Show the current point visual
+        currentPointVisual.showCurrentPoint()
     }
 
     /**
@@ -198,5 +208,8 @@ class MenuManager {
      */
     fun closeMenuHierarchy() {
         menuHierarchy?.removeAllMenus()
+
+        // Hide the current point visual
+        currentPointVisual.hideCurrentPoint()
     }
 }

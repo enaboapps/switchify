@@ -78,7 +78,7 @@ class MenuStructureHolder(private val accessibilityService: SwitchifyAccessibili
             drawableId = R.drawable.ic_close_menu,
             drawableDescription = "Close menu",
             isMenuHierarchyManipulator = true,
-            action = { MenuManager.getInstance().menuHierarchy?.removeAllMenus() }
+            action = { MenuManager.getInstance().closeMenuHierarchy() }
         )
     )
 
