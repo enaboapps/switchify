@@ -20,6 +20,7 @@ sealed class NavigationRoute(val name: String) {
     data object EditSwitch : NavigationRoute("EditSwitch")
     data object TestSwitches : NavigationRoute("TestSwitches")
     data object MenuItemCustomization : NavigationRoute("MenuItemCustomization")
+    data object MenuSize : NavigationRoute("MenuSize")
     data object MyActions : NavigationRoute("MyActions")
     data object AddMyActionsMenuItem : NavigationRoute("AddMyActionsMenuItem")
     data object EditMyActionsMenuItem : NavigationRoute("EditMyActionsMenuItem")

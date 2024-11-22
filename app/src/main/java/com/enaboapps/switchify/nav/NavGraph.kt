@@ -18,6 +18,7 @@ import com.enaboapps.switchify.screens.settings.SettingsScreen
 import com.enaboapps.switchify.screens.settings.actions.AddEditActionScreen
 import com.enaboapps.switchify.screens.settings.actions.MyActionsScreen
 import com.enaboapps.switchify.screens.settings.menu.MenuItemCustomizationScreen
+import com.enaboapps.switchify.screens.settings.menu.MenuSizeScreen
 import com.enaboapps.switchify.screens.settings.prediction.PredictionLanguageScreen
 import com.enaboapps.switchify.screens.settings.scanning.CursorSettingsScreen
 import com.enaboapps.switchify.screens.settings.scanning.ScanColorSelectionScreen
@@ -84,6 +85,9 @@ fun NavGraph(navController: NavHostController) {
         }
         composable(NavigationRoute.MenuItemCustomization.name) {
             MenuItemCustomizationScreen(navController)
+        }
+        composable(NavigationRoute.MenuSize.name) {
+            MenuSizeScreen(navController)
         }
         composable(NavigationRoute.MyActions.name) {
             MyActionsScreen(navController)
