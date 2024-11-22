@@ -33,6 +33,7 @@ class PreferenceManager(context: Context) {
         const val PREFERENCE_KEY_OPEN_NOTIFICATIONS_ON_SWITCH_PRESS =
             "open_notifications_on_switch_press"
         const val PREFERENCE_KEY_MENU_ITEM_VISIBILITY_PREFIX = "menu_item_visibility_"
+        const val PREFERENCE_KEY_MENU_SIZE = "menu_size"
         private const val PREFERENCE_FILE_NAME = "switchify_preferences"
     }
 

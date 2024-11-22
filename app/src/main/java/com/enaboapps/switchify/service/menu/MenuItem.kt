@@ -63,12 +63,27 @@ class MenuItem(
     /**
      * Inflate the menu item
      * @param linearLayout The linear layout to inflate the menu item into
-     * @param width The width of the menu item
-     * @param height The height of the menu item
      */
-    fun inflate(linearLayout: LinearLayout, width: Int = 90, height: Int = 75) {
-        val widthPx = ScreenUtils.dpToPx(linearLayout.context, width)
-        val heightPx = ScreenUtils.dpToPx(linearLayout.context, height)
+    fun inflate(linearLayout: LinearLayout) {
+        val menuSizeManager = MenuSizeManager(linearLayout.context)
+
+        val screenWidth = ScreenUtils.getWidth(linearLayout.context)
+        val itemsPerRow = menuSizeManager.getMenuSize().itemsPerPage / 2
+
+        var widthPx =
+            ScreenUtils.dpToPx(linearLayout.context, menuSizeManager.getMenuSize().itemWidth)
+        var heightPx =
+            ScreenUtils.dpToPx(linearLayout.context, menuSizeManager.getMenuSize().itemHeight)
+
+        // If width x itemsPerRow is greater than screen width, adjust the width to fit
+        if (widthPx * itemsPerRow > screenWidth) {
+            widthPx = screenWidth / itemsPerRow
+        }
+
+        // If using a drawable description, adjust the height to accommodate the description
+        if (drawableDescription.isNotEmpty()) {
+            heightPx += ScreenUtils.dpToPx(linearLayout.context, 20)
+        }
 
         view = LinearLayout(linearLayout.context).apply {
             layoutParams = LinearLayout.LayoutParams(widthPx, heightPx).apply {
@@ -115,7 +130,7 @@ class MenuItem(
         if (text.isNotEmpty()) {
             textView = TextView(linearLayout.context).apply {
                 text = this@MenuItem.text
-                setTextSize(TypedValue.COMPLEX_UNIT_SP, 10f)
+                setTextSize(TypedValue.COMPLEX_UNIT_SP, menuSizeManager.getMenuSize().textSize)
                 setAutoSizeTextTypeWithDefaults(AUTO_SIZE_TEXT_TYPE_NONE)
                 gravity = Gravity.CENTER
                 setTextColor(foregroundColor)
@@ -131,7 +146,10 @@ class MenuItem(
         if (drawableDescription.isNotEmpty()) {
             drawableDescriptionTextView = TextView(linearLayout.context).apply {
                 text = drawableDescription
-                setTextSize(TypedValue.COMPLEX_UNIT_SP, 8f)
+                setTextSize(
+                    TypedValue.COMPLEX_UNIT_SP,
+                    menuSizeManager.getMenuSize().textSizeWithIcon
+                )
                 setAutoSizeTextTypeWithDefaults(AUTO_SIZE_TEXT_TYPE_NONE)
                 setTextColor(foregroundColor)
                 layoutParams = LinearLayout.LayoutParams(
