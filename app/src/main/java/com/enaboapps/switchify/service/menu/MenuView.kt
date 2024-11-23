@@ -8,6 +8,7 @@ import android.view.ViewGroup.LayoutParams.WRAP_CONTENT
 import android.view.ViewTreeObserver
 import android.widget.LinearLayout
 import com.enaboapps.switchify.R
+import com.enaboapps.switchify.preferences.PreferenceManager
 import com.enaboapps.switchify.service.gestures.GesturePoint
 import com.enaboapps.switchify.service.menu.menus.BaseMenu
 import com.enaboapps.switchify.service.scanning.ScanningManager
@@ -59,6 +60,9 @@ class MenuView(
 
     /** Tracks the maximum height encountered */
     private var maxHeight = 0
+
+    /** Preference manager */
+    private val preferenceManager = PreferenceManager(context)
 
     init {
         setup()
@@ -177,6 +181,9 @@ class MenuView(
         baseLayout = LinearLayout(context).apply {
             orientation = LinearLayout.VERTICAL
             setBackgroundColor(context.resources.getColor(R.color.navy, null))
+            if (preferenceManager.getBooleanValue(PreferenceManager.PREFERENCE_KEY_MENU_TRANSPARENCY)) {
+                alpha = 0.5f
+            }
             layoutParams = ViewGroup.LayoutParams(
                 WRAP_CONTENT,
                 WRAP_CONTENT

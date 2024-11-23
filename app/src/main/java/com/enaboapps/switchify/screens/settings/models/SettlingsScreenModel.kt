@@ -87,6 +87,12 @@ class SettingsScreenModel(context: Context) : ViewModel() {
     }
     val openNotificationsOnSwitchPress: LiveData<Boolean> = _openNotificationsOnSwitchPress
 
+    private val _menuTransparency = MutableLiveData<Boolean>().apply {
+        value =
+            preferenceManager.getBooleanValue(PreferenceManager.Keys.PREFERENCE_KEY_MENU_TRANSPARENCY)
+    }
+    val menuTransparency: LiveData<Boolean> = _menuTransparency
+
 
     // Update methods now update MutableLiveData which in turn updates the UI
     fun setScanRate(rate: Long) {
@@ -212,6 +218,16 @@ class SettingsScreenModel(context: Context) : ViewModel() {
                 value
             )
             _openNotificationsOnSwitchPress.postValue(value)
+        }
+    }
+
+    fun setMenuTransparency(value: Boolean) {
+        viewModelScope.launch {
+            preferenceManager.setBooleanValue(
+                PreferenceManager.Keys.PREFERENCE_KEY_MENU_TRANSPARENCY,
+                value
+            )
+            _menuTransparency.postValue(value)
         }
     }
 }

@@ -80,7 +80,7 @@ fun GeneralSettingsTab(settingsScreenModel: SettingsScreenModel, navController: 
             route = NavigationRoute.SwitchStability.name
         )
         Spacer(modifier = Modifier.height(16.dp))
-        MenuSection(navController)
+        MenuSection(settingsScreenModel, navController)
         ActionsSection(navController)
         KeyboardSection(navController)
         NotificationsSection(settingsScreenModel)
@@ -210,7 +210,7 @@ private fun KeyboardSection(navController: NavController) {
 }
 
 @Composable
-private fun MenuSection(navController: NavController) {
+private fun MenuSection(screenModel: SettingsScreenModel, navController: NavController) {
     Section(title = "Menu") {
         NavRouteLink(
             title = "Customize Menu Items",
@@ -224,6 +224,15 @@ private fun MenuSection(navController: NavController) {
             summary = "Change the size of the menu",
             navController = navController,
             route = NavigationRoute.MenuSize.name
+        )
+        Spacer(modifier = Modifier.height(8.dp))
+        PreferenceSwitch(
+            title = "Menu Transparency",
+            summary = "Enable transparency for the menu so that you can see content behind it",
+            checked = screenModel.menuTransparency.value == true,
+            onCheckedChange = {
+                screenModel.setMenuTransparency(it)
+            }
         )
     }
 }
