@@ -11,7 +11,7 @@ import com.enaboapps.switchify.service.methods.nodes.Node
  * @property context The context of the menu page
  * @property rowsOfMenuItems The rows of menu items
  * @property showNavMenuItems Whether to show navigation menu items
- * @property navRowItems The navigation row items
+ * @property navItems The navigation items
  * @property pageIndex The index of the page
  * @property maxPageIndex The maximum index of the page
  * @property onMenuPageChanged The action to perform when the page is changed
@@ -20,7 +20,7 @@ class MenuPage(
     val context: Context,
     private val rowsOfMenuItems: List<List<MenuItem>>,
     private val showNavMenuItems: Boolean,
-    private val navRowItems: List<MenuItem>,
+    private val navItems: List<MenuItem>,
     private val pageIndex: Int,
     private val maxPageIndex: Int,
     val onMenuPageChanged: (pageIndex: Int) -> Unit
@@ -48,7 +48,7 @@ class MenuPage(
             }
         }
         if (showNavMenuItems) {
-            menuItems.addAll(navRowItems)
+            menuItems.addAll(navItems)
         }
         menuChangeBtn?.let { menuItems.add(it) }
         return menuItems
@@ -84,26 +84,37 @@ class MenuPage(
         }
 
         if (showNavMenuItems) {
-            val navButtonView = createNavButtonView()
-            navRowItems.forEach { menuItem ->
-                menuItem.inflate(navButtonView)
-            }
-
-            if (maxPageIndex > 0) {
-                menuChangeBtn = MenuItem(
-                    id = "change_page",
-                    drawableId = R.drawable.ic_change_menu_page,
-                    drawableDescription = "Change page",
-                    closeOnSelect = false,
-                    action = { changePage() }
-                )
-                menuChangeBtn?.inflate(navButtonView)
-            }
-
-            baseLayout.addView(navButtonView)
+            inflateNavItems()
         }
 
         return baseLayout
+    }
+
+    /**
+     * This function inflates the navigation items of the page
+     */
+    private fun inflateNavItems() {
+        val navButtonView = createNavButtonView()
+        val perRow = MenuSizeManager(context).getMenuSize().itemsPerPage / 2
+        var mutableNavItems = navItems.toMutableList()
+        if (maxPageIndex > 0) {
+            menuChangeBtn = MenuItem(
+                id = "change_page",
+                drawableId = R.drawable.ic_change_menu_page,
+                drawableDescription = "Change page",
+                closeOnSelect = false,
+                action = { changePage() }
+            )
+            mutableNavItems.add(menuChangeBtn!!)
+        }
+        mutableNavItems.chunked(perRow).forEach { rowItems ->
+            val rowLayout = createRowLayout()
+            rowItems.forEach { menuItem ->
+                menuItem.inflate(rowLayout)
+            }
+            navButtonView.addView(rowLayout)
+        }
+        baseLayout.addView(navButtonView)
     }
 
     /**
@@ -112,7 +123,7 @@ class MenuPage(
      */
     private fun createNavButtonView(): LinearLayout {
         return LinearLayout(context).apply {
-            orientation = LinearLayout.HORIZONTAL
+            orientation = LinearLayout.VERTICAL
             layoutParams = LinearLayout.LayoutParams(
                 LinearLayout.LayoutParams.MATCH_PARENT,
                 LinearLayout.LayoutParams.WRAP_CONTENT
