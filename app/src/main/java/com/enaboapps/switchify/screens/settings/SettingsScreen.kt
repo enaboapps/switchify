@@ -83,7 +83,6 @@ fun GeneralSettingsTab(settingsScreenModel: SettingsScreenModel, navController: 
         MenuSection(settingsScreenModel, navController)
         ActionsSection(navController)
         KeyboardSection(navController)
-        NotificationsSection(settingsScreenModel)
     }
 }
 
@@ -179,20 +178,6 @@ private fun TimingAndScanningSection(
             summary = "Configure the scan color",
             navController = navController,
             route = NavigationRoute.ScanColor.name
-        )
-    }
-}
-
-@Composable
-private fun NotificationsSection(settingsScreenModel: SettingsScreenModel) {
-    Section(title = "Notifications") {
-        PreferenceSwitch(
-            title = "Open notifications on switch press",
-            summary = "When you receive a notification, you can open it by pressing the switch",
-            checked = settingsScreenModel.openNotificationsOnSwitchPress.value == true,
-            onCheckedChange = {
-                settingsScreenModel.setOpenNotificationsOnSwitchPress(it)
-            }
         )
     }
 }

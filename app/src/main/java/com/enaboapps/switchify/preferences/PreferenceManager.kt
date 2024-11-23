@@ -30,8 +30,6 @@ class PreferenceManager(context: Context) {
         const val PREFERENCE_KEY_SWITCH_IGNORE_REPEAT = "switch_ignore_repeat"
         const val PREFERENCE_KEY_SWITCH_IGNORE_REPEAT_DELAY = "switch_ignore_repeat_delay"
         const val PREFERENCE_KEY_SCAN_COLOR_SET = "scan_color_set"
-        const val PREFERENCE_KEY_OPEN_NOTIFICATIONS_ON_SWITCH_PRESS =
-            "open_notifications_on_switch_press"
         const val PREFERENCE_KEY_MENU_ITEM_VISIBILITY_PREFIX = "menu_item_visibility_"
         const val PREFERENCE_KEY_MENU_SIZE = "menu_size"
         const val PREFERENCE_KEY_MENU_TRANSPARENCY = "menu_transparency"

@@ -7,11 +7,9 @@ import android.content.IntentFilter
 import android.util.Log
 import androidx.localbroadcastmanager.content.LocalBroadcastManager
 import com.enaboapps.switchify.preferences.PreferenceManager
-import com.enaboapps.switchify.service.notifications.NotificationManager
 import com.enaboapps.switchify.service.scanning.ScanSettings
 import com.enaboapps.switchify.service.scanning.ScanningManager
 import com.enaboapps.switchify.service.selection.SelectionHandler
-import com.enaboapps.switchify.service.window.ServiceMessageHUD
 import com.enaboapps.switchify.switches.SwitchEvent
 import com.enaboapps.switchify.switches.SwitchEventStore
 
@@ -21,13 +19,11 @@ import com.enaboapps.switchify.switches.SwitchEventStore
  *
  * @property context Application context used for accessing system services and resources
  * @property scanningManager Manages the scanning interface for switch-based navigation
- * @property notificationManager Handles system notifications and their presentation
  * @property scanSettings Contains configuration for scanning behavior and switch interactions
  */
 class SwitchListener(
     private val context: Context,
     private val scanningManager: ScanningManager,
-    private val notificationManager: NotificationManager,
     private val scanSettings: ScanSettings
 ) {
     private val preferenceManager = PreferenceManager(context)
@@ -58,18 +54,6 @@ class SwitchListener(
             switchEventReceiver,
             IntentFilter(SwitchEventStore.EVENTS_UPDATED)
         )
-
-        // Set up notification listener for switch-based notification handling
-        notificationManager.setListener(object : NotificationManager.NotificationListener {
-            override fun onNotificationReceived(notification: NotificationManager.NotificationInfo) {
-                if (scanSettings.isOpenNotificationsOnSwitchPressEnabled()) {
-                    ServiceMessageHUD.instance.showMessage(
-                        "Press any switch to open notification",
-                        ServiceMessageHUD.MessageType.DISAPPEARING
-                    )
-                }
-            }
-        })
     }
 
     /**
@@ -94,12 +78,6 @@ class SwitchListener(
         val switchEvent = findSwitchEvent(keyCode) ?: return false
         switchEvent.log()
 
-        // Handle notifications if there's a waiting notification
-        if (shouldHandleNotification()) {
-            notificationManager.handleSwitch()
-            return true
-        }
-
         if (handleSwitchPressedRepeat(keyCode)) return true
 
         return processSwitchPressedActions(switchEvent)
@@ -117,16 +95,6 @@ class SwitchListener(
 
         processSwitchReleasedActions(switchEvent, absorbedAction)
         return true
-    }
-
-    /**
-     * Checks if a notification should be handled based on current settings and state.
-     *
-     * @return true if there's a waiting notification that should be handled
-     */
-    private fun shouldHandleNotification(): Boolean {
-        return scanSettings.isOpenNotificationsOnSwitchPressEnabled() &&
-                notificationManager.isNotificationWaiting()
     }
 
     /**
