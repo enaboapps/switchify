@@ -182,7 +182,7 @@ class MenuView(
             orientation = LinearLayout.VERTICAL
             setBackgroundColor(context.resources.getColor(R.color.navy, null))
             if (preferenceManager.getBooleanValue(PreferenceManager.PREFERENCE_KEY_MENU_TRANSPARENCY)) {
-                alpha = 0.5f
+                alpha = 0.8f
             }
             layoutParams = ViewGroup.LayoutParams(
                 WRAP_CONTENT,
