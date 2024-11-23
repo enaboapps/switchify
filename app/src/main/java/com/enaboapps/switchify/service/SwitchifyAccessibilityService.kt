@@ -6,7 +6,6 @@ import android.view.accessibility.AccessibilityEvent
 import com.enaboapps.switchify.preferences.PreferenceManager
 import com.enaboapps.switchify.service.gestures.GestureManager
 import com.enaboapps.switchify.service.methods.nodes.NodeExaminer
-import com.enaboapps.switchify.service.notifications.NotificationManager
 import com.enaboapps.switchify.service.scanning.ScanMethod
 import com.enaboapps.switchify.service.scanning.ScanSettings
 import com.enaboapps.switchify.service.scanning.ScanningManager
@@ -28,7 +27,6 @@ class SwitchifyAccessibilityService : AccessibilityService() {
     private lateinit var scanningManager: ScanningManager
     private lateinit var switchListener: SwitchListener
     private lateinit var screenWatcher: ScreenWatcher
-    private lateinit var notificationManager: NotificationManager
     private lateinit var scanSettings: ScanSettings
     private val serviceScope = CoroutineScope(SupervisorJob() + Dispatchers.Main)
 
@@ -43,7 +41,6 @@ class SwitchifyAccessibilityService : AccessibilityService() {
             }
         }
         KeyboardBridge.updateKeyboardState(windows, this)
-        event?.let { notificationManager.handleAccessibilityEvent(it) }
     }
 
     override fun onInterrupt() {}
@@ -67,11 +64,9 @@ class SwitchifyAccessibilityService : AccessibilityService() {
         )
         screenWatcher.register(this)
 
-        notificationManager = NotificationManager(this)
-
         scanSettings = ScanSettings(this)
 
-        switchListener = SwitchListener(this, scanningManager, notificationManager, scanSettings)
+        switchListener = SwitchListener(this, scanningManager, scanSettings)
 
         GestureManager.getInstance().setup(this)
         SelectionHandler.init(this)
@@ -101,11 +96,6 @@ class SwitchifyAccessibilityService : AccessibilityService() {
      * It performs different actions based on the type of the key event.
      */
     private fun handleSwitchEvent(event: KeyEvent): Boolean {
-        if (scanSettings.isOpenNotificationsOnSwitchPressEnabled() && notificationManager.isNotificationWaiting()) {
-            notificationManager.handleSwitch()
-            return true
-        }
-
         return when (event.action) {
             KeyEvent.ACTION_DOWN -> switchListener.onSwitchPressed(event.keyCode)
             KeyEvent.ACTION_UP -> switchListener.onSwitchReleased(event.keyCode)
