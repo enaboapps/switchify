@@ -209,10 +209,17 @@ class MenuView(
             } else {
                 gesturePoint.x + offset
             }
-            val y = if (gesturePoint.y + maxHeight + offset > screenHeight) {
+            var y = if (gesturePoint.y + maxHeight + offset > screenHeight) {
                 GesturePoint.y - maxHeight.toFloat() - offset
             } else {
                 gesturePoint.y + offset
+            }
+
+            // If y is negative, move it to the top of the screen
+            if (y < 0) {
+                y = 0f
+            } else if (y + maxHeight > screenHeight) { // If y is greater than the screen height, move it to the bottom of the screen
+                y = (screenHeight - maxHeight).toFloat()
             }
 
             MenuViewHandler.instance.updateView(
