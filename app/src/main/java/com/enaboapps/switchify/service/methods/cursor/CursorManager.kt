@@ -23,7 +23,7 @@ class CursorManager(private val context: Context) : ScanMethodBase, GesturePoint
         private const val MIN_QUADRANT_INDEX = 0
     }
 
-    private val cursorLineMovement = 40
+    private val cursorLineMovement = 10
     private val scanSettings = ScanSettings(context)
     private val cursorUI = CursorUI(context)
 
