@@ -65,9 +65,9 @@ fun CursorSettingsScreen(navController: NavController) {
                     ),
                     title = "Fine Cursor Scan Rate",
                     summary = "Adjust the scan rate for fine cursor movements",
-                    min = 100,
+                    min = 25,
                     max = 5000,
-                    step = 100,
+                    step = 25,
                     onValueChanged = { newValue ->
                         preferenceManager.setLongValue(
                             PreferenceManager.PREFERENCE_KEY_CURSOR_FINE_SCAN_RATE,
