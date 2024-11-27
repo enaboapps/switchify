@@ -5,6 +5,7 @@ import android.graphics.Color
 import android.widget.RelativeLayout
 import com.enaboapps.switchify.service.methods.shared.ScanMethodUIConstants
 import com.enaboapps.switchify.service.scanning.ScanColorManager
+import com.enaboapps.switchify.service.utils.ScreenUtils
 import com.enaboapps.switchify.service.window.SwitchifyAccessibilityWindow
 
 /**
@@ -18,6 +19,8 @@ class CursorUI(private val context: Context) {
     private var yCursorLine: RelativeLayout? = null
     private var xQuadrant: RelativeLayout? = null
     private var yQuadrant: RelativeLayout? = null
+    private var xQuadrantOutline: RelativeLayout? = null
+    private var yQuadrantOutline: RelativeLayout? = null
 
     private val window = SwitchifyAccessibilityWindow.instance
 
@@ -61,6 +64,84 @@ class CursorUI(private val context: Context) {
     }
 
     /**
+     * Shows or updates the x quadrant outline.
+     *
+     * @param quadrantNumber The quadrant number to position the quadrant.
+     */
+    private fun showXQuadrantOutline(quadrantNumber: Int) {
+        val xPosition = quadrantNumber * getQuadrantWidth()
+        val yPosition = CursorBounds.Y_MIN
+        val width = getQuadrantWidth()
+        val height = ScreenUtils.getHeight(context)
+
+        if (xQuadrantOutline == null) {
+            xQuadrantOutline = RelativeLayout(context).apply {
+                background = QuadrantOutlineDrawable(context)
+            }
+            xQuadrantOutline?.let {
+                window.addView(it, xPosition, yPosition, width, height)
+            }
+        } else {
+            updateXQuadrantOutline(quadrantNumber)
+        }
+    }
+
+    /**
+     * Updates the x quadrant outline.
+     *
+     * @param quadrantNumber The quadrant number to position the quadrant.
+     */
+    private fun updateXQuadrantOutline(quadrantNumber: Int) {
+        val xPosition = quadrantNumber * getQuadrantWidth()
+        val yPosition = CursorBounds.Y_MIN
+        val width = getQuadrantWidth()
+        val height = ScreenUtils.getHeight(context)
+
+        xQuadrantOutline?.let {
+            window.updateViewLayout(it, xPosition, yPosition, width, height)
+        }
+    }
+
+    /**
+     * Shows or updates the y quadrant outline.
+     *
+     * @param quadrantNumber The quadrant number to position the quadrant.
+     */
+    private fun showYQuadrantOutline(quadrantNumber: Int) {
+        val xPosition = CursorBounds.X_MIN
+        val yPosition = quadrantNumber * getQuadrantHeight()
+        val width = ScreenUtils.getWidth(context)
+        val height = getQuadrantHeight()
+
+        if (yQuadrantOutline == null) {
+            yQuadrantOutline = RelativeLayout(context).apply {
+                background = QuadrantOutlineDrawable(context)
+            }
+            yQuadrantOutline?.let {
+                window.addView(it, xPosition, yPosition, width, height)
+            }
+        } else {
+            updateYQuadrantOutline(quadrantNumber)
+        }
+    }
+
+    /**
+     * Updates the y quadrant outline.
+     *
+     * @param quadrantNumber The quadrant number to position the quadrant.
+     */
+    private fun updateYQuadrantOutline(quadrantNumber: Int) {
+        val xPosition = CursorBounds.X_MIN
+        val yPosition = quadrantNumber * getQuadrantHeight()
+        val width = ScreenUtils.getWidth(context)
+        val height = getQuadrantHeight()
+
+        yQuadrantOutline?.let {
+            window.updateViewLayout(it, xPosition, yPosition, width, height)
+        }
+    }
+
+    /**
      * Shows or updates the horizontal cursor line.
      *
      * @param x The x-coordinate for the line.
@@ -86,6 +167,9 @@ class CursorUI(private val context: Context) {
         } else {
             updateXCursorLine(x)
         }
+
+        // Show the quadrant outline
+        showXQuadrantOutline(x / getQuadrantWidth())
     }
 
     /**
@@ -114,6 +198,9 @@ class CursorUI(private val context: Context) {
         } else {
             updateYCursorLine(y)
         }
+
+        // Show the quadrant outline
+        showYQuadrantOutline(y / getQuadrantHeight())
     }
 
     /**
@@ -143,6 +230,9 @@ class CursorUI(private val context: Context) {
         } else {
             updateXQuadrant(quadrantNumber)
         }
+
+        removeXQuadrantOutline()
+        removeYQuadrantOutline()
     }
 
     /**
@@ -172,6 +262,9 @@ class CursorUI(private val context: Context) {
         } else {
             updateYQuadrant(quadrantNumber)
         }
+
+        removeXQuadrantOutline()
+        removeYQuadrantOutline()
     }
 
     /**
@@ -211,6 +304,26 @@ class CursorUI(private val context: Context) {
         yQuadrant?.let {
             window.removeView(it)
             yQuadrant = null
+        }
+    }
+
+    /**
+     * Removes the x quadrant outline.
+     */
+    fun removeXQuadrantOutline() {
+        xQuadrantOutline?.let {
+            window.removeView(it)
+            xQuadrantOutline = null
+        }
+    }
+
+    /**
+     * Removes the y quadrant outline.
+     */
+    fun removeYQuadrantOutline() {
+        yQuadrantOutline?.let {
+            window.removeView(it)
+            yQuadrantOutline = null
         }
     }
 
@@ -268,13 +381,20 @@ class CursorUI(private val context: Context) {
      * @return True if all elements are removed, false otherwise.
      */
     fun isReset(): Boolean {
-        return xCursorLine == null && yCursorLine == null && xQuadrant == null && yQuadrant == null
+        return xCursorLine == null
+                && yCursorLine == null
+                && xQuadrant == null
+                && yQuadrant == null
+                && xQuadrantOutline == null
+                && yQuadrantOutline == null
     }
 
     /**
      * Removes all cursor UI elements.
      */
     fun reset() {
+        removeXQuadrantOutline()
+        removeYQuadrantOutline()
         removeXCursorLine()
         removeYCursorLine()
         removeXQuadrant()
