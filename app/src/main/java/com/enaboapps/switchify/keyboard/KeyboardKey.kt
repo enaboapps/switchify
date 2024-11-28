@@ -14,10 +14,12 @@ import android.widget.LinearLayout
 import android.widget.TextView.AUTO_SIZE_TEXT_TYPE_NONE
 import androidx.core.content.res.ResourcesCompat
 import com.enaboapps.switchify.R
+import com.enaboapps.switchifykeyboardscanlib.KeyboardNodePosition
+import com.enaboapps.switchifykeyboardscanlib.KeyboardSwitchifyNode
 
 class KeyboardKey @JvmOverloads constructor(
     context: Context, attrs: AttributeSet? = null, defStyleAttr: Int = 0
-) : LinearLayout(context, attrs, defStyleAttr) {
+) : LinearLayout(context, attrs, defStyleAttr), KeyboardSwitchifyNode {
 
     var tapAction: (() -> Unit)? = null
     var holdAction: (() -> Unit)? = null
@@ -134,5 +136,16 @@ class KeyboardKey @JvmOverloads constructor(
         imageButton?.apply {
             this.background = background
         }
+    }
+
+    override fun getPosition(): KeyboardNodePosition {
+        val position = IntArray(2)
+        getLocationOnScreen(position)
+        return KeyboardNodePosition(
+            position[0].toFloat(),
+            position[1].toFloat(),
+            width.toFloat(),
+            height.toFloat()
+        )
     }
 }

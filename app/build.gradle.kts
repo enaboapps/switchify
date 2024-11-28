@@ -111,6 +111,7 @@ dependencies {
     implementation(libs.play.services.auth)
     implementation(libs.credentials)
     implementation(libs.google.id)
+    implementation(libs.switchifykeyboardscanlib)
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.test.ext.junit)
     androidTestImplementation(libs.espresso.core)

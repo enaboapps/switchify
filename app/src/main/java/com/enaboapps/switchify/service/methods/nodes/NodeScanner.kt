@@ -5,13 +5,12 @@ import android.content.Context
 import android.content.Intent
 import android.content.IntentFilter
 import androidx.localbroadcastmanager.content.LocalBroadcastManager
-import com.enaboapps.switchify.keyboard.KeyboardAccessibilityManager
-import com.enaboapps.switchify.keyboard.KeyboardLayoutInfo
-import com.enaboapps.switchify.keyboard.SwitchifyKeyboardService
 import com.enaboapps.switchify.service.scanning.ScanMethod
 import com.enaboapps.switchify.service.scanning.tree.ScanTree
 import com.enaboapps.switchify.service.selection.SelectionHandler
 import com.enaboapps.switchify.service.utils.ScreenWatcher
+import com.enaboapps.switchifykeyboardscanlib.KeyboardSwitchifyLayoutInfo
+import com.enaboapps.switchifykeyboardscanlib.KeyboardSwitchifyLink
 import com.google.gson.Gson
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -37,8 +36,9 @@ class NodeScanner {
     private val keyboardLayoutReceiver = object : BroadcastReceiver() {
         override fun onReceive(context: Context, intent: Intent) {
             val jsonLayoutInfo =
-                intent.getStringExtra(KeyboardAccessibilityManager.EXTRA_KEYBOARD_LAYOUT_INFO)
-            val layoutInfo = Gson().fromJson(jsonLayoutInfo, KeyboardLayoutInfo::class.java)
+                intent.getStringExtra(KeyboardSwitchifyLink.EXTRA_KEYBOARD_LAYOUT_INFO)
+            val layoutInfo =
+                Gson().fromJson(jsonLayoutInfo, KeyboardSwitchifyLayoutInfo::class.java)
             updateNodesWithLayoutInfo(layoutInfo)
         }
     }
@@ -48,6 +48,11 @@ class NodeScanner {
             isKeyboardVisible = true
             SelectionHandler.setBypassAutoSelect(true)
             SelectionHandler.setStartScanningAction { scanTree.startScanning() }
+            val jsonLayoutInfo =
+                intent.getStringExtra(KeyboardSwitchifyLink.EXTRA_KEYBOARD_LAYOUT_INFO)
+            val layoutInfo =
+                Gson().fromJson(jsonLayoutInfo, KeyboardSwitchifyLayoutInfo::class.java)
+            updateNodesWithLayoutInfo(layoutInfo)
             println("Keyboard shown")
         }
     }
@@ -81,15 +86,15 @@ class NodeScanner {
         val localBroadcastManager = LocalBroadcastManager.getInstance(context)
         localBroadcastManager.registerReceiver(
             keyboardLayoutReceiver,
-            IntentFilter(KeyboardAccessibilityManager.ACTION_KEYBOARD_LAYOUT_INFO)
+            IntentFilter(KeyboardSwitchifyLink.ACTION_KEYBOARD_LAYOUT_INFO)
         )
         localBroadcastManager.registerReceiver(
             keyboardShowReceiver,
-            IntentFilter(SwitchifyKeyboardService.ACTION_KEYBOARD_SHOW)
+            IntentFilter(KeyboardSwitchifyLink.ACTION_KEYBOARD_SHOW)
         )
         localBroadcastManager.registerReceiver(
             keyboardHideReceiver,
-            IntentFilter(SwitchifyKeyboardService.ACTION_KEYBOARD_HIDE)
+            IntentFilter(KeyboardSwitchifyLink.ACTION_KEYBOARD_HIDE)
         )
     }
 
@@ -109,7 +114,7 @@ class NodeScanner {
      *
      * @param layoutInfo KeyboardLayoutInfo instance.
      */
-    private fun updateNodesWithLayoutInfo(layoutInfo: KeyboardLayoutInfo) {
+    private fun updateNodesWithLayoutInfo(layoutInfo: KeyboardSwitchifyLayoutInfo) {
         val newNodes = layoutInfo.keys.map { Node.fromKeyInfo(it) }
         setKeyboardNodes(newNodes)
     }
