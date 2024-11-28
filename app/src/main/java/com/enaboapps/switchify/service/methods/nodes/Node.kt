@@ -3,12 +3,12 @@ package com.enaboapps.switchify.service.methods.nodes
 import android.graphics.PointF
 import android.graphics.Rect
 import android.view.accessibility.AccessibilityNodeInfo
-import com.enaboapps.switchify.keyboard.KeyInfo
 import com.enaboapps.switchify.service.gestures.GestureManager
 import com.enaboapps.switchify.service.gestures.GesturePoint
 import com.enaboapps.switchify.service.menu.MenuItem
 import com.enaboapps.switchify.service.scanning.ScanNodeInterface
 import com.enaboapps.switchify.service.selection.SelectionHandler
+import com.enaboapps.switchifykeyboardscanlib.KeyboardSwitchifyInfo
 
 /**
  * This class represents a node
@@ -47,18 +47,18 @@ class Node(
         }
 
         /**
-         * This function creates a node from a KeyInfo object
-         * @param keyInfo The KeyInfo object
+         * This function creates a node from a KeyboardSwitchifyInfo object
+         * @param keyboardSwitchifyInfo The KeyboardSwitchifyInfo object
          * @return The node
          */
-        fun fromKeyInfo(keyInfo: KeyInfo): Node {
+        fun fromKeyInfo(keyboardSwitchifyInfo: KeyboardSwitchifyInfo): Node {
             val node = Node()
-            node.x = keyInfo.x
-            node.y = keyInfo.y
-            node.centerX = keyInfo.x + keyInfo.width / 2
-            node.centerY = keyInfo.y + keyInfo.height / 2
-            node.width = keyInfo.width
-            node.height = keyInfo.height
+            node.x = keyboardSwitchifyInfo.x
+            node.y = keyboardSwitchifyInfo.y
+            node.centerX = keyboardSwitchifyInfo.x + keyboardSwitchifyInfo.width / 2
+            node.centerY = keyboardSwitchifyInfo.y + keyboardSwitchifyInfo.height / 2
+            node.width = keyboardSwitchifyInfo.width
+            node.height = keyboardSwitchifyInfo.height
             return node
         }
 

@@ -1,6 +1,5 @@
 package com.enaboapps.switchify.keyboard
 
-import android.content.Intent
 import android.graphics.drawable.Drawable
 import android.inputmethodservice.InputMethodService
 import android.view.KeyEvent
@@ -11,7 +10,6 @@ import android.view.ViewTreeObserver
 import android.view.inputmethod.EditorInfo
 import android.widget.LinearLayout
 import androidx.core.content.res.ResourcesCompat
-import androidx.localbroadcastmanager.content.LocalBroadcastManager
 import com.enaboapps.switchify.R
 import com.enaboapps.switchify.keyboard.prediction.PredictionListener
 import com.enaboapps.switchify.keyboard.prediction.PredictionManager
@@ -19,6 +17,7 @@ import com.enaboapps.switchify.keyboard.prediction.PredictionView
 import com.enaboapps.switchify.keyboard.utils.CapsModeHandler
 import com.enaboapps.switchify.keyboard.utils.TextParser
 import com.enaboapps.switchify.service.utils.ScreenUtils
+import com.enaboapps.switchifykeyboardscanlib.KeyboardSwitchifyLink
 
 /**
  * This class is responsible for managing the keyboard service.
@@ -29,8 +28,8 @@ class SwitchifyKeyboardService : InputMethodService(), KeyboardLayoutListener, P
     // The main keyboard layout
     private lateinit var keyboardLayout: LinearLayout
 
-    // The keyboard accessibility manager
-    private lateinit var keyboardAccessibilityManager: KeyboardAccessibilityManager
+    // The keyboard Switchify link
+    private lateinit var keyboardSwitchifyLink: KeyboardSwitchifyLink
 
     // The global layout listener
     private var globalLayoutListener: ViewTreeObserver.OnGlobalLayoutListener? = null
@@ -44,11 +43,6 @@ class SwitchifyKeyboardService : InputMethodService(), KeyboardLayoutListener, P
     // The text parser
     private val textParser = TextParser.getInstance()
 
-    companion object {
-        const val ACTION_KEYBOARD_SHOW = "com.enaboapps.switchify.keyboard.ACTION_KEYBOARD_SHOW"
-        const val ACTION_KEYBOARD_HIDE = "com.enaboapps.switchify.keyboard.ACTION_KEYBOARD_HIDE"
-    }
-
     /**
      * This method is called when the service is created.
      * It initializes the keyboard accessibility manager and the prediction manager.
@@ -56,8 +50,8 @@ class SwitchifyKeyboardService : InputMethodService(), KeyboardLayoutListener, P
     override fun onCreate() {
         super.onCreate()
 
-        // Initialize the keyboard accessibility manager
-        keyboardAccessibilityManager = KeyboardAccessibilityManager(this)
+        // Initialize the keyboard Switchify link
+        keyboardSwitchifyLink = KeyboardSwitchifyLink(this)
 
         // Set the layout listener
         KeyboardLayoutManager.listener = this
@@ -104,7 +98,7 @@ class SwitchifyKeyboardService : InputMethodService(), KeyboardLayoutListener, P
         super.onStartInputView(info, restarting)
         // Add the global layout listener when the input view is started
         globalLayoutListener = ViewTreeObserver.OnGlobalLayoutListener {
-            keyboardAccessibilityManager.captureAndBroadcastLayoutInfo(keyboardLayout)
+            keyboardSwitchifyLink.captureAndBroadcastLayoutInfo(keyboardLayout)
         }
         keyboardLayout.viewTreeObserver.addOnGlobalLayoutListener(globalLayoutListener)
 
@@ -119,8 +113,7 @@ class SwitchifyKeyboardService : InputMethodService(), KeyboardLayoutListener, P
         updateTextState()
 
         // Broadcast keyboard show event
-        val intent = Intent(ACTION_KEYBOARD_SHOW)
-        LocalBroadcastManager.getInstance(this).sendBroadcast(intent)
+        keyboardSwitchifyLink.showKeyboard(keyboardLayout)
     }
 
     /**
@@ -133,8 +126,7 @@ class SwitchifyKeyboardService : InputMethodService(), KeyboardLayoutListener, P
         keyboardLayout.viewTreeObserver.removeOnGlobalLayoutListener(globalLayoutListener)
 
         // Broadcast keyboard hide event
-        val intent = Intent(ACTION_KEYBOARD_HIDE)
-        LocalBroadcastManager.getInstance(this).sendBroadcast(intent)
+        keyboardSwitchifyLink.hideKeyboard()
     }
 
     /**

@@ -19,6 +19,7 @@ dependencyResolutionManagement {
                 includeGroupByRegex("co.thingthing.*")
             }
         }
+        maven { url = uri("https://jitpack.io") }
         google()
     }
 }

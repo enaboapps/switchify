@@ -21,6 +21,7 @@ espresso-core = "3.6.1"
 google-services = "4.4.2"
 firebase-crashlytics-gradle = "3.0.2"
 app-update = "2.1.0"
+switchifykeyboardscanlib = "1.0.2"
 
 [libraries]
 core-ktx = { group = "androidx.core", name = "core-ktx", version.ref = "core-ktx" }
@@ -50,6 +51,7 @@ compose-ui-tooling = { group = "androidx.compose.ui", name = "ui-tooling", versi
 compose-ui-test-manifest = { group = "androidx.compose.ui", name = "ui-test-manifest", version.ref = "compose-runtime-livedata" }
 app-update = { group = "com.google.android.play", name = "app-update-ktx", version.ref = "app-update" }
 play-services-auth = { group = "com.google.android.gms", name = "play-services-auth", version.ref = "play-services-auth" }
+switchifykeyboardscanlib = { group = "com.github.enaboapps", name = "SwitchifyKeyboardScanLib", version.ref = "switchifykeyboardscanlib" }
 
 [plugins]
 compose-compiler = { id = "org.jetbrains.kotlin.plugin.compose", version.ref = "kotlin" }
