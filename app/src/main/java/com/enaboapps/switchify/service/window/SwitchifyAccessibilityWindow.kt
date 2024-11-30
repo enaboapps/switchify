@@ -87,6 +87,28 @@ class SwitchifyAccessibilityWindow {
         }
     }
 
+    fun addViewUnderBase(view: ViewGroup, params: WindowManager.LayoutParams) {
+        mainHandler.post {
+            try {
+                windowManager?.removeView(baseLayout)
+                windowManager?.addView(view, params)
+                show()
+            } catch (e: Exception) {
+                Log.e(TAG, "Error in addView: ${e.message}", e)
+            }
+        }
+    }
+
+    fun removeViewFromWindow(view: ViewGroup) {
+        mainHandler.post {
+            try {
+                windowManager?.removeView(view)
+            } catch (e: Exception) {
+                Log.e(TAG, "Error in removeView: ${e.message}", e)
+            }
+        }
+    }
+
     fun addViewToBottom(view: ViewGroup, margins: Int = 0) {
         mainHandler.post {
             try {
