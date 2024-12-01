@@ -4,13 +4,15 @@ import android.accessibilityservice.AccessibilityService
 import android.content.Context
 import android.os.Handler
 import android.os.Looper
+import android.util.TypedValue
 import android.view.Gravity
 import android.view.WindowManager
+import android.view.animation.Animation
+import android.view.animation.TranslateAnimation
 import android.widget.Button
 import android.widget.LinearLayout
 import android.widget.TextView
-import android.view.animation.Animation
-import android.view.animation.TranslateAnimation
+import android.widget.TextView.AUTO_SIZE_TEXT_TYPE_NONE
 import com.enaboapps.switchify.R
 import com.enaboapps.switchify.preferences.PreferenceManager
 import com.enaboapps.switchify.service.window.SwitchifyAccessibilityWindow
@@ -103,7 +105,8 @@ class LockScreenView(
             val textView = TextView(accessibilityService).apply {
                 text = "Enter 4-digit code to unlock Switchify"
                 setTextColor(accessibilityService.resources.getColor(R.color.white, null))
-                textSize = 24f
+                setTextSize(TypedValue.COMPLEX_UNIT_SP, 24f)
+                setAutoSizeTextTypeWithDefaults(AUTO_SIZE_TEXT_TYPE_NONE)
                 gravity = Gravity.CENTER
                 setPadding(0, 0, 0, 48)
             }
@@ -111,7 +114,8 @@ class LockScreenView(
 
             val codeInput = TextView(accessibilityService).apply {
                 setTextColor(accessibilityService.resources.getColor(R.color.white, null))
-                textSize = 32f
+                setTextSize(TypedValue.COMPLEX_UNIT_SP, 32f)
+                setAutoSizeTextTypeWithDefaults(AUTO_SIZE_TEXT_TYPE_NONE)
                 gravity = Gravity.CENTER
                 text = ""
                 letterSpacing = 0.5f
@@ -139,10 +143,10 @@ class LockScreenView(
                     if (currentText.length < 4) {
                         val newText = "•".repeat(currentText.length + 1)
                         codeInput.text = newText
-                        
+
                         val actualCode = (codeInput.tag as? String ?: "") + number
                         codeInput.tag = actualCode
-                        
+
                         if (actualCode.length == 4) {
                             if (validateLockScreenCode(actualCode)) {
                                 hide()
@@ -165,7 +169,7 @@ class LockScreenView(
                     if (currentText.isNotEmpty()) {
                         val newText = "•".repeat(currentText.length - 1)
                         codeInput.text = newText
-                        
+
                         // Update actual code in tag
                         val actualCode = (codeInput.tag as? String ?: "")
                         if (actualCode.isNotEmpty()) {
@@ -179,7 +183,8 @@ class LockScreenView(
             val textView = TextView(accessibilityService).apply {
                 text = "Tap the button to unlock Switchify"
                 setTextColor(accessibilityService.resources.getColor(R.color.white, null))
-                textSize = 24f
+                setTextSize(TypedValue.COMPLEX_UNIT_SP, 24f)
+                setAutoSizeTextTypeWithDefaults(AUTO_SIZE_TEXT_TYPE_NONE)
                 gravity = Gravity.CENTER
                 setPadding(0, 0, 0, 48)
             }
@@ -188,7 +193,8 @@ class LockScreenView(
             val button = Button(accessibilityService).apply {
                 text = "Unlock"
                 setTextColor(accessibilityService.resources.getColor(R.color.white, null))
-                textSize = 20f
+                setTextSize(TypedValue.COMPLEX_UNIT_SP, 24f)
+                setAutoSizeTextTypeWithDefaults(AUTO_SIZE_TEXT_TYPE_NONE)
                 gravity = Gravity.CENTER
                 layoutParams = LinearLayout.LayoutParams(
                     400,
@@ -214,7 +220,8 @@ class LockScreenView(
     }
 
     private fun validateLockScreenCode(code: String): Boolean {
-        val savedCode = preferenceManager.getStringValue(PreferenceManager.PREFERENCE_KEY_LOCK_SCREEN_CODE)
+        val savedCode =
+            preferenceManager.getStringValue(PreferenceManager.PREFERENCE_KEY_LOCK_SCREEN_CODE)
         return code.length == 4 && code == savedCode
     }
 
