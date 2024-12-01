@@ -1,15 +1,13 @@
 package com.enaboapps.switchify.service.lockscreen
 
 import android.content.Context
-import android.text.InputType
 import android.view.Gravity
 import android.view.WindowManager
-import android.view.inputmethod.EditorInfo
-import android.view.inputmethod.InputMethodManager
 import android.widget.Button
-import android.widget.EditText
 import android.widget.LinearLayout
 import android.widget.TextView
+import android.view.animation.Animation
+import android.view.animation.TranslateAnimation
 import com.enaboapps.switchify.R
 import com.enaboapps.switchify.preferences.PreferenceManager
 import com.enaboapps.switchify.service.window.SwitchifyAccessibilityWindow
@@ -73,7 +71,7 @@ class LockScreenView {
     private fun buildLockScreenLayout(context: Context) {
         if (isLockScreenCodeSet()) {
             val textView = TextView(context).apply {
-                text = "Enter the lock screen code to unlock Switchify"
+                text = "Enter 4-digit code to unlock Switchify"
                 setTextColor(context.resources.getColor(R.color.white, null))
                 textSize = 24f
                 gravity = Gravity.CENTER
@@ -81,42 +79,70 @@ class LockScreenView {
             }
             baseLayout.addView(textView)
 
-            val codeInput = EditText(context).apply {
+            val codeInput = TextView(context).apply {
                 setTextColor(context.resources.getColor(R.color.white, null))
                 textSize = 32f
                 gravity = Gravity.CENTER
-                inputType = InputType.TYPE_CLASS_NUMBER
-                imeOptions = EditorInfo.IME_ACTION_DONE
-                background = null
-                hint = "Enter code"
-                setHintTextColor(context.resources.getColor(R.color.white, null))
+                text = ""
+                letterSpacing = 0.5f
                 layoutParams = LinearLayout.LayoutParams(
-                    500,
+                    400,
+                    LinearLayout.LayoutParams.WRAP_CONTENT
+                ).apply {
+                    gravity = Gravity.CENTER_HORIZONTAL
+                    setMargins(0, 0, 0, 48)
+                }
+            }
+            baseLayout.addView(codeInput)
+
+            val numberPad = LockScreenNumberPadView(context).apply {
+                layoutParams = LinearLayout.LayoutParams(
+                    LinearLayout.LayoutParams.WRAP_CONTENT,
                     LinearLayout.LayoutParams.WRAP_CONTENT
                 ).apply {
                     gravity = Gravity.CENTER_HORIZONTAL
                 }
 
-                setOnEditorActionListener { _, actionId, _ ->
-                    if (actionId == EditorInfo.IME_ACTION_DONE) {
-                        val enteredCode = text.toString()
-                        if (validateLockScreenCode(enteredCode)) {
-                            hide()
-                            // Dismiss keyboard
-                            val imm =
-                                context.getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
-                            imm.hideSoftInputFromWindow(windowToken, 0)
+                setOnNumberClickListener { number ->
+                    val currentText = codeInput.text.toString()
+                    if (currentText.length < 4) {
+                        val newText = "•".repeat(currentText.length + 1)
+                        codeInput.text = newText
+                        
+                        val actualCode = (codeInput.tag as? String ?: "") + number
+                        codeInput.tag = actualCode
+                        
+                        if (actualCode.length == 4) {
+                            if (validateLockScreenCode(actualCode)) {
+                                hide()
+                            } else {
+                                // Wrong code handling
+                                codeInput.startAnimation(createShakeAnimation())
+                                codeInput.postDelayed({
+                                    // Clear the input after animation
+                                    codeInput.text = ""
+                                    codeInput.tag = ""
+                                }, 500)
+                            }
                         }
-                        true
-                    } else {
-                        false
                     }
                 }
 
-                // Request focus when view is created
-                requestFocus()
+                setOnDeleteClickListener {
+                    val currentText = codeInput.text.toString()
+                    if (currentText.isNotEmpty()) {
+                        val newText = "•".repeat(currentText.length - 1)
+                        codeInput.text = newText
+                        
+                        // Update actual code in tag
+                        val actualCode = (codeInput.tag as? String ?: "")
+                        if (actualCode.isNotEmpty()) {
+                            codeInput.tag = actualCode.substring(0, actualCode.length - 1)
+                        }
+                    }
+                }
             }
-            baseLayout.addView(codeInput)
+            baseLayout.addView(numberPad)
         } else {
             val textView = TextView(context).apply {
                 text = "Tap the button to unlock Switchify"
@@ -156,6 +182,15 @@ class LockScreenView {
     }
 
     private fun validateLockScreenCode(code: String): Boolean {
-        return code == preferenceManager.getStringValue(PreferenceManager.PREFERENCE_KEY_LOCK_SCREEN_CODE)
+        val savedCode = preferenceManager.getStringValue(PreferenceManager.PREFERENCE_KEY_LOCK_SCREEN_CODE)
+        return code.length == 4 && code == savedCode
+    }
+
+    private fun createShakeAnimation(): Animation {
+        return TranslateAnimation(0f, 10f, 0f, 0f).apply {
+            duration = 50
+            repeatMode = Animation.REVERSE
+            repeatCount = 5
+        }
     }
 }

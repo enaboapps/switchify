@@ -102,10 +102,11 @@ private fun LockScreenCodeInput(
 ) {
     var code by remember { mutableStateOf(lockScreenCode) }
     var confirmCode by remember { mutableStateOf("") }
-    var isError by remember { mutableStateOf(false) }
-    var errorMessage by remember { mutableStateOf("") }
+    var codeError by remember { mutableStateOf("") }
+    var confirmError by remember { mutableStateOf("") }
     var loadedCode: String? by remember { mutableStateOf(null) }
     var confirmPreviousCode by remember { mutableStateOf("") }
+    var previousCodeError by remember { mutableStateOf("") }
 
     LaunchedEffect(Unit) {
         if (code.isNotEmpty()) {
@@ -123,13 +124,16 @@ private fun LockScreenCodeInput(
                     onValueChange = { newValue ->
                         if (newValue.all { it.isDigit() }) {
                             confirmPreviousCode = newValue
+                            previousCodeError = if (confirmPreviousCode != loadedCode) {
+                                "Incorrect previous code"
+                            } else ""
                         }
                     },
                     label = "Confirm Previous Lock Screen Code",
                     keyboardType = KeyboardType.Number,
                     isSecure = true,
-                    isError = confirmPreviousCode != loadedCode,
-                    supportingText = if (confirmPreviousCode != loadedCode) "This is not your previous lock screen code" else null
+                    isError = previousCodeError.isNotEmpty(),
+                    supportingText = previousCodeError.ifEmpty { null }
                 )
             } else {
                 TextArea(
@@ -137,22 +141,19 @@ private fun LockScreenCodeInput(
                     onValueChange = { newValue ->
                         if (newValue.all { it.isDigit() }) {
                             code = newValue
-                            isError = false
-                            if (code != confirmCode) {
-                                isError = true
-                                errorMessage = "Codes do not match"
-                            }
-                            if (code.isEmpty()) {
-                                isError = true
-                                errorMessage = "Code cannot be empty"
+                            codeError = when {
+                                code.isEmpty() -> "Code cannot be empty"
+                                code.length != 4 -> "Code must be 4 digits"
+                                code != confirmCode && confirmCode.isNotEmpty() -> "Codes do not match"
+                                else -> ""
                             }
                         }
                     },
                     label = "Lock Screen Code",
                     keyboardType = KeyboardType.Number,
                     isSecure = true,
-                    isError = isError,
-                    supportingText = if (isError) errorMessage else null
+                    isError = codeError.isNotEmpty(),
+                    supportingText = codeError.ifEmpty { null }
                 )
 
                 TextArea(
@@ -160,20 +161,21 @@ private fun LockScreenCodeInput(
                     onValueChange = { newValue ->
                         if (newValue.all { it.isDigit() }) {
                             confirmCode = newValue
-                            if (code != confirmCode) {
-                                isError = true
-                                errorMessage = "Codes do not match"
-                            } else {
-                                isError = false
-                                errorMessage = ""
+                            confirmError = when {
+                                code != confirmCode -> "Codes do not match"
+                                else -> ""
+                            }
+                            // Also update code error if codes don't match
+                            if (code.isNotEmpty()) {
+                                codeError = if (code != confirmCode) "Codes do not match" else ""
                             }
                         }
                     },
                     label = "Confirm Lock Screen Code",
                     keyboardType = KeyboardType.Number,
                     isSecure = true,
-                    isError = isError,
-                    supportingText = if (isError) errorMessage else null
+                    isError = confirmError.isNotEmpty(),
+                    supportingText = confirmError.ifEmpty { null }
                 )
 
                 if (loadedCode != null && confirmPreviousCode == loadedCode) {
@@ -188,14 +190,11 @@ private fun LockScreenCodeInput(
 
                 FullWidthButton(
                     text = "Save",
-                    enabled = code.isNotEmpty() && confirmCode == code,
+                    enabled = code.length == 4 && code == confirmCode,
                     onClick = {
-                        if (code.isNotEmpty() && confirmCode == code) {
+                        if (code.length == 4 && code == confirmCode) {
                             onLockScreenCodeChanged(code)
                             isSettingLockScreenCode = false
-                        } else {
-                            isError = true
-                            errorMessage = "Codes do not match"
                         }
                     }
                 )
@@ -205,8 +204,9 @@ private fun LockScreenCodeInput(
                 text = if (code.isNotEmpty()) "Change Code" else "Set Code",
                 onClick = {
                     isSettingLockScreenCode = true
-                    isError = false
-                    errorMessage = ""
+                    codeError = ""
+                    confirmError = ""
+                    previousCodeError = ""
                     code = ""
                     confirmCode = ""
                 }
