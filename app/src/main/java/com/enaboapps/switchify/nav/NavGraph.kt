@@ -17,6 +17,7 @@ import com.enaboapps.switchify.screens.howto.HowToUseScreen
 import com.enaboapps.switchify.screens.settings.SettingsScreen
 import com.enaboapps.switchify.screens.settings.actions.AddEditActionScreen
 import com.enaboapps.switchify.screens.settings.actions.MyActionsScreen
+import com.enaboapps.switchify.screens.settings.lockscreen.LockScreenSettingsScreen
 import com.enaboapps.switchify.screens.settings.menu.MenuItemCustomizationScreen
 import com.enaboapps.switchify.screens.settings.menu.MenuSizeScreen
 import com.enaboapps.switchify.screens.settings.prediction.PredictionLanguageScreen
@@ -88,6 +89,9 @@ fun NavGraph(navController: NavHostController) {
         }
         composable(NavigationRoute.MenuSize.name) {
             MenuSizeScreen(navController)
+        }
+        composable(NavigationRoute.LockScreenSettings.name) {
+            LockScreenSettingsScreen(navController)
         }
         composable(NavigationRoute.MyActions.name) {
             MyActionsScreen(navController)

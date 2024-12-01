@@ -81,6 +81,7 @@ fun GeneralSettingsTab(settingsScreenModel: SettingsScreenModel, navController: 
         )
         Spacer(modifier = Modifier.height(16.dp))
         MenuSection(settingsScreenModel, navController)
+        LockScreenSection(navController)
         ActionsSection(navController)
         KeyboardSection(navController)
     }
@@ -218,6 +219,18 @@ private fun MenuSection(screenModel: SettingsScreenModel, navController: NavCont
             onCheckedChange = {
                 screenModel.setMenuTransparency(it)
             }
+        )
+    }
+}
+
+@Composable
+private fun LockScreenSection(navController: NavController) {
+    Section(title = "Lock Screen") {
+        NavRouteLink(
+            title = "Lock Screen Settings",
+            summary = "Configure the lock screen",
+            navController = navController,
+            route = NavigationRoute.LockScreenSettings.name
         )
     }
 }

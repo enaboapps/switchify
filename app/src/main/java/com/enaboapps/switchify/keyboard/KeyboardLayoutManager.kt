@@ -291,6 +291,7 @@ object KeyboardLayoutManager {
             KeyType.Character("."),
             KeyType.Character("0"),
             KeyType.Backspace,
+            KeyType.ImeAction,
             KeyType.HideKeyboard
         )
     )

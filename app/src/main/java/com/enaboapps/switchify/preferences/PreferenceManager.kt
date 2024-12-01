@@ -33,6 +33,8 @@ class PreferenceManager(context: Context) {
         const val PREFERENCE_KEY_MENU_ITEM_VISIBILITY_PREFIX = "menu_item_visibility_"
         const val PREFERENCE_KEY_MENU_SIZE = "menu_size"
         const val PREFERENCE_KEY_MENU_TRANSPARENCY = "menu_transparency"
+        const val PREFERENCE_KEY_LOCK_SCREEN = "lock_screen"
+        const val PREFERENCE_KEY_LOCK_SCREEN_CODE = "lock_screen_code"
         private const val PREFERENCE_FILE_NAME = "switchify_preferences"
     }
 

@@ -25,7 +25,11 @@ class PreferenceSync(private val sharedPreferences: SharedPreferences) {
         private const val COLLECTION_USER_SETTINGS = "user-settings"
         private const val DOCUMENT_PREFERENCES = "preferences"
         private const val COLLECTION_USERS = "users"
-        private val BLACKLISTED_KEYS = setOf(PreferenceManager.Keys.PREFERENCE_KEY_SCAN_METHOD)
+        private val BLACKLISTED_KEYS = setOf(
+            PreferenceManager.Keys.PREFERENCE_KEY_SCAN_METHOD,
+            PreferenceManager.Keys.PREFERENCE_KEY_LOCK_SCREEN,
+            PreferenceManager.Keys.PREFERENCE_KEY_LOCK_SCREEN_CODE
+        )
     }
 
     private fun getDocumentPath(): String {

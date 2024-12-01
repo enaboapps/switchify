@@ -5,6 +5,7 @@ import android.view.KeyEvent
 import android.view.accessibility.AccessibilityEvent
 import com.enaboapps.switchify.preferences.PreferenceManager
 import com.enaboapps.switchify.service.gestures.GestureManager
+import com.enaboapps.switchify.service.lockscreen.LockScreenView
 import com.enaboapps.switchify.service.methods.nodes.NodeExaminer
 import com.enaboapps.switchify.service.scanning.ScanMethod
 import com.enaboapps.switchify.service.scanning.ScanSettings
@@ -27,6 +28,7 @@ class SwitchifyAccessibilityService : AccessibilityService() {
     private lateinit var scanningManager: ScanningManager
     private lateinit var switchListener: SwitchListener
     private lateinit var screenWatcher: ScreenWatcher
+    private lateinit var lockScreenView: LockScreenView
     private lateinit var scanSettings: ScanSettings
     private val serviceScope = CoroutineScope(SupervisorJob() + Dispatchers.Main)
 
@@ -47,7 +49,7 @@ class SwitchifyAccessibilityService : AccessibilityService() {
 
     /**
      * This method is called when the service is connected.
-     * It sets up the scanning manager, switch listener, screen watcher, gesture manager, and auto selection handler.
+     * It sets up the scanning manager, switch listener, screen watcher, lock screen view, gesture manager, and auto selection handler.
      * It also finds nodes in the active window and updates the keyboard state.
      */
     override fun onServiceConnected() {
@@ -58,8 +60,15 @@ class SwitchifyAccessibilityService : AccessibilityService() {
         scanningManager = ScanningManager(this, this)
         scanningManager.setup()
 
+        lockScreenView = LockScreenView(this)
+        lockScreenView.setup(this)
+
         screenWatcher = ScreenWatcher(
-            onScreenSleep = { scanningManager.reset() },
+            onScreenWake = { lockScreenView.show() },
+            onScreenSleep = {
+                scanningManager.reset()
+                lockScreenView.hide()
+            },
             onOrientationChanged = { scanningManager.reset() }
         )
         screenWatcher.register(this)
