@@ -1,6 +1,9 @@
 package com.enaboapps.switchify.service.lockscreen
 
+import android.accessibilityservice.AccessibilityService
 import android.content.Context
+import android.os.Handler
+import android.os.Looper
 import android.view.Gravity
 import android.view.WindowManager
 import android.widget.Button
@@ -12,10 +15,21 @@ import com.enaboapps.switchify.R
 import com.enaboapps.switchify.preferences.PreferenceManager
 import com.enaboapps.switchify.service.window.SwitchifyAccessibilityWindow
 
-class LockScreenView {
+class LockScreenView(
+    private val accessibilityService: AccessibilityService
+) {
     private lateinit var baseLayout: LinearLayout
     private lateinit var preferenceManager: PreferenceManager
     private var showing = false
+    private var timeoutHandler = Handler(Looper.getMainLooper())
+    private val INACTIVITY_TIMEOUT = 40000L // 40 seconds
+
+    private val inactivityRunnable = Runnable {
+        if (showing) {
+            accessibilityService.performGlobalAction(AccessibilityService.GLOBAL_ACTION_LOCK_SCREEN)
+            hide()
+        }
+    }
 
     fun setup(context: Context) {
         baseLayout = LinearLayout(context).apply {
@@ -27,14 +41,15 @@ class LockScreenView {
         preferenceManager = PreferenceManager(context)
     }
 
-    fun show(context: Context) {
+    fun show() {
         if (showing || !isLockScreenEnabled()) {
             return
         }
 
         disposeOfLockScreenLayout()
-        buildLockScreenLayout(context)
+        buildLockScreenLayout()
         showing = true
+        startInactivityTimeout()
 
         val params = WindowManager.LayoutParams(
             WindowManager.LayoutParams.MATCH_PARENT,
@@ -50,12 +65,23 @@ class LockScreenView {
         SwitchifyAccessibilityWindow.instance.addViewUnderBase(baseLayout, params)
     }
 
+    private fun startInactivityTimeout() {
+        timeoutHandler.removeCallbacks(inactivityRunnable)
+        timeoutHandler.postDelayed(inactivityRunnable, INACTIVITY_TIMEOUT)
+    }
+
+    private fun resetInactivityTimeout() {
+        if (showing) {
+            startInactivityTimeout()
+        }
+    }
+
     fun hide() {
         if (!showing) {
             return
         }
 
-        // Remove the base layout from the window
+        timeoutHandler.removeCallbacks(inactivityRunnable)
         try {
             SwitchifyAccessibilityWindow.instance.removeViewFromWindow(baseLayout)
             showing = false
@@ -64,23 +90,27 @@ class LockScreenView {
         }
     }
 
+    fun onDestroy() {
+        timeoutHandler.removeCallbacks(inactivityRunnable)
+    }
+
     private fun disposeOfLockScreenLayout() {
         baseLayout.removeAllViews()
     }
 
-    private fun buildLockScreenLayout(context: Context) {
+    private fun buildLockScreenLayout() {
         if (isLockScreenCodeSet()) {
-            val textView = TextView(context).apply {
+            val textView = TextView(accessibilityService).apply {
                 text = "Enter 4-digit code to unlock Switchify"
-                setTextColor(context.resources.getColor(R.color.white, null))
+                setTextColor(accessibilityService.resources.getColor(R.color.white, null))
                 textSize = 24f
                 gravity = Gravity.CENTER
                 setPadding(0, 0, 0, 48)
             }
             baseLayout.addView(textView)
 
-            val codeInput = TextView(context).apply {
-                setTextColor(context.resources.getColor(R.color.white, null))
+            val codeInput = TextView(accessibilityService).apply {
+                setTextColor(accessibilityService.resources.getColor(R.color.white, null))
                 textSize = 32f
                 gravity = Gravity.CENTER
                 text = ""
@@ -95,7 +125,7 @@ class LockScreenView {
             }
             baseLayout.addView(codeInput)
 
-            val numberPad = LockScreenNumberPadView(context).apply {
+            val numberPad = LockScreenNumberPadView(accessibilityService).apply {
                 layoutParams = LinearLayout.LayoutParams(
                     LinearLayout.LayoutParams.WRAP_CONTENT,
                     LinearLayout.LayoutParams.WRAP_CONTENT
@@ -104,6 +134,7 @@ class LockScreenView {
                 }
 
                 setOnNumberClickListener { number ->
+                    resetInactivityTimeout()  // Reset timeout on number press
                     val currentText = codeInput.text.toString()
                     if (currentText.length < 4) {
                         val newText = "•".repeat(currentText.length + 1)
@@ -129,6 +160,7 @@ class LockScreenView {
                 }
 
                 setOnDeleteClickListener {
+                    resetInactivityTimeout()  // Reset timeout on delete press
                     val currentText = codeInput.text.toString()
                     if (currentText.isNotEmpty()) {
                         val newText = "•".repeat(currentText.length - 1)
@@ -144,18 +176,18 @@ class LockScreenView {
             }
             baseLayout.addView(numberPad)
         } else {
-            val textView = TextView(context).apply {
+            val textView = TextView(accessibilityService).apply {
                 text = "Tap the button to unlock Switchify"
-                setTextColor(context.resources.getColor(R.color.white, null))
+                setTextColor(accessibilityService.resources.getColor(R.color.white, null))
                 textSize = 24f
                 gravity = Gravity.CENTER
                 setPadding(0, 0, 0, 48)
             }
             baseLayout.addView(textView)
 
-            val button = Button(context).apply {
+            val button = Button(accessibilityService).apply {
                 text = "Unlock"
-                setTextColor(context.resources.getColor(R.color.white, null))
+                setTextColor(accessibilityService.resources.getColor(R.color.white, null))
                 textSize = 20f
                 gravity = Gravity.CENTER
                 layoutParams = LinearLayout.LayoutParams(

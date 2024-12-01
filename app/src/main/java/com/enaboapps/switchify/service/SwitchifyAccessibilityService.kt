@@ -60,11 +60,11 @@ class SwitchifyAccessibilityService : AccessibilityService() {
         scanningManager = ScanningManager(this, this)
         scanningManager.setup()
 
-        lockScreenView = LockScreenView()
+        lockScreenView = LockScreenView(this)
         lockScreenView.setup(this)
 
         screenWatcher = ScreenWatcher(
-            onScreenWake = { lockScreenView.show(this) },
+            onScreenWake = { lockScreenView.show() },
             onScreenSleep = {
                 scanningManager.reset()
                 lockScreenView.hide()
