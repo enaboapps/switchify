@@ -60,11 +60,11 @@ object SwitchLongPressHandler {
     /**
      * Stops the long press action sequence.
      * Performs the action if it is not null.
-     * @param scanningManager The scanning manager.
+     * @param scanningManager The scanning manager. Can be null (will not perform the action).
      */
-    fun stopLongPress(scanningManager: ScanningManager) {
+    fun stopLongPress(scanningManager: ScanningManager?) {
         actionToPerform?.let {
-            scanningManager.performAction(it)
+            scanningManager?.performAction(it)
             actionToPerform = null
         }
         longPressJob?.cancel()
