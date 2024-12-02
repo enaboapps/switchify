@@ -93,6 +93,9 @@ class SwitchifyAccessibilityService : AccessibilityService() {
                 scanningManager.updateNodes(nodes)
             }
         }
+
+        // Show the lock screen when the service starts
+        lockScreenView.show()
     }
 
     override fun onKeyEvent(event: KeyEvent?): Boolean {
