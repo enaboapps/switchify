@@ -247,6 +247,16 @@ class SwitchListener(
     }
 
     /**
+     * Resets the last switch press time and code.
+     * Resets the long press handler.
+     */
+    fun reset() {
+        lastSwitchPressedTime = 0
+        lastSwitchPressedCode = 0
+        SwitchLongPressHandler.stopLongPress(null)
+    }
+
+    /**
      * Data class representing an absorbed switch action and its timing information.
      *
      * @property switchEvent The switch event that was absorbed
