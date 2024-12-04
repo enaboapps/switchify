@@ -108,6 +108,7 @@ class LinearGesturePerformer(
      */
     fun cancelGesture() {
         resetGestureState()
+        currentPointVisual.hideCurrentPoint()
     }
 
     /**
