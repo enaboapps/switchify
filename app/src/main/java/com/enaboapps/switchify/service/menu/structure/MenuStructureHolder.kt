@@ -314,11 +314,6 @@ class MenuStructureHolder(private val accessibilityService: SwitchifyAccessibili
                     action = { accessibilityService?.performGlobalAction(AccessibilityService.GLOBAL_ACTION_NOTIFICATIONS) }
                 ),
                 MenuItem(
-                    id = "all_apps",
-                    text = "All Apps",
-                    action = { accessibilityService?.performGlobalAction(AccessibilityService.GLOBAL_ACTION_ACCESSIBILITY_ALL_APPS) }
-                ),
-                MenuItem(
                     id = "open_assistant",
                     text = "Open Assistant",
                     action = {
