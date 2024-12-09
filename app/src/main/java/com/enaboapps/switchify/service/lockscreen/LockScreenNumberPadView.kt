@@ -16,7 +16,7 @@ class LockScreenNumberPadView(context: Context) : LinearLayout(context) {
     }
 
     init {
-        orientation = LinearLayout.VERTICAL
+        orientation = VERTICAL
         gravity = Gravity.CENTER
 
         val gridLayout = GridLayout(context).apply {

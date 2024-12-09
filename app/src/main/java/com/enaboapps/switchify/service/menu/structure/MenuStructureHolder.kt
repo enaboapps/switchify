@@ -3,7 +3,6 @@ package com.enaboapps.switchify.service.menu.structure
 import android.accessibilityservice.AccessibilityService
 import android.content.Context
 import android.content.Intent
-import android.content.pm.PackageManager
 import android.media.AudioManager
 import android.view.accessibility.AccessibilityNodeInfo
 import com.enaboapps.switchify.R
@@ -18,7 +17,6 @@ import com.enaboapps.switchify.service.menu.MenuManager
 import com.enaboapps.switchify.service.methods.nodes.Node
 import com.enaboapps.switchify.service.methods.nodes.NodeExaminer
 import com.enaboapps.switchify.service.scanning.ScanMethod
-import com.enaboapps.switchify.service.utils.ScreenUtils
 
 class MenuStructureHolder(private val accessibilityService: SwitchifyAccessibilityService? = null) {
     private val tapMenuItem = MenuItem(

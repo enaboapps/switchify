@@ -10,8 +10,8 @@ import com.enaboapps.switchify.service.custom.actions.store.data.ACTION_CALL_NUM
 import com.enaboapps.switchify.service.custom.actions.store.data.ACTION_COPY_TEXT_TO_CLIPBOARD
 import com.enaboapps.switchify.service.custom.actions.store.data.ACTION_OPEN_APP
 import com.enaboapps.switchify.service.custom.actions.store.data.ACTION_OPEN_LINK
-import com.enaboapps.switchify.service.custom.actions.store.data.ACTION_SEND_TEXT
 import com.enaboapps.switchify.service.custom.actions.store.data.ACTION_SEND_EMAIL
+import com.enaboapps.switchify.service.custom.actions.store.data.ACTION_SEND_TEXT
 import com.enaboapps.switchify.service.custom.actions.store.data.ActionExtra
 import com.enaboapps.switchify.utils.AppLauncher
 
@@ -54,7 +54,10 @@ class ActionPerformer(
             ) // Copy text to clipboard
             ACTION_CALL_NUMBER -> callNumber(extra?.numberToCall ?: "") // Call a number
             ACTION_OPEN_LINK -> openLink(extra?.linkUrl ?: "") // Open a link
-            ACTION_SEND_TEXT -> sendText(extra?.numberToSend ?: "", extra?.message ?: "") // Send a text
+            ACTION_SEND_TEXT -> sendText(
+                extra?.numberToSend ?: "",
+                extra?.message ?: ""
+            ) // Send a text
             ACTION_SEND_EMAIL -> sendEmail(extra?.emailAddress ?: "") // Send an email
         }
     }
