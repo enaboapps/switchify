@@ -6,10 +6,10 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.platform.LocalContext
+import com.enaboapps.switchify.components.Picker
+import com.enaboapps.switchify.components.Section
 import com.enaboapps.switchify.preferences.PreferenceManager
 import com.enaboapps.switchify.service.scanning.ScanMode
-import com.enaboapps.switchify.widgets.Picker
-import com.enaboapps.switchify.widgets.Section
 
 @Composable
 fun ScanModeSelectionSection(

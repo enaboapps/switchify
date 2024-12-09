@@ -28,7 +28,7 @@ import androidx.compose.ui.input.key.onKeyEvent
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
-import com.enaboapps.switchify.widgets.NavBar
+import com.enaboapps.switchify.components.NavBar
 
 @Composable
 fun TestSwitchesScreen(navController: NavHostController) {

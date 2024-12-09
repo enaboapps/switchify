@@ -16,9 +16,9 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
+import com.enaboapps.switchify.components.FullWidthButton
+import com.enaboapps.switchify.components.NavBar
 import com.enaboapps.switchify.keyboard.utils.KeyboardUtils
-import com.enaboapps.switchify.widgets.FullWidthButton
-import com.enaboapps.switchify.widgets.NavBar
 
 @Composable
 fun EnableKeyboardScreen(navController: NavController) {

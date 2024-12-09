@@ -13,12 +13,12 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
+import com.enaboapps.switchify.components.NavBar
+import com.enaboapps.switchify.components.Picker
+import com.enaboapps.switchify.components.PreferenceTimeStepper
+import com.enaboapps.switchify.components.Section
 import com.enaboapps.switchify.preferences.PreferenceManager
 import com.enaboapps.switchify.service.methods.cursor.CursorMode
-import com.enaboapps.switchify.widgets.NavBar
-import com.enaboapps.switchify.widgets.Picker
-import com.enaboapps.switchify.widgets.PreferenceTimeStepper
-import com.enaboapps.switchify.widgets.Section
 
 @Composable
 fun CursorSettingsScreen(navController: NavController) {

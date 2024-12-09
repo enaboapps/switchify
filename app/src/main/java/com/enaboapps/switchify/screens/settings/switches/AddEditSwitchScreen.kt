@@ -31,13 +31,13 @@ import androidx.compose.ui.input.key.onKeyEvent
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
+import com.enaboapps.switchify.components.FullWidthButton
+import com.enaboapps.switchify.components.NavBar
+import com.enaboapps.switchify.components.TextArea
 import com.enaboapps.switchify.screens.settings.switches.actions.SwitchActionPicker
 import com.enaboapps.switchify.screens.settings.switches.models.AddEditSwitchScreenModel
 import com.enaboapps.switchify.switches.SwitchAction
 import com.enaboapps.switchify.switches.SwitchEventStore
-import com.enaboapps.switchify.widgets.FullWidthButton
-import com.enaboapps.switchify.widgets.NavBar
-import com.enaboapps.switchify.widgets.TextArea
 
 @Composable
 fun AddEditSwitchScreen(navController: NavController, code: String? = null) {

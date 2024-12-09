@@ -23,9 +23,9 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import com.enaboapps.switchify.auth.AuthManager
+import com.enaboapps.switchify.components.FullWidthButton
+import com.enaboapps.switchify.components.NavBar
 import com.enaboapps.switchify.nav.NavigationRoute
-import com.enaboapps.switchify.widgets.FullWidthButton
-import com.enaboapps.switchify.widgets.NavBar
 import com.google.firebase.auth.FirebaseAuth
 
 @Composable

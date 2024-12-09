@@ -10,6 +10,10 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
+import com.enaboapps.switchify.components.FullWidthButton
+import com.enaboapps.switchify.components.NavBar
+import com.enaboapps.switchify.components.Picker
+import com.enaboapps.switchify.components.TextArea
 import com.enaboapps.switchify.screens.settings.actions.inputs.AppLaunchExtraInput
 import com.enaboapps.switchify.screens.settings.actions.inputs.CallNumberExtraInput
 import com.enaboapps.switchify.screens.settings.actions.inputs.CopyTextExtraInput
@@ -26,10 +30,6 @@ import com.enaboapps.switchify.service.custom.actions.store.data.ACTION_SEND_EMA
 import com.enaboapps.switchify.service.custom.actions.store.data.ACTION_SEND_TEXT
 import com.enaboapps.switchify.service.custom.actions.store.data.ActionExtra
 import com.enaboapps.switchify.service.custom.actions.store.data.getActionDescription
-import com.enaboapps.switchify.widgets.FullWidthButton
-import com.enaboapps.switchify.widgets.NavBar
-import com.enaboapps.switchify.widgets.Picker
-import com.enaboapps.switchify.widgets.TextArea
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable

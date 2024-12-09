@@ -16,8 +16,8 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.MutableLiveData
 import androidx.navigation.NavController
+import com.enaboapps.switchify.components.NavBar
 import com.enaboapps.switchify.service.menu.MenuSizeManager
-import com.enaboapps.switchify.widgets.NavBar
 
 @Composable
 fun MenuSizeScreen(navController: NavController) {

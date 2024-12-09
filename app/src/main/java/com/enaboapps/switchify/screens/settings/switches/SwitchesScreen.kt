@@ -29,16 +29,16 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import com.enaboapps.switchify.R
+import com.enaboapps.switchify.components.LoadingIndicator
+import com.enaboapps.switchify.components.NavBar
+import com.enaboapps.switchify.components.NavBarAction
+import com.enaboapps.switchify.components.NavRouteLink
+import com.enaboapps.switchify.components.Section
+import com.enaboapps.switchify.components.UICard
 import com.enaboapps.switchify.nav.NavigationRoute
 import com.enaboapps.switchify.screens.settings.switches.models.SwitchesScreenModel
 import com.enaboapps.switchify.switches.SwitchEvent
 import com.enaboapps.switchify.switches.SwitchEventStore
-import com.enaboapps.switchify.widgets.LoadingIndicator
-import com.enaboapps.switchify.widgets.NavBar
-import com.enaboapps.switchify.widgets.NavBarAction
-import com.enaboapps.switchify.widgets.NavRouteLink
-import com.enaboapps.switchify.widgets.Section
-import com.enaboapps.switchify.widgets.UICard
 
 @Composable
 fun SwitchesScreen(navController: NavController) {

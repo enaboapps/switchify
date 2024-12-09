@@ -6,8 +6,8 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
+import com.enaboapps.switchify.components.TextArea
 import com.enaboapps.switchify.service.custom.actions.store.data.ActionExtra
-import com.enaboapps.switchify.widgets.TextArea
 
 @Composable
 fun SendTextExtraInput(

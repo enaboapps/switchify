@@ -13,12 +13,12 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
+import com.enaboapps.switchify.components.NavBar
+import com.enaboapps.switchify.components.NavRouteLink
+import com.enaboapps.switchify.components.Section
 import com.enaboapps.switchify.nav.NavigationRoute
 import com.enaboapps.switchify.service.custom.actions.store.Action
 import com.enaboapps.switchify.service.custom.actions.store.ActionStore
-import com.enaboapps.switchify.widgets.NavBar
-import com.enaboapps.switchify.widgets.NavRouteLink
-import com.enaboapps.switchify.widgets.Section
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable

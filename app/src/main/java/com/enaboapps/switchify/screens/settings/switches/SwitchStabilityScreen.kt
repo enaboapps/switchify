@@ -13,10 +13,10 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
+import com.enaboapps.switchify.components.NavBar
+import com.enaboapps.switchify.components.PreferenceSwitch
+import com.enaboapps.switchify.components.PreferenceTimeStepper
 import com.enaboapps.switchify.screens.settings.switches.models.SwitchStabilityScreenModel
-import com.enaboapps.switchify.widgets.NavBar
-import com.enaboapps.switchify.widgets.PreferenceSwitch
-import com.enaboapps.switchify.widgets.PreferenceTimeStepper
 
 @Composable
 fun SwitchStabilityScreen(navController: NavController) {
