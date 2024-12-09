@@ -2,6 +2,7 @@ package com.enaboapps.switchify.service.menu.structure
 
 import android.accessibilityservice.AccessibilityService
 import android.content.Context
+import android.content.Intent
 import android.content.pm.PackageManager
 import android.media.AudioManager
 import android.view.accessibility.AccessibilityNodeInfo
@@ -316,6 +317,15 @@ class MenuStructureHolder(private val accessibilityService: SwitchifyAccessibili
                     id = "all_apps",
                     text = "All Apps",
                     action = { accessibilityService?.performGlobalAction(AccessibilityService.GLOBAL_ACTION_ACCESSIBILITY_ALL_APPS) }
+                ),
+                MenuItem(
+                    id = "open_assistant",
+                    text = "Open Assistant",
+                    action = {
+                        val intent = Intent(Intent.ACTION_VOICE_COMMAND)
+                        intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK
+                        accessibilityService?.startActivity(intent)
+                    }
                 ),
                 if (packageManager?.hasSystemFeature(PackageManager.FEATURE_ACTIVITIES_ON_SECONDARY_DISPLAYS) == true && accessibilityService?.let {
                         ScreenUtils.isTablet(
