@@ -299,7 +299,6 @@ class MenuStructureHolder(private val accessibilityService: SwitchifyAccessibili
      * The device menu item store object
      */
     fun buildDeviceMenuObject(): MenuStructure {
-        val packageManager = accessibilityService?.packageManager
         return MenuStructure(
             id = "device_menu",
             items = listOfNotNull(
@@ -322,17 +321,6 @@ class MenuStructureHolder(private val accessibilityService: SwitchifyAccessibili
                         accessibilityService?.startActivity(intent)
                     }
                 ),
-                if (packageManager?.hasSystemFeature(PackageManager.FEATURE_ACTIVITIES_ON_SECONDARY_DISPLAYS) == true && accessibilityService?.let {
-                        ScreenUtils.isTablet(
-                            it
-                        )
-                    } == true) {
-                    MenuItem(
-                        id = "toggle_split_screen",
-                        text = "Toggle Split Screen",
-                        action = { accessibilityService.performGlobalAction(AccessibilityService.GLOBAL_ACTION_TOGGLE_SPLIT_SCREEN) }
-                    )
-                } else null,
                 MenuItem(
                     id = "quick_settings",
                     text = "Quick Settings",
