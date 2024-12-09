@@ -16,9 +16,9 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
+import com.enaboapps.switchify.components.Picker
 import com.enaboapps.switchify.screens.settings.switches.actions.inputs.MyActionsPicker
 import com.enaboapps.switchify.switches.SwitchAction
-import com.enaboapps.switchify.widgets.Picker
 
 @Composable
 fun SwitchActionPicker(

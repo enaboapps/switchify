@@ -18,10 +18,10 @@ import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import com.enaboapps.switchify.auth.AuthManager
 import com.enaboapps.switchify.auth.GoogleAuthHandler
+import com.enaboapps.switchify.components.*
 import com.enaboapps.switchify.nav.NavigationRoute
 import com.enaboapps.switchify.preferences.PreferenceManager
 import com.enaboapps.switchify.service.custom.actions.store.ActionStore
-import com.enaboapps.switchify.widgets.*
 import kotlinx.coroutines.launch
 
 @Composable

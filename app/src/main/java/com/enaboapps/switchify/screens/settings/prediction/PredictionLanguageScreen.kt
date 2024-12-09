@@ -16,9 +16,9 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import co.thingthing.fleksy.lib.languages.RemoteLanguage
+import com.enaboapps.switchify.components.NavBar
+import com.enaboapps.switchify.components.UICard
 import com.enaboapps.switchify.keyboard.prediction.PredictionLanguageManager
-import com.enaboapps.switchify.widgets.NavBar
-import com.enaboapps.switchify.widgets.UICard
 
 @Composable
 fun PredictionLanguageScreen(navController: NavController) {

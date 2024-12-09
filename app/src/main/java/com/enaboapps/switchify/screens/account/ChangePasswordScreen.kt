@@ -23,9 +23,9 @@ import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import com.enaboapps.switchify.auth.AuthManager
-import com.enaboapps.switchify.widgets.FullWidthButton
-import com.enaboapps.switchify.widgets.NavBar
-import com.enaboapps.switchify.widgets.TextArea
+import com.enaboapps.switchify.components.FullWidthButton
+import com.enaboapps.switchify.components.NavBar
+import com.enaboapps.switchify.components.TextArea
 
 @Composable
 fun ChangePasswordScreen(navController: NavController) {

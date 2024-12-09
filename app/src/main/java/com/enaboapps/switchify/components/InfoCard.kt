@@ -1,4 +1,4 @@
-package com.enaboapps.switchify.widgets
+package com.enaboapps.switchify.components
 
 import androidx.compose.runtime.Composable
 

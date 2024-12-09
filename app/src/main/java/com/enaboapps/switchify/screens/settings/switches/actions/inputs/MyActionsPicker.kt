@@ -6,11 +6,11 @@ import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.platform.LocalContext
+import com.enaboapps.switchify.components.Picker
 import com.enaboapps.switchify.service.custom.actions.store.Action
 import com.enaboapps.switchify.service.custom.actions.store.ActionStore
 import com.enaboapps.switchify.switches.SwitchAction
 import com.enaboapps.switchify.switches.SwitchActionExtra
-import com.enaboapps.switchify.widgets.Picker
 
 @Composable
 fun MyActionsPicker(

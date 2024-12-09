@@ -15,11 +15,11 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import com.enaboapps.switchify.R
+import com.enaboapps.switchify.components.*
 import com.enaboapps.switchify.nav.NavigationRoute
 import com.enaboapps.switchify.screens.settings.models.SettingsScreenModel
 import com.enaboapps.switchify.screens.settings.scanning.ScanMethodSelectionSection
 import com.enaboapps.switchify.screens.settings.scanning.ScanModeSelectionSection
-import com.enaboapps.switchify.widgets.*
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable

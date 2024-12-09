@@ -23,12 +23,12 @@ import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.MutableLiveData
 import androidx.navigation.NavController
+import com.enaboapps.switchify.components.FullWidthButton
+import com.enaboapps.switchify.components.NavBar
+import com.enaboapps.switchify.components.PreferenceSwitch
+import com.enaboapps.switchify.components.Section
+import com.enaboapps.switchify.components.TextArea
 import com.enaboapps.switchify.screens.settings.lockscreen.models.LockScreenSettingsScreenModel
-import com.enaboapps.switchify.widgets.FullWidthButton
-import com.enaboapps.switchify.widgets.NavBar
-import com.enaboapps.switchify.widgets.PreferenceSwitch
-import com.enaboapps.switchify.widgets.Section
-import com.enaboapps.switchify.widgets.TextArea
 
 @Composable
 fun LockScreenSettingsScreen(navController: NavController) {
