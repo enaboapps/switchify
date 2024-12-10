@@ -48,7 +48,7 @@ fun SettingsScreen(navController: NavController) {
 
             when (selectedTabIndex) {
                 0 -> GeneralSettingsTab(settingsScreenModel, navController)
-                1 -> ScanningSettingsTab(settingsScreenModel, navController)
+                1 -> ScanningSettingsTab(navController)
                 2 -> SelectionSettingsTab(settingsScreenModel)
                 3 -> AboutSection()
             }
@@ -86,7 +86,7 @@ fun GeneralSettingsTab(settingsScreenModel: SettingsScreenModel, navController: 
 }
 
 @Composable
-fun ScanningSettingsTab(settingsScreenModel: SettingsScreenModel, navController: NavController) {
+fun ScanningSettingsTab(navController: NavController) {
     Column(
         modifier = Modifier
             .fillMaxSize()
@@ -94,11 +94,47 @@ fun ScanningSettingsTab(settingsScreenModel: SettingsScreenModel, navController:
             .padding(16.dp)
     ) {
         ScanMethodSelectionSection()
+
+        Section(title = "Scanning Method Settings") {
+            NavRouteLink(
+                title = "Cursor Scan",
+                summary = "Move a cursor around the screen to select items - best for precise control and navigation",
+                navController = navController,
+                route = NavigationRoute.CursorSettings.name
+            )
+
+            NavRouteLink(
+                title = "Item Scan",
+                summary = "Scan through interactive elements one by one or in groups - best for structured content",
+                navController = navController,
+                route = NavigationRoute.ItemScanSettings.name
+            )
+
+            NavRouteLink(
+                title = "Radar Scan",
+                summary = "A rotating line that helps select items in a circular pattern - best for quick access to screen areas",
+                navController = navController,
+                route = NavigationRoute.RadarSettings.name
+            )
+        }
+
         ScanModeSelectionSection()
-        TimingAndScanningSection(settingsScreenModel, navController)
-        ItemScanSection(settingsScreenModel)
-        ManualScanSection(settingsScreenModel)
-        CursorSection(navController)
+
+        NavRouteLink(
+            title = "Other Scan Settings",
+            summary = "Configure other scan settings",
+            navController = navController,
+            route = NavigationRoute.OtherScanSettings.name
+        )
+
+        Section(title = "Scan Appearance") {
+            NavRouteLink(
+                title = "Scan Color",
+                summary = "Configure the scan highlight color",
+                navController = navController,
+                route = NavigationRoute.ScanColor.name
+            )
+        }
     }
 }
 
@@ -111,73 +147,6 @@ fun SelectionSettingsTab(settingsScreenModel: SettingsScreenModel) {
             .padding(16.dp)
     ) {
         SelectionSection(settingsScreenModel)
-    }
-}
-
-@Composable
-private fun TimingAndScanningSection(
-    settingsScreenModel: SettingsScreenModel,
-    navController: NavController
-) {
-    Section(title = "Timing and Scanning") {
-        PreferenceTimeStepper(
-            value = settingsScreenModel.scanRate.value ?: 0,
-            title = "Scan rate",
-            summary = "The interval at which the scanner will move to the next item",
-            min = 200,
-            max = 100000
-        ) {
-            settingsScreenModel.setScanRate(it)
-        }
-        PreferenceTimeStepper(
-            value = settingsScreenModel.radarScanRate.value ?: 0,
-            title = "Radar scan rate",
-            summary = "The interval at which the radar will move",
-            min = 10,
-            max = 100000,
-            step = 10
-        ) {
-            settingsScreenModel.setRadarScanRate(it)
-        }
-        PreferenceSwitch(
-            title = "Automatically start scan after selection (auto scan only)",
-            summary = "Automatically start the scan after a selection is made",
-            checked = settingsScreenModel.automaticallyStartScanAfterSelection.value == true
-        ) {
-            settingsScreenModel.setAutomaticallyStartScanAfterSelection(it)
-        }
-        PreferenceSwitch(
-            title = "Pause on first item",
-            summary = "Pause scanning when the first item is highlighted",
-            checked = settingsScreenModel.pauseOnFirstItem.value == true
-        ) {
-            settingsScreenModel.setPauseOnFirstItem(it)
-        }
-        if (settingsScreenModel.pauseOnFirstItem.value == true) {
-            PreferenceTimeStepper(
-                value = settingsScreenModel.pauseOnFirstItemDelay.value ?: 0,
-                title = "Pause on first item delay",
-                summary = "The delay to pause on the first item",
-                min = 100,
-                max = 100000
-            ) {
-                settingsScreenModel.setPauseOnFirstItemDelay(it)
-            }
-        }
-        PreferenceSwitch(
-            title = "Assisted selection",
-            summary = "Assist the user in selecting items by selecting the closest available item to where they tap",
-            checked = settingsScreenModel.assistedSelection.value == true,
-            onCheckedChange = {
-                settingsScreenModel.setAssistedSelection(it)
-            }
-        )
-        NavRouteLink(
-            title = "Scan Color",
-            summary = "Configure the scan color",
-            navController = navController,
-            route = NavigationRoute.ScanColor.name
-        )
     }
 }
 
@@ -245,18 +214,6 @@ private fun ActionsSection(navController: NavController) {
 }
 
 @Composable
-private fun CursorSection(navController: NavController) {
-    Section(title = "Cursor") {
-        NavRouteLink(
-            title = "Cursor Settings",
-            summary = "Configure the cursor settings",
-            navController = navController,
-            route = NavigationRoute.CursorSettings.name
-        )
-    }
-}
-
-@Composable
 private fun SelectionSection(screenModel: SettingsScreenModel) {
     Section(title = "Selection") {
         PreferenceSwitch(
@@ -276,52 +233,14 @@ private fun SelectionSection(screenModel: SettingsScreenModel) {
         ) {
             screenModel.setAutoSelectDelay(it)
         }
-    }
-}
-
-@Composable
-private fun ItemScanSection(screenModel: SettingsScreenModel) {
-    Section(title = "Item Scan") {
         PreferenceSwitch(
-            title = "Row column scan",
-            summary = "Scan items in a row column pattern",
-            checked = screenModel.rowColumnScan.value == true,
+            title = "Assisted selection",
+            summary = "Assist the user in selecting items by selecting the closest available item to where they tap",
+            checked = screenModel.assistedSelection.value == true,
             onCheckedChange = {
-                screenModel.setRowColumnScan(it)
+                screenModel.setAssistedSelection(it)
             }
         )
-        PreferenceSwitch(
-            title = "Group scan (requires row column scan)",
-            summary = "Scan items in a group pattern",
-            checked = screenModel.groupScan.value == true,
-            onCheckedChange = {
-                screenModel.setGroupScan(it)
-            }
-        )
-    }
-}
-
-@Composable
-private fun ManualScanSection(screenModel: SettingsScreenModel) {
-    Section(title = "Manual Scan") {
-        PreferenceSwitch(
-            title = "Move Repeat",
-            summary = "Hold down a switch to move repeatedly",
-            checked = screenModel.moveRepeat.value == true,
-            onCheckedChange = {
-                screenModel.setMoveRepeat(it)
-            }
-        )
-        PreferenceTimeStepper(
-            value = screenModel.moveRepeatDelay.value ?: 0,
-            title = "Move Repeat Delay",
-            summary = "The delay before repeating the last move action",
-            min = 100,
-            max = 100000,
-            step = 100
-        ) {
-            screenModel.setMoveRepeatDelay(it)
-        }
     }
 }
 
