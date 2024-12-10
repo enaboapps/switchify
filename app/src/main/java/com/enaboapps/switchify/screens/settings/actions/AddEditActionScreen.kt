@@ -1,42 +1,25 @@
 package com.enaboapps.switchify.screens.settings.actions
 
 import androidx.compose.foundation.layout.*
-import androidx.compose.foundation.rememberScrollState
-import androidx.compose.foundation.verticalScroll
-import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
+import com.enaboapps.switchify.components.BaseView
 import com.enaboapps.switchify.components.FullWidthButton
-import com.enaboapps.switchify.components.NavBar
 import com.enaboapps.switchify.components.Picker
 import com.enaboapps.switchify.components.TextArea
-import com.enaboapps.switchify.screens.settings.actions.inputs.AppLaunchExtraInput
-import com.enaboapps.switchify.screens.settings.actions.inputs.CallNumberExtraInput
-import com.enaboapps.switchify.screens.settings.actions.inputs.CopyTextExtraInput
-import com.enaboapps.switchify.screens.settings.actions.inputs.OpenLinkExtraInput
-import com.enaboapps.switchify.screens.settings.actions.inputs.SendEmailExtraInput
-import com.enaboapps.switchify.screens.settings.actions.inputs.SendTextExtraInput
+import com.enaboapps.switchify.screens.settings.actions.inputs.*
 import com.enaboapps.switchify.service.custom.actions.ActionPerformer
 import com.enaboapps.switchify.service.custom.actions.store.ActionStore
-import com.enaboapps.switchify.service.custom.actions.store.data.ACTION_CALL_NUMBER
-import com.enaboapps.switchify.service.custom.actions.store.data.ACTION_COPY_TEXT_TO_CLIPBOARD
-import com.enaboapps.switchify.service.custom.actions.store.data.ACTION_OPEN_APP
-import com.enaboapps.switchify.service.custom.actions.store.data.ACTION_OPEN_LINK
-import com.enaboapps.switchify.service.custom.actions.store.data.ACTION_SEND_EMAIL
-import com.enaboapps.switchify.service.custom.actions.store.data.ACTION_SEND_TEXT
-import com.enaboapps.switchify.service.custom.actions.store.data.ActionExtra
-import com.enaboapps.switchify.service.custom.actions.store.data.getActionDescription
+import com.enaboapps.switchify.service.custom.actions.store.data.*
 
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun AddEditActionScreen(navController: NavController, actionId: String? = null) {
     val context = LocalContext.current
     val actionStore = remember { ActionStore(context) }
-    val snackbarHostState = remember { SnackbarHostState() }
 
     val isEditMode = actionId != null
     val screenTitle = if (isEditMode) "Edit Action" else "Add Action"
@@ -67,78 +50,65 @@ fun AddEditActionScreen(navController: NavController, actionId: String? = null) 
         actionText.isNotBlank() && selectedAction.isNotBlank() && selectedExtra != null && extraValid
     }
 
-    Scaffold(
-        topBar = {
-            NavBar(title = screenTitle, navController = navController)
-        },
-        snackbarHost = { SnackbarHost(snackbarHostState) }
-    ) { paddingValues ->
-        Column(
-            modifier = Modifier
-                .fillMaxSize()
-                .padding(paddingValues)
-                .verticalScroll(rememberScrollState())
-                .padding(16.dp)
-        ) {
-            ActionTextInput(
-                text = actionText,
-                onTextChange = { actionText = it }
-            )
+    BaseView(title = screenTitle, navController = navController) {
+        ActionTextInput(
+            text = actionText,
+            onTextChange = { actionText = it }
+        )
 
-            Spacer(modifier = Modifier.height(16.dp))
+        Spacer(modifier = Modifier.height(16.dp))
 
-            ActionPicker(
-                selectedAction = selectedAction,
-                availableActions = availableActions,
-                onActionSelected = {
-                    selectedAction = it
+        ActionPicker(
+            selectedAction = selectedAction,
+            availableActions = availableActions,
+            onActionSelected = {
+                selectedAction = it
+            }
+        )
+
+        Spacer(modifier = Modifier.height(16.dp))
+
+        ActionExtraInput(
+            selectedAction = selectedAction,
+            selectedExtra = selectedExtra,
+            onExtraUpdated = { selectedExtra = it },
+            onExtraValidated = { extraValid = it }
+        )
+
+        Spacer(modifier = Modifier.height(16.dp))
+
+        TestButton(
+            isEnabled = buttonsEnabled,
+            onTestClicked = {
+                if (selectedAction.isNotBlank() && selectedExtra != null) {
+                    actionPerformer.test(selectedAction, selectedExtra)
                 }
-            )
+            }
+        )
 
-            Spacer(modifier = Modifier.height(16.dp))
-
-            ActionExtraInput(
-                selectedAction = selectedAction,
-                selectedExtra = selectedExtra,
-                onExtraUpdated = { selectedExtra = it },
-                onExtraValidated = { extraValid = it }
-            )
-
-            Spacer(modifier = Modifier.height(16.dp))
-
-            TestButton(
-                isEnabled = buttonsEnabled,
-                onTestClicked = {
-                    if (selectedAction.isNotBlank() && selectedExtra != null) {
-                        actionPerformer.test(selectedAction, selectedExtra)
-                    }
+        SaveButton(
+            isEditMode = isEditMode,
+            isSaving = isSaving,
+            isEnabled = buttonsEnabled,
+            onSaveClicked = {
+                isSaving = true
+                if (isEditMode) {
+                    actionStore.updateAction(
+                        id = actionId,
+                        action = selectedAction,
+                        text = actionText,
+                        extra = selectedExtra
+                    )
+                } else {
+                    actionStore.addAction(
+                        action = selectedAction,
+                        text = actionText,
+                        extra = selectedExtra
+                    )
                 }
-            )
-
-            SaveButton(
-                isEditMode = isEditMode,
-                isSaving = isSaving,
-                isEnabled = buttonsEnabled,
-                onSaveClicked = {
-                    isSaving = true
-                    if (isEditMode) {
-                        actionStore.updateAction(
-                            id = actionId,
-                            action = selectedAction,
-                            text = actionText,
-                            extra = selectedExtra
-                        )
-                    } else {
-                        actionStore.addAction(
-                            action = selectedAction,
-                            text = actionText,
-                            extra = selectedExtra
-                        )
-                    }
-                    navController.popBackStack()
-                }
-            )
-        }
+                navController.popBackStack()
+            }
+        )
     }
 }
 

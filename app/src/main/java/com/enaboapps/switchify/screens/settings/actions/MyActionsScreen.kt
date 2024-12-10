@@ -1,8 +1,6 @@
 package com.enaboapps.switchify.screens.settings.actions
 
 import androidx.compose.foundation.layout.*
-import androidx.compose.foundation.rememberScrollState
-import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.Delete
@@ -13,27 +11,26 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
-import com.enaboapps.switchify.components.NavBar
+import com.enaboapps.switchify.components.BaseView
 import com.enaboapps.switchify.components.NavRouteLink
 import com.enaboapps.switchify.components.Section
 import com.enaboapps.switchify.nav.NavigationRoute
 import com.enaboapps.switchify.service.custom.actions.store.Action
 import com.enaboapps.switchify.service.custom.actions.store.ActionStore
 
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun MyActionsScreen(navController: NavController) {
     val context = LocalContext.current
     val actionStore = ActionStore(context)
-    val snackbarHostState = remember { SnackbarHostState() }
+    remember { SnackbarHostState() }
 
     val actions = remember { mutableStateListOf<Action>() }
     actions.addAll(actionStore.getActions())
 
-    Scaffold(
-        topBar = {
-            NavBar(title = "My Actions", navController = navController)
-        },
+    BaseView(
+        title = "My Actions",
+        navController = navController,
+        enableScroll = false,
         floatingActionButton = {
             FloatingActionButton(onClick = {
                 navController.navigate(NavigationRoute.AddMyActionsMenuItem.name)
@@ -43,16 +40,13 @@ fun MyActionsScreen(navController: NavController) {
                     contentDescription = "Add"
                 )
             }
-        },
-        snackbarHost = { SnackbarHost(snackbarHostState) }
-    ) { paddingValues ->
+        }
+    ) {
         Column(
             modifier = Modifier
-                .fillMaxSize()
-                .padding(paddingValues)
-                .verticalScroll(rememberScrollState())
-                .padding(16.dp),
-            horizontalAlignment = Alignment.CenterHorizontally
+                .padding(16.dp)
+                .fillMaxSize(),
+            verticalArrangement = Arrangement.spacedBy(16.dp)
         ) {
             Text(
                 text = "Actions can be performed from the menu or can be used as a switch action.",

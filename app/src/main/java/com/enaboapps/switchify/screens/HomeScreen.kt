@@ -9,14 +9,9 @@ import android.widget.Toast
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.IntentSenderRequest
 import androidx.activity.result.contract.ActivityResultContracts
-import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.material3.AlertDialog
-import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
@@ -26,13 +21,12 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import com.enaboapps.switchify.auth.AuthManager
-import com.enaboapps.switchify.components.NavBar
+import com.enaboapps.switchify.components.BaseView
 import com.enaboapps.switchify.components.NavBarAction
 import com.enaboapps.switchify.components.NavRouteLink
 import com.enaboapps.switchify.keyboard.utils.KeyboardUtils
@@ -55,14 +49,6 @@ fun HomeScreen(navController: NavController, serviceUtils: ServiceUtils = Servic
     val isAccessibilityServiceEnabled = serviceUtils.isAccessibilityServiceEnabled(context)
     val isSwitchifyKeyboardEnabled = KeyboardUtils.isSwitchifyKeyboardEnabled(context)
     val isSetupComplete = PreferenceManager(context).isSetupComplete()
-
-    val feedbackNavButton = NavBarAction(
-        text = "Feedback",
-        onClick = {
-            val url = "https://switchify.featurebase.app/"
-            context.startActivity(Intent(Intent.ACTION_VIEW, Uri.parse(url)))
-        }
-    )
 
     LaunchedEffect(isSetupComplete) {
         if (!isSetupComplete) {
@@ -140,99 +126,77 @@ fun HomeScreen(navController: NavController, serviceUtils: ServiceUtils = Servic
         }
     }
 
-    Scaffold(
-        topBar = {
-            NavBar(
-                title = "Switchify",
+    BaseView(
+        title = "Switchify",
+        navController = navController,
+        navBarActions = listOf(NavBarAction(text = "Feedback", onClick = {
+            val url = "https://switchify.featurebase.app/"
+            context.startActivity(Intent(Intent.ACTION_VIEW, Uri.parse(url)))
+        }))
+    ) {
+        Spacer(modifier = Modifier.height(20.dp))
+
+        NavRouteLink(
+            title = "Settings",
+            summary = "Tap here to adjust your settings.",
+            navController = navController,
+            route = NavigationRoute.Settings.name
+        )
+
+        SwitchConfigInvalidBanner(SwitchEventStore(LocalContext.current).isConfigInvalid())
+
+
+        if (!isAccessibilityServiceEnabled) {
+            NavRouteLink(
+                title = "Accessibility Service",
+                summary = "Tap here to enable the accessibility service.",
                 navController = navController,
-                actions = listOf(feedbackNavButton)
+                route = NavigationRoute.EnableAccessibilityService.name
             )
         }
-    ) { paddingValues ->
-        LazyColumn(
-            modifier = Modifier
-                .padding(paddingValues)
-                .fillMaxSize(),
-            verticalArrangement = Arrangement.spacedBy(12.dp),
-            horizontalAlignment = Alignment.CenterHorizontally
-        ) {
-            item {
-                Spacer(modifier = Modifier.height(20.dp))
-            }
 
-            item {
-                NavRouteLink(
-                    title = "Settings",
-                    summary = "Tap here to adjust your settings.",
-                    navController = navController,
-                    route = NavigationRoute.Settings.name
-                )
-            }
-
-            item {
-                SwitchConfigInvalidBanner(SwitchEventStore(LocalContext.current).isConfigInvalid())
-            }
-
-            if (!isAccessibilityServiceEnabled) {
-                item {
-                    NavRouteLink(
-                        title = "Accessibility Service",
-                        summary = "Tap here to enable the accessibility service.",
-                        navController = navController,
-                        route = NavigationRoute.EnableAccessibilityService.name
-                    )
-                }
-            }
-
-            if (!isSwitchifyKeyboardEnabled) {
-                item {
-                    NavRouteLink(
-                        title = "Switchify Keyboard",
-                        summary = "Tap here to enable the Switchify keyboard.",
-                        navController = navController,
-                        route = NavigationRoute.EnableSwitchifyKeyboard.name
-                    )
-                }
-            }
-
-            item {
-                NavRouteLink(
-                    title = "How To Use",
-                    summary = "Learn how to use Switchify.",
-                    navController = navController,
-                    route = NavigationRoute.HowToUse.name
-                )
-            }
-
-            item {
-                AccountCard(navController)
-            }
+        if (!isSwitchifyKeyboardEnabled) {
+            NavRouteLink(
+                title = "Switchify Keyboard",
+                summary = "Tap here to enable the Switchify keyboard.",
+                navController = navController,
+                route = NavigationRoute.EnableSwitchifyKeyboard.name
+            )
         }
-    }
 
-    if (showUpdateDialog) {
-        AlertDialog(
-            onDismissRequest = { showUpdateDialog = false },
-            title = { Text("Update Available") },
-            text = { Text("A new version has been downloaded. Restart now to complete the installation?") },
-            confirmButton = {
-                TextButton(
-                    onClick = {
-                        showUpdateDialog = false
-                        appUpdateManager.completeUpdate()
-                    }
-                ) {
-                    Text("Restart")
-                }
-            },
-            dismissButton = {
-                TextButton(
-                    onClick = { showUpdateDialog = false }
-                ) {
-                    Text("Later")
-                }
-            }
+        NavRouteLink(
+            title = "How To Use",
+            summary = "Learn how to use Switchify.",
+            navController = navController,
+            route = NavigationRoute.HowToUse.name
         )
+
+        AccountCard(navController)
+
+        if (showUpdateDialog) {
+            AlertDialog(
+                onDismissRequest = { showUpdateDialog = false },
+                title = { Text("Update Available") },
+                text = { Text("A new version has been downloaded. Restart now to complete the installation?") },
+                confirmButton = {
+                    TextButton(
+                        onClick = {
+                            showUpdateDialog = false
+                            appUpdateManager.completeUpdate()
+                        }
+                    ) {
+                        Text("Restart")
+                    }
+                },
+                dismissButton = {
+                    TextButton(
+                        onClick = { showUpdateDialog = false }
+                    ) {
+                        Text("Later")
+                    }
+                }
+            )
+        }
     }
 }
 

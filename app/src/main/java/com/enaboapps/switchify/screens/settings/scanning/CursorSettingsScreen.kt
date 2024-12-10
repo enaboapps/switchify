@@ -1,9 +1,8 @@
 package com.enaboapps.switchify.screens.settings.scanning
 
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
-import androidx.compose.material3.Scaffold
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -13,7 +12,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
-import com.enaboapps.switchify.components.NavBar
+import com.enaboapps.switchify.components.BaseView
 import com.enaboapps.switchify.components.Picker
 import com.enaboapps.switchify.components.PreferenceTimeStepper
 import com.enaboapps.switchify.components.Section
@@ -35,16 +34,14 @@ fun CursorSettingsScreen(navController: NavController) {
         currentMode = mode
     }
 
-    Scaffold(
-        topBar = {
-            NavBar(title = "Cursor Settings", navController = navController)
-        }
-    ) { paddingValues ->
+    BaseView(
+        title = "Cursor Settings",
+        navController = navController
+    ) {
         Column(
             modifier = Modifier
-                .fillMaxWidth()
-                .padding(paddingValues)
-                .padding(vertical = 16.dp),
+                .padding(16.dp)
+                .fillMaxSize()
         ) {
             Section(title = "Cursor Mode") {
                 Picker(
