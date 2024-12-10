@@ -6,10 +6,7 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.rememberScrollState
-import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
@@ -23,8 +20,8 @@ import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import com.enaboapps.switchify.auth.AuthManager
+import com.enaboapps.switchify.components.BaseView
 import com.enaboapps.switchify.components.FullWidthButton
-import com.enaboapps.switchify.components.NavBar
 import com.enaboapps.switchify.components.TextArea
 
 @Composable
@@ -32,21 +29,16 @@ fun ForgotPasswordScreen(navController: NavController) {
     var email by remember { mutableStateOf("") }
     var message by remember { mutableStateOf<String?>(null) }
     val authManager = AuthManager.instance
-    val scrollState = rememberScrollState()
 
-    Scaffold(topBar = {
-        NavBar(
-            title = "Reset Password",
-            navController = navController
-        )
-    }) { paddingValues ->
+    BaseView(
+        title = "Reset Password",
+        navController = navController
+    ) {
         Column(
             modifier = Modifier
-                .padding(paddingValues)
                 .padding(16.dp)
-                .fillMaxSize()
-                .verticalScroll(scrollState),
-            verticalArrangement = Arrangement.Top, // Ensures content starts from the top
+                .fillMaxSize(),
+            verticalArrangement = Arrangement.Center,
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
             if (message != null) {

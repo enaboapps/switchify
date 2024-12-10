@@ -8,48 +8,37 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.rememberScrollState
-import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Email
 import androidx.compose.material3.Card
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import com.enaboapps.switchify.auth.AuthManager
+import com.enaboapps.switchify.components.BaseView
 import com.enaboapps.switchify.components.FullWidthButton
-import com.enaboapps.switchify.components.NavBar
 import com.enaboapps.switchify.nav.NavigationRoute
 import com.google.firebase.auth.FirebaseAuth
 
 @Composable
 fun AccountScreen(navController: NavController) {
-    val authManager =
-        AuthManager.instance // Assuming AuthManager is already defined in your project
+    val authManager = AuthManager.instance
     val currentUser = FirebaseAuth.getInstance().currentUser
     val userEmail = currentUser?.email ?: "Not Logged In"
-    val verticalScrollState = rememberScrollState()
 
-    Scaffold(topBar = {
-        NavBar(
-            title = "Account",
-            navController = navController
-        )
-    }) { paddingValues ->
+    BaseView(
+        title = "Account",
+        navController = navController
+    ) {
         Column(
             modifier = Modifier
-                .padding(paddingValues)
                 .padding(16.dp)
-                .fillMaxSize()
-                .verticalScroll(verticalScrollState),
-            verticalArrangement = Arrangement.Top,
-            horizontalAlignment = Alignment.CenterHorizontally
+                .fillMaxSize(),
+            verticalArrangement = Arrangement.spacedBy(16.dp)
         ) {
             EmailAddressView(email = userEmail)
             Spacer(modifier = Modifier.height(20.dp))

@@ -5,10 +5,7 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.rememberScrollState
-import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -23,8 +20,8 @@ import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.MutableLiveData
 import androidx.navigation.NavController
+import com.enaboapps.switchify.components.BaseView
 import com.enaboapps.switchify.components.FullWidthButton
-import com.enaboapps.switchify.components.NavBar
 import com.enaboapps.switchify.components.PreferenceSwitch
 import com.enaboapps.switchify.components.Section
 import com.enaboapps.switchify.components.TextArea
@@ -34,7 +31,6 @@ import com.enaboapps.switchify.screens.settings.lockscreen.models.LockScreenSett
 fun LockScreenSettingsScreen(navController: NavController) {
     val context = LocalContext.current
     val lockScreenSettingsScreenModel = LockScreenSettingsScreenModel(context)
-    val verticalScrollState = rememberScrollState()
     val currentLockScreenCode = MutableLiveData<String>()
     currentLockScreenCode.value = lockScreenSettingsScreenModel.lockScreenCode.value
     val currentLockScreen = MutableLiveData<Boolean>()
@@ -48,17 +44,16 @@ fun LockScreenSettingsScreen(navController: NavController) {
         lockScreenSettingsScreenModel.setLockScreenCode(lockScreenCode)
         currentLockScreenCode.value = lockScreenCode
     }
-    Scaffold(
-        topBar = {
-            NavBar("Lock Screen Settings", navController)
-        }
+
+    BaseView(
+        title = "Lock Screen Settings",
+        navController = navController,
+        enableScroll = false
     ) {
         Column(
             modifier = Modifier
+                .padding(16.dp)
                 .fillMaxSize()
-                .padding(it)
-                .padding(horizontal = 16.dp)
-                .verticalScroll(verticalScrollState),
         ) {
             Spacer(modifier = Modifier.height(16.dp))
             Text(

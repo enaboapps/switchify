@@ -6,7 +6,6 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.RadioButton
-import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.livedata.observeAsState
@@ -16,7 +15,7 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.MutableLiveData
 import androidx.navigation.NavController
-import com.enaboapps.switchify.components.NavBar
+import com.enaboapps.switchify.components.BaseView
 import com.enaboapps.switchify.service.menu.MenuSizeManager
 
 @Composable
@@ -27,16 +26,14 @@ fun MenuSizeScreen(navController: NavController) {
     currentMenuSize.value = menuSizeManager.getMenuSize().name
     val currentMenuSizeState = currentMenuSize.observeAsState()
 
-    Scaffold(
-        topBar = {
-            NavBar("Menu Size", navController)
-        }
+    BaseView(
+        title = "Menu Size",
+        navController = navController
     ) {
         Column(
             modifier = Modifier
+                .padding(16.dp)
                 .fillMaxSize()
-                .padding(it)
-                .padding(horizontal = 16.dp)
         ) {
             MenuSizeManager.menuSizes.forEach { menuSize ->
                 Row(

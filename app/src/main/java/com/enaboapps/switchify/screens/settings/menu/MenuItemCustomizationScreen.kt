@@ -1,21 +1,17 @@
 package com.enaboapps.switchify.screens.settings.menu
 
 import androidx.compose.foundation.layout.*
-import androidx.compose.foundation.rememberScrollState
-import androidx.compose.foundation.verticalScroll
-import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
-import com.enaboapps.switchify.components.NavBar
+import com.enaboapps.switchify.components.BaseView
 import com.enaboapps.switchify.components.PreferenceSwitch
 import com.enaboapps.switchify.preferences.PreferenceManager
 import com.enaboapps.switchify.service.menu.MenuItem
 import com.enaboapps.switchify.service.menu.structure.MenuStructureHolder
 
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun MenuItemCustomizationScreen(navController: NavController) {
     val context = LocalContext.current
@@ -28,17 +24,15 @@ fun MenuItemCustomizationScreen(navController: NavController) {
     items.addAll(menuStructureHolder.buildDeviceMenuObject().getMenuItems())
     val uniqueItems = items.distinctBy { it.id }
 
-    Scaffold(
-        topBar = {
-            NavBar(title = "Customize Menu Items", navController = navController)
-        }
-    ) { paddingValues ->
+    BaseView(
+        title = "Customize Menu Items",
+        navController = navController,
+        enableScroll = false
+    ) {
         Column(
             modifier = Modifier
-                .fillMaxSize()
-                .padding(paddingValues)
-                .verticalScroll(rememberScrollState())
                 .padding(16.dp)
+                .fillMaxSize()
         ) {
             uniqueItems.forEach { menuItem ->
                 val isVisible = remember { mutableStateOf(menuItem.isVisible(context)) }

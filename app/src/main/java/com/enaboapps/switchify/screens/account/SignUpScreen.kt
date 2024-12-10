@@ -54,20 +54,17 @@ fun SignUpScreen(navController: NavController) {
         actionStore.pushActionsToFirestore()
     }
 
-    Scaffold(topBar = {
-        NavBar(
-            title = "Sign Up",
-            navController = navController
-        )
-    }) { paddingValues ->
+    BaseView(
+        title = "Sign Up",
+        navController = navController
+    ) {
         Column(
             modifier = Modifier
-                .padding(paddingValues)
-                .padding(16.dp)
                 .fillMaxSize()
+                .padding(16.dp)
                 .verticalScroll(verticalScrollState),
-            verticalArrangement = Arrangement.Top,
-            horizontalAlignment = Alignment.CenterHorizontally
+            horizontalAlignment = Alignment.CenterHorizontally,
+            verticalArrangement = Arrangement.Center
         ) {
             if (errorMessage != null) {
                 Text(

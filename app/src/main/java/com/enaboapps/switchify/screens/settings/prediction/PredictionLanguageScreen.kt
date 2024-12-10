@@ -3,8 +3,8 @@ package com.enaboapps.switchify.screens.settings.prediction
 import android.widget.Toast
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
-import androidx.compose.material3.Scaffold
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
@@ -16,7 +16,7 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import co.thingthing.fleksy.lib.languages.RemoteLanguage
-import com.enaboapps.switchify.components.NavBar
+import com.enaboapps.switchify.components.BaseView
 import com.enaboapps.switchify.components.UICard
 import com.enaboapps.switchify.keyboard.prediction.PredictionLanguageManager
 
@@ -36,13 +36,14 @@ fun PredictionLanguageScreen(navController: NavController) {
         loadLanguages()
     }
 
-    Scaffold(
-        topBar = {
-            NavBar(title = "Choose Prediction Language", navController = navController)
-        }
-    ) { paddingValues ->
+    BaseView(
+        title = "Choose Prediction Language",
+        navController = navController
+    ) {
         Column(
-            modifier = Modifier.padding(paddingValues)
+            modifier = Modifier
+                .padding(16.dp)
+                .fillMaxSize()
         ) {
             // Display available languages
             languages.forEach {

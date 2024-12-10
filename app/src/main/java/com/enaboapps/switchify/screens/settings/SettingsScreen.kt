@@ -21,22 +21,20 @@ import com.enaboapps.switchify.screens.settings.models.SettingsScreenModel
 import com.enaboapps.switchify.screens.settings.scanning.ScanMethodSelectionSection
 import com.enaboapps.switchify.screens.settings.scanning.ScanModeSelectionSection
 
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun SettingsScreen(navController: NavController) {
     val context = LocalContext.current
     val settingsScreenModel = SettingsScreenModel(context)
     var selectedTabIndex by remember { mutableIntStateOf(0) }
 
-    Scaffold(
-        topBar = {
-            NavBar(title = "Settings", navController = navController)
-        }
-    ) { paddingValues ->
+    BaseView(
+        title = "Settings",
+        navController = navController,
+        enableScroll = false
+    ) {
         Column(
             modifier = Modifier
                 .fillMaxSize()
-                .padding(paddingValues)
         ) {
             TabRow(selectedTabIndex = selectedTabIndex) {
                 listOf("General", "Scanning", "Selection", "About").forEachIndexed { index, tab ->
@@ -211,7 +209,6 @@ private fun MenuSection(screenModel: SettingsScreenModel, navController: NavCont
             navController = navController,
             route = NavigationRoute.MenuSize.name
         )
-        Spacer(modifier = Modifier.height(8.dp))
         PreferenceSwitch(
             title = "Menu Transparency",
             summary = "Enable transparency for the menu so that you can see content behind it",
