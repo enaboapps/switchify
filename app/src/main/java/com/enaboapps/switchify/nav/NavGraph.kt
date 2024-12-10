@@ -22,6 +22,9 @@ import com.enaboapps.switchify.screens.settings.menu.MenuItemCustomizationScreen
 import com.enaboapps.switchify.screens.settings.menu.MenuSizeScreen
 import com.enaboapps.switchify.screens.settings.prediction.PredictionLanguageScreen
 import com.enaboapps.switchify.screens.settings.scanning.CursorSettingsScreen
+import com.enaboapps.switchify.screens.settings.scanning.ItemScanSettingsScreen
+import com.enaboapps.switchify.screens.settings.scanning.OtherScanSettingsScreen
+import com.enaboapps.switchify.screens.settings.scanning.RadarSettingsScreen
 import com.enaboapps.switchify.screens.settings.scanning.ScanColorSelectionScreen
 import com.enaboapps.switchify.screens.settings.switches.AddEditSwitchScreen
 import com.enaboapps.switchify.screens.settings.switches.SwitchStabilityScreen
@@ -109,6 +112,15 @@ fun NavGraph(navController: NavHostController) {
             it.arguments?.getString("id")?.let { id ->
                 AddEditActionScreen(navController, id)
             }
+        }
+        composable(NavigationRoute.ItemScanSettings.name) {
+            ItemScanSettingsScreen(navController)
+        }
+        composable(NavigationRoute.OtherScanSettings.name) {
+            OtherScanSettingsScreen(navController)
+        }
+        composable(NavigationRoute.RadarSettings.name) {
+            RadarSettingsScreen(navController)
         }
     }
 }
