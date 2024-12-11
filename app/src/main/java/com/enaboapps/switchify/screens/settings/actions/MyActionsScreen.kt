@@ -3,7 +3,6 @@ package com.enaboapps.switchify.screens.settings.actions
 import androidx.compose.foundation.layout.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
-import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
@@ -60,11 +59,7 @@ fun MyActionsScreen(navController: NavController) {
                     ActionItem(
                         id = action.id,
                         action = action.text,
-                        navController = navController,
-                        onDelete = {
-                            actionStore.removeAction(action.id)
-                            actions.remove(action)
-                        }
+                        navController = navController
                     )
                 }
             }
@@ -76,29 +71,12 @@ fun MyActionsScreen(navController: NavController) {
 private fun ActionItem(
     id: String,
     action: String,
-    navController: NavController,
-    onDelete: () -> Unit
+    navController: NavController
 ) {
-    Row(
-        modifier = Modifier
-            .fillMaxWidth()
-            .padding(16.dp),
-        verticalAlignment = Alignment.CenterVertically
-    ) {
-        Column(modifier = Modifier.weight(1f)) {
-            NavRouteLink(
-                title = action,
-                summary = "Edit this action",
-                navController = navController,
-                route = "${NavigationRoute.EditMyActionsMenuItem.name}/${id}"
-            )
-        }
-        IconButton(onClick = onDelete) {
-            Icon(
-                imageVector = Icons.Default.Delete,
-                contentDescription = "Delete Action",
-                tint = MaterialTheme.colorScheme.error
-            )
-        }
-    }
+    NavRouteLink(
+        title = action,
+        summary = "Edit this action",
+        navController = navController,
+        route = "${NavigationRoute.EditMyActionsMenuItem.name}/${id}"
+    )
 }
