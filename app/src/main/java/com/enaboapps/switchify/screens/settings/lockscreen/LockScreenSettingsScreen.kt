@@ -1,8 +1,6 @@
 package com.enaboapps.switchify.screens.settings.lockscreen
 
-import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.MaterialTheme
@@ -47,45 +45,37 @@ fun LockScreenSettingsScreen(navController: NavController) {
 
     BaseView(
         title = "Lock Screen Settings",
-        navController = navController,
-        enableScroll = false
+        navController = navController
     ) {
-        Column(
-            modifier = Modifier
-                .padding(16.dp)
-                .fillMaxSize()
-        ) {
-            Spacer(modifier = Modifier.height(16.dp))
-            Text(
-                text = "Why would I want to enable the lock screen?",
-                style = MaterialTheme.typography.bodyLarge,
-                modifier = Modifier.padding(horizontal = 20.dp)
-            )
-            Spacer(modifier = Modifier.height(8.dp))
-            Text(
-                text = "The default Android lock screen can sometimes disable Accessibility Services, such as Switchify. Our lock screen is designed to always work with Switchify. " +
-                        "We recommend disabling the default lock screen and using our lock screen instead." +
-                        "\nDisclaimer: The default lock screen is built with high security standards. We cannot guarantee that our lock screen will not be hacked or compromised.",
-                style = MaterialTheme.typography.bodyMedium,
-                modifier = Modifier.padding(horizontal = 20.dp)
-            )
-            Spacer(modifier = Modifier.height(16.dp))
-            PreferenceSwitch(
-                title = "Lock Screen",
-                summary = "Enable the lock screen",
-                checked = observeLockScreen.value == true,
-                onCheckedChange = {
-                    setLockScreen(it)
+        Text(
+            text = "Why would I want to enable the lock screen?",
+            style = MaterialTheme.typography.bodyLarge,
+            modifier = Modifier.padding(horizontal = 20.dp)
+        )
+        Spacer(modifier = Modifier.height(8.dp))
+        Text(
+            text = "The default Android lock screen can sometimes disable Accessibility Services, such as Switchify. Our lock screen is designed to always work with Switchify. " +
+                    "We recommend disabling the default lock screen and using our lock screen instead." +
+                    "\nDisclaimer: The default lock screen is built with high security standards. We cannot guarantee that our lock screen will not be hacked or compromised.",
+            style = MaterialTheme.typography.bodyMedium,
+            modifier = Modifier.padding(horizontal = 20.dp)
+        )
+        Spacer(modifier = Modifier.height(16.dp))
+        PreferenceSwitch(
+            title = "Lock Screen",
+            summary = "Enable the lock screen",
+            checked = observeLockScreen.value == true,
+            onCheckedChange = {
+                setLockScreen(it)
+            }
+        )
+        if (observeLockScreen.value == true) {
+            LockScreenCodeInput(
+                lockScreenCode = currentLockScreenCode.value ?: "",
+                onLockScreenCodeChanged = {
+                    setLockScreenCode(it)
                 }
             )
-            if (observeLockScreen.value == true) {
-                LockScreenCodeInput(
-                    lockScreenCode = currentLockScreenCode.value ?: "",
-                    onLockScreenCodeChanged = {
-                        setLockScreenCode(it)
-                    }
-                )
-            }
         }
     }
 }

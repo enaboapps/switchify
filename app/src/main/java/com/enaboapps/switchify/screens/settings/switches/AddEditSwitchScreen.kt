@@ -3,15 +3,11 @@ package com.enaboapps.switchify.screens.settings.switches
 import androidx.compose.foundation.focusable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.rememberScrollState
-import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
@@ -31,8 +27,8 @@ import androidx.compose.ui.input.key.onKeyEvent
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
+import com.enaboapps.switchify.components.BaseView
 import com.enaboapps.switchify.components.FullWidthButton
-import com.enaboapps.switchify.components.NavBar
 import com.enaboapps.switchify.components.TextArea
 import com.enaboapps.switchify.screens.settings.switches.actions.SwitchActionPicker
 import com.enaboapps.switchify.screens.settings.switches.models.AddEditSwitchScreenModel
@@ -48,7 +44,6 @@ fun AddEditSwitchScreen(navController: NavController, code: String? = null) {
             init(code, switchEventStore, context)
         }
     }
-    val verticalScrollState = rememberScrollState()
     val shouldSave by addEditSwitchScreenModel.shouldSave.observeAsState()
     val isValid by addEditSwitchScreenModel.isValid.observeAsState()
     val editing = code != null
@@ -61,65 +56,57 @@ fun AddEditSwitchScreen(navController: NavController, code: String? = null) {
             addEditSwitchScreenModel.processKeyCode(keyEvent.key, context)
         })
     } else {
-        Scaffold(
-            topBar = {
-                NavBar(title = screenTitle, navController = navController)
-            }
+        BaseView(
+            title = screenTitle,
+            navController = navController
         ) {
+            SwitchName(name = addEditSwitchScreenModel.name, onNameChange = {
+                addEditSwitchScreenModel.updateName(it)
+            })
             Column(
                 modifier = Modifier
-                    .verticalScroll(verticalScrollState)
-                    .padding(it)
-                    .padding(all = 16.dp),
+                    .fillMaxWidth()
+                    .padding(16.dp), horizontalAlignment = Alignment.CenterHorizontally
             ) {
-                SwitchName(name = addEditSwitchScreenModel.name, onNameChange = {
-                    addEditSwitchScreenModel.updateName(it)
-                })
-                Column(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(16.dp), horizontalAlignment = Alignment.CenterHorizontally
-                ) {
-                    SwitchActionSection(addEditSwitchScreenModel)
-                    if (shouldSave!!) {
-                        FullWidthButton(text = "Save", enabled = isValid!!, onClick = {
-                            addEditSwitchScreenModel.save()
-                            navController.popBackStack()
-                        })
-                    }
-                    if (editing) {
-                        FullWidthButton(text = "Delete", onClick = {
-                            showDeleteConfirmation.value = true
-                        })
-                    }
+                SwitchActionSection(addEditSwitchScreenModel)
+                if (shouldSave!!) {
+                    FullWidthButton(text = "Save", enabled = isValid!!, onClick = {
+                        addEditSwitchScreenModel.save()
+                        navController.popBackStack()
+                    })
                 }
+                if (editing) {
+                    FullWidthButton(text = "Delete", onClick = {
+                        showDeleteConfirmation.value = true
+                    })
+                }
+            }
 
-                if (showDeleteConfirmation.value) {
-                    AlertDialog(
-                        onDismissRequest = { showDeleteConfirmation.value = false },
-                        title = { Text("Confirm Deletion") },
-                        text = { Text("Are you sure you want to delete this switch?") },
-                        confirmButton = {
-                            TextButton(
-                                onClick = {
-                                    showDeleteConfirmation.value = false
-                                    addEditSwitchScreenModel.delete {
-                                        navController.popBackStack()
-                                    }
+            if (showDeleteConfirmation.value) {
+                AlertDialog(
+                    onDismissRequest = { showDeleteConfirmation.value = false },
+                    title = { Text("Confirm Deletion") },
+                    text = { Text("Are you sure you want to delete this switch?") },
+                    confirmButton = {
+                        TextButton(
+                            onClick = {
+                                showDeleteConfirmation.value = false
+                                addEditSwitchScreenModel.delete {
+                                    navController.popBackStack()
                                 }
-                            ) {
-                                Text("Delete")
                             }
-                        },
-                        dismissButton = {
-                            TextButton(
-                                onClick = { showDeleteConfirmation.value = false }
-                            ) {
-                                Text("Cancel")
-                            }
+                        ) {
+                            Text("Delete")
                         }
-                    )
-                }
+                    },
+                    dismissButton = {
+                        TextButton(
+                            onClick = { showDeleteConfirmation.value = false }
+                        ) {
+                            Text("Cancel")
+                        }
+                    }
+                )
             }
         }
     }
@@ -169,22 +156,16 @@ fun SwitchName(
 ) {
     var name by remember { mutableStateOf(name) }
 
-    Row(
-        modifier = Modifier
-            .padding(16.dp)
-            .fillMaxWidth()
-    ) {
-        TextArea(
-            value = name,
-            onValueChange = {
-                name = it
-                onNameChange(it)
-            },
-            label = "Switch Name",
-            isError = name.isBlank(),
-            supportingText = "Switch name is required"
-        )
-    }
+    TextArea(
+        value = name,
+        onValueChange = {
+            name = it
+            onNameChange(it)
+        },
+        label = "Switch Name",
+        isError = name.isBlank(),
+        supportingText = "Switch name is required"
+    )
 }
 
 @Composable
@@ -193,41 +174,39 @@ fun SwitchActionSection(viewModel: AddEditSwitchScreenModel) {
     val longPressActions = viewModel.longPressActions.observeAsState()
     val refreshingLongPressActions = viewModel.refreshingLongPressActions.observeAsState()
     val context = LocalContext.current
-    Column {
-        SwitchActionPicker(
-            title = "Press Action",
-            switchAction = viewModel.pressAction.value!!,
-            onChange = {
-                viewModel.setPressAction(it, context)
-            }
+    SwitchActionPicker(
+        title = "Press Action",
+        switchAction = viewModel.pressAction.value!!,
+        onChange = {
+            viewModel.setPressAction(it, context)
+        }
+    )
+
+    Spacer(modifier = Modifier.padding(16.dp))
+
+    if (allowLongPress.value!! && !refreshingLongPressActions.value!!) {
+        Text(
+            text = "Each switch can have multiple actions for long press. " +
+                    "You can add or remove actions below. " +
+                    "The actions will be executed in the order they are listed based on the duration of the long press.",
+            style = MaterialTheme.typography.bodyMedium,
+            modifier = Modifier.padding(horizontal = 20.dp)
         )
 
-        Spacer(modifier = Modifier.padding(16.dp))
-
-        if (allowLongPress.value!! && !refreshingLongPressActions.value!!) {
-            Text(
-                text = "Each switch can have multiple actions for long press. " +
-                        "You can add or remove actions below. " +
-                        "The actions will be executed in the order they are listed based on the duration of the long press.",
-                style = MaterialTheme.typography.bodyMedium,
-                modifier = Modifier.padding(horizontal = 20.dp)
+        longPressActions.value?.forEachIndexed { index, action ->
+            SwitchActionPicker(
+                title = "Long Press Action ${index + 1}",
+                switchAction = action,
+                onChange = { newAction ->
+                    viewModel.updateLongPressAction(action, newAction)
+                },
+                onDelete = {
+                    viewModel.removeLongPressAction(index)
+                }
             )
-
-            longPressActions.value?.forEachIndexed { index, action ->
-                SwitchActionPicker(
-                    title = "Long Press Action ${index + 1}",
-                    switchAction = action,
-                    onChange = { newAction ->
-                        viewModel.updateLongPressAction(action, newAction)
-                    },
-                    onDelete = {
-                        viewModel.removeLongPressAction(index)
-                    }
-                )
-            }
-            FullWidthButton(text = "Add Long Press Action", onClick = {
-                viewModel.addLongPressAction(SwitchAction(SwitchAction.ACTION_SELECT))
-            })
         }
+        FullWidthButton(text = "Add Long Press Action", onClick = {
+            viewModel.addLongPressAction(SwitchAction(SwitchAction.ACTION_SELECT))
+        })
     }
 }

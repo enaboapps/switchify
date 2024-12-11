@@ -5,11 +5,8 @@ import android.net.Uri
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.layout.*
-import androidx.compose.foundation.rememberScrollState
-import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.input.ImeAction
@@ -30,7 +27,6 @@ fun SignUpScreen(navController: NavController) {
     var confirmPassword by remember { mutableStateOf("") }
     var errorMessage by remember { mutableStateOf<String?>(null) }
     val authManager = AuthManager.instance
-    val verticalScrollState = rememberScrollState()
     val context = LocalContext.current
     val scope = rememberCoroutineScope()
     val googleAuthHandler = remember { GoogleAuthHandler() }
@@ -58,129 +54,120 @@ fun SignUpScreen(navController: NavController) {
         title = "Sign Up",
         navController = navController
     ) {
-        Column(
-            modifier = Modifier
-                .fillMaxSize()
-                .padding(16.dp)
-                .verticalScroll(verticalScrollState),
-            horizontalAlignment = Alignment.CenterHorizontally,
-            verticalArrangement = Arrangement.Center
-        ) {
-            if (errorMessage != null) {
-                Text(
-                    text = errorMessage ?: "",
-                    color = MaterialTheme.colorScheme.error,
-                    style = MaterialTheme.typography.bodyMedium
-                )
-                Spacer(modifier = Modifier.height(8.dp))
+        if (errorMessage != null) {
+            Text(
+                text = errorMessage ?: "",
+                color = MaterialTheme.colorScheme.error,
+                style = MaterialTheme.typography.bodyMedium
+            )
+            Spacer(modifier = Modifier.height(8.dp))
+        }
+
+        Text(text = "Create an account to save your settings. This will allow you to access your settings on any device.")
+        Spacer(modifier = Modifier.height(16.dp))
+
+        TextArea(
+            value = email,
+            onValueChange = { email = it },
+            label = "Email",
+            keyboardType = KeyboardType.Email,
+            imeAction = ImeAction.Next,
+            isError = email.isBlank(),
+            supportingText = "Email is required"
+        )
+
+        Spacer(modifier = Modifier.height(8.dp))
+
+        TextArea(
+            value = password,
+            onValueChange = { password = it },
+            label = "Password",
+            keyboardType = KeyboardType.Password,
+            imeAction = ImeAction.Next,
+            isSecure = true,
+            isError = password.isBlank(),
+            supportingText = "Password is required"
+        )
+
+        Spacer(modifier = Modifier.height(8.dp))
+
+        TextArea(
+            value = confirmPassword,
+            onValueChange = { confirmPassword = it },
+            label = "Confirm Password",
+            keyboardType = KeyboardType.Password,
+            isSecure = true,
+            isError = confirmPassword.isBlank(),
+            supportingText = "Confirm password is required"
+        )
+
+        Spacer(modifier = Modifier.height(16.dp))
+
+        FullWidthButton(
+            text = "Sign Up",
+            onClick = {
+                errorMessage = when {
+                    !authManager.isPasswordStrong(password) -> "Password must be at least 8 characters long, include an uppercase letter, a lowercase letter, and a number."
+                    password != confirmPassword -> "Passwords do not match."
+                    email.isEmpty() -> "Email cannot be empty."
+                    password.isEmpty() -> "Password cannot be empty."
+                    else -> null
+                }
+                if (errorMessage == null) {
+                    authManager.createUserWithEmailAndPassword(email, password,
+                        onSuccess = {
+                            onSignUp()
+                        },
+                        onFailure = { exception ->
+                            errorMessage = exception.localizedMessage
+                        }
+                    )
+                }
             }
+        )
 
-            Text(text = "Create an account to save your settings. This will allow you to access your settings on any device.")
-            Spacer(modifier = Modifier.height(16.dp))
+        Spacer(modifier = Modifier.height(16.dp))
+        Text("or")
+        Spacer(modifier = Modifier.height(16.dp))
 
-            TextArea(
-                value = email,
-                onValueChange = { email = it },
-                label = "Email",
-                keyboardType = KeyboardType.Email,
-                imeAction = ImeAction.Next,
-                isError = email.isBlank(),
-                supportingText = "Email is required"
-            )
-
-            Spacer(modifier = Modifier.height(8.dp))
-
-            TextArea(
-                value = password,
-                onValueChange = { password = it },
-                label = "Password",
-                keyboardType = KeyboardType.Password,
-                imeAction = ImeAction.Next,
-                isSecure = true,
-                isError = password.isBlank(),
-                supportingText = "Password is required"
-            )
-
-            Spacer(modifier = Modifier.height(8.dp))
-
-            TextArea(
-                value = confirmPassword,
-                onValueChange = { confirmPassword = it },
-                label = "Confirm Password",
-                keyboardType = KeyboardType.Password,
-                isSecure = true,
-                isError = confirmPassword.isBlank(),
-                supportingText = "Confirm password is required"
-            )
-
-            Spacer(modifier = Modifier.height(16.dp))
-
-            FullWidthButton(
-                text = "Sign Up",
-                onClick = {
-                    errorMessage = when {
-                        !authManager.isPasswordStrong(password) -> "Password must be at least 8 characters long, include an uppercase letter, a lowercase letter, and a number."
-                        password != confirmPassword -> "Passwords do not match."
-                        email.isEmpty() -> "Email cannot be empty."
-                        password.isEmpty() -> "Password cannot be empty."
-                        else -> null
-                    }
-                    if (errorMessage == null) {
-                        authManager.createUserWithEmailAndPassword(email, password,
-                            onSuccess = {
-                                onSignUp()
+        FullWidthButton(
+            text = "Sign up with Google",
+            onClick = {
+                scope.launch {
+                    googleAuthHandler.googleSignIn(context).collect { result ->
+                        result.fold(
+                            onSuccess = { authResult ->
+                                if (authResult.user != null) {
+                                    onSignUp()
+                                } else {
+                                    errorMessage = "Sign up failed"
+                                }
                             },
                             onFailure = { exception ->
-                                errorMessage = exception.localizedMessage
+                                errorMessage = exception.message
                             }
                         )
                     }
                 }
-            )
-
-            Spacer(modifier = Modifier.height(16.dp))
-            Text("or")
-            Spacer(modifier = Modifier.height(16.dp))
-
-            FullWidthButton(
-                text = "Sign up with Google",
-                onClick = {
-                    scope.launch {
-                        googleAuthHandler.googleSignIn(context).collect { result ->
-                            result.fold(
-                                onSuccess = { authResult ->
-                                    if (authResult.user != null) {
-                                        onSignUp()
-                                    } else {
-                                        errorMessage = "Sign up failed"
-                                    }
-                                },
-                                onFailure = { exception ->
-                                    errorMessage = exception.message
-                                }
-                            )
-                        }
-                    }
-                }
-            )
-
-            Spacer(modifier = Modifier.height(16.dp))
-
-            val urlLauncher = rememberLauncherForActivityResult(
-                contract = ActivityResultContracts.StartActivityForResult()
-            ) {
-                // Handle the result
             }
+        )
 
-            val privacyPolicyUrl = "https://www.switchifyapp.com/privacy"
+        Spacer(modifier = Modifier.height(16.dp))
 
-            FullWidthButton(
-                text = "Privacy Policy",
-                onClick = {
-                    urlLauncher.launch(Intent(Intent.ACTION_VIEW, Uri.parse(privacyPolicyUrl)))
-                },
-                isTextButton = true
-            )
+        val urlLauncher = rememberLauncherForActivityResult(
+            contract = ActivityResultContracts.StartActivityForResult()
+        ) {
+            // Handle the result
         }
+
+        val privacyPolicyUrl = "https://www.switchifyapp.com/privacy"
+
+        FullWidthButton(
+            text = "Privacy Policy",
+            onClick = {
+                urlLauncher.launch(Intent(Intent.ACTION_VIEW, Uri.parse(privacyPolicyUrl)))
+            },
+            isTextButton = true
+        )
     }
 }
