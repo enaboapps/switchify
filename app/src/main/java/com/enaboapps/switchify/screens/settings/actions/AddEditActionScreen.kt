@@ -1,6 +1,9 @@
 package com.enaboapps.switchify.screens.settings.actions
 
 import androidx.compose.foundation.layout.*
+import androidx.compose.material3.AlertDialog
+import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
@@ -31,6 +34,7 @@ fun AddEditActionScreen(navController: NavController, actionId: String? = null) 
     var actionText by remember { mutableStateOf("") }
     var extraValid by remember { mutableStateOf(true) }
     var isSaving by remember { mutableStateOf(false) }
+    var showDeleteConfirmation by remember { mutableStateOf(false) }
 
     // Load existing action data if in edit mode
     LaunchedEffect(actionId) {
@@ -109,6 +113,37 @@ fun AddEditActionScreen(navController: NavController, actionId: String? = null) 
                 navController.popBackStack()
             }
         )
+        if (isEditMode) {
+            FullWidthButton(text = "Delete", onClick = {
+                showDeleteConfirmation = true
+            })
+        }
+
+        if (showDeleteConfirmation) {
+            AlertDialog(
+                onDismissRequest = { showDeleteConfirmation = false },
+                title = { Text("Confirm Deletion") },
+                text = { Text("Are you sure you want to delete this action?") },
+                confirmButton = {
+                    TextButton(
+                        onClick = {
+                            showDeleteConfirmation = false
+                            actionStore.removeAction(actionId.toString())
+                            navController.popBackStack()
+                        }
+                    ) {
+                        Text("Delete")
+                    }
+                },
+                dismissButton = {
+                    TextButton(
+                        onClick = { showDeleteConfirmation = false }
+                    ) {
+                        Text("Cancel")
+                    }
+                }
+            )
+        }
     }
 }
 
