@@ -3,8 +3,6 @@ package com.enaboapps.switchify.screens.settings
 import android.content.Intent
 import android.net.Uri
 import androidx.compose.foundation.layout.*
-import androidx.compose.foundation.rememberScrollState
-import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
@@ -30,40 +28,31 @@ fun SettingsScreen(navController: NavController) {
     BaseView(
         title = "Settings",
         navController = navController,
+        padding = 0.dp,
         enableScroll = false
     ) {
-        Column(
-            modifier = Modifier
-                .fillMaxSize()
-        ) {
-            TabRow(selectedTabIndex = selectedTabIndex) {
-                listOf("General", "Scanning", "Selection", "About").forEachIndexed { index, tab ->
-                    Tab(
-                        selected = selectedTabIndex == index,
-                        onClick = { selectedTabIndex = index },
-                        text = { Text(tab) }
-                    )
-                }
+        TabRow(selectedTabIndex = selectedTabIndex) {
+            listOf("General", "Scanning", "Selection", "About").forEachIndexed { index, tab ->
+                Tab(
+                    selected = selectedTabIndex == index,
+                    onClick = { selectedTabIndex = index },
+                    text = { Text(tab) }
+                )
             }
+        }
 
-            when (selectedTabIndex) {
-                0 -> GeneralSettingsTab(settingsScreenModel, navController)
-                1 -> ScanningSettingsTab(navController)
-                2 -> SelectionSettingsTab(settingsScreenModel)
-                3 -> AboutSection()
-            }
+        when (selectedTabIndex) {
+            0 -> GeneralSettingsTab(settingsScreenModel, navController)
+            1 -> ScanningSettingsTab(navController)
+            2 -> SelectionSettingsTab(settingsScreenModel)
+            3 -> AboutSection()
         }
     }
 }
 
 @Composable
 fun GeneralSettingsTab(settingsScreenModel: SettingsScreenModel, navController: NavController) {
-    Column(
-        modifier = Modifier
-            .fillMaxSize()
-            .verticalScroll(rememberScrollState())
-            .padding(16.dp)
-    ) {
+    ScrollableView {
         NavRouteLink(
             title = "Switches",
             summary = "Configure your switches",
@@ -87,12 +76,7 @@ fun GeneralSettingsTab(settingsScreenModel: SettingsScreenModel, navController: 
 
 @Composable
 fun ScanningSettingsTab(navController: NavController) {
-    Column(
-        modifier = Modifier
-            .fillMaxSize()
-            .verticalScroll(rememberScrollState())
-            .padding(16.dp)
-    ) {
+    ScrollableView {
         ScanMethodSelectionSection()
 
         Section(title = "Scanning Method Settings") {
@@ -140,12 +124,7 @@ fun ScanningSettingsTab(navController: NavController) {
 
 @Composable
 fun SelectionSettingsTab(settingsScreenModel: SettingsScreenModel) {
-    Column(
-        modifier = Modifier
-            .fillMaxSize()
-            .verticalScroll(rememberScrollState())
-            .padding(16.dp)
-    ) {
+    ScrollableView {
         SelectionSection(settingsScreenModel)
     }
 }
@@ -253,31 +232,38 @@ fun AboutSection() {
     val repositoryUrl = "https://github.com/enaboapps/switchify"
     val privacyPolicyUrl = "https://www.switchifyapp.com/privacy"
 
-    Column(
-        modifier = Modifier
-            .fillMaxSize()
-            .verticalScroll(rememberScrollState())
-            .padding()
-            .padding(horizontal = 16.dp, vertical = 24.dp),
-        verticalArrangement = Arrangement.Top,
-        horizontalAlignment = Alignment.CenterHorizontally
-    ) {
-        Text(
-            text = stringResource(R.string.app_name),
-            style = MaterialTheme.typography.displayLarge,
-            textAlign = TextAlign.Center
-        )
+    ScrollableView {
+        Box(
+            modifier = Modifier.fillMaxWidth(),
+            contentAlignment = Alignment.Center
+        ) {
+            Text(
+                text = stringResource(R.string.app_name),
+                style = MaterialTheme.typography.displayLarge,
+                textAlign = TextAlign.Center
+            )
+        }
         Spacer(modifier = Modifier.height(8.dp))
-        Text(
-            text = "Version $version",
-            style = MaterialTheme.typography.bodyMedium
-        )
+        Box(
+            modifier = Modifier.fillMaxWidth(),
+            contentAlignment = Alignment.Center
+        ) {
+            Text(
+                text = "Version $version",
+                style = MaterialTheme.typography.bodyMedium
+            )
+        }
         Spacer(modifier = Modifier.height(24.dp))
-        Text(
-            text = stringResource(R.string.app_description),
-            style = MaterialTheme.typography.bodyLarge,
-            textAlign = TextAlign.Center
-        )
+        Box(
+            modifier = Modifier.fillMaxWidth(),
+            contentAlignment = Alignment.Center
+        ) {
+            Text(
+                text = stringResource(R.string.app_description),
+                style = MaterialTheme.typography.bodyLarge,
+                textAlign = TextAlign.Center
+            )
+        }
         Spacer(modifier = Modifier.height(24.dp))
         FullWidthButton(text = "Website", onClick = {
             context.startActivity(Intent(Intent.ACTION_VIEW, Uri.parse(websiteUrl)))

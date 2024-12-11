@@ -1,12 +1,9 @@
 package com.enaboapps.switchify.screens.settings.switches
 
 import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.rememberScrollState
-import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material3.AlertDialog
@@ -14,7 +11,6 @@ import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
@@ -29,8 +25,8 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import com.enaboapps.switchify.R
+import com.enaboapps.switchify.components.BaseView
 import com.enaboapps.switchify.components.LoadingIndicator
-import com.enaboapps.switchify.components.NavBar
 import com.enaboapps.switchify.components.NavBarAction
 import com.enaboapps.switchify.components.NavRouteLink
 import com.enaboapps.switchify.components.Section
@@ -47,23 +43,18 @@ fun SwitchesScreen(navController: NavController) {
     )
 
     val uiState by switchesScreenModel.uiState.collectAsState()
-    val verticalScrollState = rememberScrollState()
 
-    Scaffold(
-        topBar = {
-            NavBar(
-                title = "Switches",
-                navController = navController,
-                actions = listOf(
-                    NavBarAction(
-                        text = "Test Switches",
-                        onClick = {
-                            navController.navigate(NavigationRoute.TestSwitches.name)
-                        }
-                    )
-                )
+    BaseView(
+        title = "Switches",
+        navController = navController,
+        navBarActions = listOf(
+            NavBarAction(
+                text = "Test Switches",
+                onClick = {
+                    navController.navigate(NavigationRoute.TestSwitches.name)
+                }
             )
-        },
+        ),
         floatingActionButton = {
             FloatingActionButton(
                 onClick = {
@@ -76,11 +67,11 @@ fun SwitchesScreen(navController: NavController) {
                 )
             }
         }
-    ) { paddingValues ->
+    ) {
         when {
             uiState.isLoading -> {
                 Box(
-                    modifier = Modifier.fillMaxSize(),
+                    modifier = Modifier.fillMaxWidth(),
                     contentAlignment = Alignment.Center
                 ) {
                     LoadingIndicator()
@@ -88,45 +79,37 @@ fun SwitchesScreen(navController: NavController) {
             }
 
             else -> {
-                Column(
-                    modifier = Modifier
-                        .fillMaxSize()
-                        .verticalScroll(verticalScrollState)
-                        .padding(paddingValues)
-                        .padding(all = 16.dp),
-                ) {
-                    if (uiState.localSwitches.isEmpty()) {
-                        Box(
-                            modifier = Modifier.padding(16.dp),
-                            contentAlignment = Alignment.Center
-                        ) {
-                            Text(
-                                text = "No switches found",
-                                style = MaterialTheme.typography.titleMedium
+                if (uiState.localSwitches.isEmpty()) {
+                    Box(
+                        modifier = Modifier.fillMaxWidth(),
+                        contentAlignment = Alignment.Center
+                    ) {
+                        Text(
+                            text = "No switches found",
+                            style = MaterialTheme.typography.titleMedium
+                        )
+                    }
+                } else {
+                    Section(title = "Switches") {
+                        uiState.localSwitches.forEach { event ->
+                            SwitchEventItem(
+                                navController = navController,
+                                switchEvent = event
                             )
                         }
-                    } else {
-                        Section(title = "Switches") {
-                            uiState.localSwitches.forEach { event ->
-                                SwitchEventItem(
-                                    navController = navController,
-                                    switchEvent = event
-                                )
-                            }
-                        }
                     }
+                }
 
-                    // Display remote switches that aren't on device
-                    val availableRemoteSwitches = uiState.remoteSwitches.filter { !it.isOnDevice }
-                    if (availableRemoteSwitches.isNotEmpty()) {
-                        Section(title = "Previously Used Switches") {
-                            availableRemoteSwitches.forEach { remoteSwitch ->
-                                RemoteSwitchItem(
-                                    model = switchesScreenModel,
-                                    remoteSwitch = remoteSwitch,
-                                    isImporting = uiState.importingSwitch == remoteSwitch.code
-                                )
-                            }
+                // Display remote switches that aren't on device
+                val availableRemoteSwitches = uiState.remoteSwitches.filter { !it.isOnDevice }
+                if (availableRemoteSwitches.isNotEmpty()) {
+                    Section(title = "Previously Used Switches") {
+                        availableRemoteSwitches.forEach { remoteSwitch ->
+                            RemoteSwitchItem(
+                                model = switchesScreenModel,
+                                remoteSwitch = remoteSwitch,
+                                isImporting = uiState.importingSwitch == remoteSwitch.code
+                            )
                         }
                     }
                 }
@@ -203,14 +186,10 @@ private fun SwitchEventItem(
     navController: NavController,
     switchEvent: SwitchEvent
 ) {
-    Column(
-        modifier = Modifier.padding(8.dp)
-    ) {
-        NavRouteLink(
-            title = switchEvent.name,
-            summary = "Edit this switch",
-            navController = navController,
-            route = "${NavigationRoute.EditSwitch.name}/${switchEvent.code}"
-        )
-    }
+    NavRouteLink(
+        title = switchEvent.name,
+        summary = "Edit this switch",
+        navController = navController,
+        route = "${NavigationRoute.EditSwitch.name}/${switchEvent.code}"
+    )
 }

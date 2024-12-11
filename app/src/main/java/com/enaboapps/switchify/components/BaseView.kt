@@ -3,11 +3,12 @@ package com.enaboapps.switchify.components
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.rememberScrollState
-import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Scaffold
 import androidx.compose.runtime.Composable
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.unit.Dp
+import androidx.compose.ui.unit.dp
 
 /**
  * This is a component used in all screens of the app.
@@ -27,29 +28,29 @@ fun BaseView(
     navBarActions: List<NavBarAction> = emptyList(),
     floatingActionButton: @Composable () -> Unit = {},
     enableScroll: Boolean = true,
+    padding: Dp = 16.dp,
     content: @Composable () -> Unit
 ) {
-    val scrollState = rememberScrollState()
-
     Scaffold(
         topBar = {
             NavBar(title, navController, navBarActions)
         },
         floatingActionButton = floatingActionButton
     ) { paddingValues ->
-        Column(
-            modifier = Modifier
-                .fillMaxSize()
-                .padding(paddingValues)
-                .then(
-                    if (enableScroll) {
-                        Modifier.verticalScroll(scrollState)
-                    } else {
-                        Modifier
-                    }
-                )
-        ) {
-            content()
+        if (enableScroll) {
+            ScrollableView(modifier = Modifier.padding(paddingValues)) {
+                content()
+            }
+        } else {
+            Column(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .padding(paddingValues)
+                    .padding(padding),
+                horizontalAlignment = Alignment.CenterHorizontally
+            ) {
+                content()
+            }
         }
     }
 }

@@ -1,10 +1,8 @@
 package com.enaboapps.switchify.screens.account
 
-import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
@@ -34,30 +32,23 @@ fun AccountScreen(navController: NavController) {
         title = "Account",
         navController = navController
     ) {
-        Column(
-            modifier = Modifier
-                .padding(16.dp)
-                .fillMaxSize(),
-            verticalArrangement = Arrangement.spacedBy(16.dp)
-        ) {
-            EmailAddressView(email = userEmail)
-            Spacer(modifier = Modifier.height(20.dp))
+        EmailAddressView(email = userEmail)
+        Spacer(modifier = Modifier.height(20.dp))
 
-            FullWidthButton(
-                text = "Change Password",
-                onClick = {
-                    navController.navigate(NavigationRoute.ChangePassword.name)
-                }
-            )
+        FullWidthButton(
+            text = "Change Password",
+            onClick = {
+                navController.navigate(NavigationRoute.ChangePassword.name)
+            }
+        )
 
-            FullWidthButton(
-                text = "Sign Out",
-                onClick = {
-                    authManager.signOut()
-                    navController.popBackStack(navController.graph.startDestinationId, false)
-                }
-            )
-        }
+        FullWidthButton(
+            text = "Sign Out",
+            onClick = {
+                authManager.signOut()
+                navController.popBackStack(navController.graph.startDestinationId, false)
+            }
+        )
     }
 }
 

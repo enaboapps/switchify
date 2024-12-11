@@ -42,37 +42,30 @@ fun MyActionsScreen(navController: NavController) {
             }
         }
     ) {
-        Column(
-            modifier = Modifier
-                .padding(16.dp)
-                .fillMaxSize(),
-            verticalArrangement = Arrangement.spacedBy(16.dp)
-        ) {
-            Text(
-                text = "Actions can be performed from the menu or can be used as a switch action.",
-                style = MaterialTheme.typography.headlineSmall,
-                modifier = Modifier.padding(16.dp)
-            )
-            Section(title = "Actions") {
-                if (actions.isEmpty()) {
-                    Box(modifier = Modifier.padding(16.dp), contentAlignment = Alignment.Center) {
-                        Text(
-                            text = "No actions found",
-                            style = MaterialTheme.typography.titleMedium
-                        )
-                    }
-                } else {
-                    actions.forEach { action ->
-                        ActionItem(
-                            id = action.id,
-                            action = action.text,
-                            navController = navController,
-                            onDelete = {
-                                actionStore.removeAction(action.id)
-                                actions.remove(action)
-                            }
-                        )
-                    }
+        Text(
+            text = "Actions can be performed from the menu or can be used as a switch action.",
+            style = MaterialTheme.typography.headlineSmall,
+            modifier = Modifier.padding(16.dp)
+        )
+        Section(title = "Actions") {
+            if (actions.isEmpty()) {
+                Box(modifier = Modifier.padding(16.dp), contentAlignment = Alignment.Center) {
+                    Text(
+                        text = "No actions found",
+                        style = MaterialTheme.typography.titleMedium
+                    )
+                }
+            } else {
+                actions.forEach { action ->
+                    ActionItem(
+                        id = action.id,
+                        action = action.text,
+                        navController = navController,
+                        onDelete = {
+                            actionStore.removeAction(action.id)
+                            actions.remove(action)
+                        }
+                    )
                 }
             }
         }
