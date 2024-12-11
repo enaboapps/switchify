@@ -79,6 +79,13 @@ fun ScanningSettingsTab(navController: NavController) {
     ScrollableView {
         ScanMethodSelectionSection()
 
+        InfoCard(
+            title = "Looking for timing and scan settings?",
+            description = "Switchify is made up of three main methods: the cursor, the radar, and the item scan. " +
+                    "Each method has its own set of settings that can be adjusted to suit your needs below." +
+                    "\n\nTip: You can switch between methods while using Switchify by opening the menu and selecting the desired method."
+        )
+
         Section(title = "Scanning Method Settings") {
             NavRouteLink(
                 title = "Cursor Scan",
