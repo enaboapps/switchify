@@ -36,6 +36,17 @@ class ScanSettings(context: Context) {
     }
 
     /**
+     * Get the scan cycles
+     * @return The scan cycles
+     */
+    fun getScanCycles(): Int {
+        return preferenceManager.getStringValue(
+            PreferenceManager.Keys.PREFERENCE_KEY_SCAN_CYCLES,
+            "3"
+        ).toInt()
+    }
+
+    /**
      * Get the cursor scan rate
      * @return The cursor scan rate
      */

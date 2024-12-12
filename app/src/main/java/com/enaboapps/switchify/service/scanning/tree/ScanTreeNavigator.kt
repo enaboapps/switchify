@@ -28,6 +28,9 @@ class ScanTreeNavigator(
     /** Indicates whether the scanning is currently within a tree item. */
     var isInTreeItem = false
 
+    /* Tracks the current cycle of the scanning tree */
+    var currentCycle = 0
+
     /** Indicates whether we're scanning groups or items within a group. */
     var isScanningGroups = true
 
@@ -210,7 +213,12 @@ class ScanTreeNavigator(
      * @return Always returns true as it wraps around to the first item if at the end.
      */
     private fun moveSelectionToNextTreeItem(): Boolean {
-        currentTreeItem = if (currentTreeItem < tree.size - 1) currentTreeItem + 1 else 0
+        if (currentTreeItem < tree.size - 1) {
+            currentTreeItem++
+        } else {
+            currentTreeItem = 0
+            currentCycle++
+        }
         resetGroupAndColumn()
         return true
     }
@@ -220,7 +228,12 @@ class ScanTreeNavigator(
      * @return Always returns true as it wraps around to the last item if at the beginning.
      */
     private fun moveSelectionToPreviousTreeItem(): Boolean {
-        currentTreeItem = if (currentTreeItem > 0) currentTreeItem - 1 else tree.size - 1
+        if (currentTreeItem > 0) {
+            currentTreeItem--
+        } else {
+            currentTreeItem = tree.size - 1
+            currentCycle++
+        }
         resetGroupAndColumn()
         return true
     }
@@ -248,6 +261,16 @@ class ScanTreeNavigator(
     fun handleEscape(): Boolean = shouldEscapeItem || shouldEscapeGroup
 
     /**
+     * Handles the number of cycles for the scanning tree
+     * @return True if cycles value has reached the user defined value, false otherwise.
+     */
+    fun handleCycles(): Boolean {
+        val userDefinedCycles = scanSettings.getScanCycles()
+        println("Cycles: $currentCycle, user defined: $userDefinedCycles")
+        return currentCycle == userDefinedCycles
+    }
+
+    /**
      * Confirms the escape action and updates the navigation state accordingly.
      * @return True if the escape was confirmed, false otherwise.
      */
@@ -259,6 +282,7 @@ class ScanTreeNavigator(
             if (!isRowColumnScanEnabled) {
                 currentColumn = 0
             }
+            currentCycle = 0
             return true
         }
 
@@ -268,6 +292,7 @@ class ScanTreeNavigator(
             scanDirection = ScanDirection.RIGHT
             currentColumn = 0
             currentGroup = 0
+            currentCycle = 0
             return true
         }
 
@@ -291,6 +316,7 @@ class ScanTreeNavigator(
         if (shouldEscapeItem) {
             shouldEscapeItem = false
             setColumn()
+            currentCycle++
             if (isRowColumnScanEnabled) {
                 currentGroup = if (scanDirection == ScanDirection.RIGHT) {
                     0
@@ -346,6 +372,7 @@ class ScanTreeNavigator(
         currentTreeItem = 0
         currentGroup = 0
         currentColumn = 0
+        currentCycle = 0
         isInTreeItem = false
         isScanningGroups = scanSettings.isGroupScanEnabled()
         shouldEscapeItem = false

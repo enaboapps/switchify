@@ -172,6 +172,19 @@ class ScanTree(
     }
 
     /**
+     * Handles the number of cycles for the scanning tree
+     * @return True if cycles value has reached the user defined value, false otherwise.
+     */
+    private fun handleCycles(): Boolean {
+        if (navigator.handleCycles()) {
+            stopScanning()
+            return true
+        } else {
+            return false
+        }
+    }
+
+    /**
      * Manually steps forward in the scanning tree.
      * This method is used for manual navigation through the tree.
      */
@@ -240,6 +253,10 @@ class ScanTree(
      */
     private fun stepAutoScanning() {
         unhighlightCurrent()
+
+        if (handleCycles()) {
+            return
+        }
 
         if (handleEscape()) {
             return

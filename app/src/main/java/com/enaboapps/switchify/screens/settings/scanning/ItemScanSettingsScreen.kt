@@ -1,9 +1,12 @@
 package com.enaboapps.switchify.screens.settings.scanning
 
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.ui.platform.LocalContext
 import androidx.navigation.NavController
 import com.enaboapps.switchify.components.BaseView
+import com.enaboapps.switchify.components.Picker
 import com.enaboapps.switchify.components.PreferenceSwitch
 import com.enaboapps.switchify.components.PreferenceTimeStepper
 import com.enaboapps.switchify.components.Section
@@ -12,6 +15,14 @@ import com.enaboapps.switchify.preferences.PreferenceManager
 @Composable
 fun ItemScanSettingsScreen(navController: NavController) {
     val preferenceManager = PreferenceManager(LocalContext.current)
+    var currentScanCycles = remember {
+        mutableStateOf(
+            preferenceManager.getStringValue(
+                PreferenceManager.Keys.PREFERENCE_KEY_SCAN_CYCLES,
+                "3"
+            )
+        )
+    }
 
     BaseView(
         title = "Item Scan Settings",
@@ -46,6 +57,21 @@ fun ItemScanSettingsScreen(navController: NavController) {
                         it
                     )
                 }
+            )
+
+            Picker(
+                title = "Scan cycles",
+                selectedItem = currentScanCycles.value,
+                items = listOf("1", "2", "3", "4", "5", "6", "7", "8", "9", "10"),
+                onItemSelected = { item ->
+                    currentScanCycles.value = item
+                    preferenceManager.setStringValue(
+                        PreferenceManager.Keys.PREFERENCE_KEY_SCAN_CYCLES,
+                        item
+                    )
+                },
+                itemToString = { it.toString() },
+                itemDescription = { "Scan $it times before stopping" }
             )
         }
 

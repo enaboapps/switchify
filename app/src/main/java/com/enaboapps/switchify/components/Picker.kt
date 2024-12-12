@@ -1,13 +1,9 @@
 package com.enaboapps.switchify.components
 
-import androidx.compose.foundation.clickable
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Delete
-import androidx.compose.material3.Card
+import androidx.compose.material.icons.filled.KeyboardArrowDown
 import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.Icon
@@ -19,9 +15,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 
 @Composable
@@ -37,35 +31,13 @@ fun <T> Picker(
 ) {
     var expanded by remember { mutableStateOf(false) }
 
-    Card(
-        modifier = Modifier
-            .fillMaxWidth()
-            .padding(horizontal = 20.dp, vertical = 8.dp)
-            .clickable(onClick = { expanded = true })
-    ) {
-        Row(
-            modifier = Modifier
-                .padding(20.dp)
-                .fillMaxWidth(),
-            verticalAlignment = Alignment.CenterVertically
-        ) {
-            Column(
-                modifier = Modifier.weight(1f)
-            ) {
-                Text(
-                    text = title.uppercase(),
-                    style = MaterialTheme.typography.titleMedium,
-                    fontWeight = FontWeight.Medium
-                )
-                if (selectedItem != null) {
-                    Text(text = itemToString(selectedItem))
-                    Text(text = itemDescription(selectedItem))
-                } else {
-                    Text(text = "No item selected", style = MaterialTheme.typography.bodyMedium)
-                }
-            }
-
-            if (onDelete != null) {
+    UICard(
+        modifier = modifier.padding(bottom = 8.dp),
+        title = title,
+        description = if (selectedItem != null) itemToString(selectedItem) else "",
+        extraDescription = if (selectedItem != null) itemDescription(selectedItem) else "",
+        rightActionButton = {
+            onDelete?.let {
                 IconButton(onClick = onDelete) {
                     Icon(
                         imageVector = Icons.Default.Delete,
@@ -74,8 +46,14 @@ fun <T> Picker(
                     )
                 }
             }
+        },
+        rightIcon = Icons.Default.KeyboardArrowDown,
+        onClick = {
+            expanded = true
         }
+    )
 
+    if (expanded) {
         DropdownMenu(
             modifier = modifier,
             expanded = expanded,
