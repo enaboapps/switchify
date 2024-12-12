@@ -9,6 +9,7 @@ class PreferenceManager(context: Context) {
         const val PREFERENCE_KEY_SETUP_COMPLETE = "setup_complete"
         const val PREFERENCE_KEY_SCAN_MODE = "scan_mode"
         const val PREFERENCE_KEY_SCAN_RATE = "scan_rate"
+        const val PREFERENCE_KEY_SCAN_CYCLES = "scan_cycles"
         const val PREFERENCE_KEY_SCAN_METHOD = "scan_method"
         const val PREFERENCE_KEY_CURSOR_FINE_SCAN_RATE = "cursor_fine_scan_rate"
         const val PREFERENCE_KEY_CURSOR_BLOCK_SCAN_RATE = "cursor_block_scan_rate"

@@ -23,8 +23,10 @@ fun UICard(
     modifier: Modifier = Modifier
         .fillMaxWidth(),
     title: String,
-    description: String,
+    description: String? = null,
+    extraDescription: String? = null,
     rightIcon: ImageVector? = null,
+    rightActionButton: @Composable () -> Unit = {},
     onClick: () -> Unit,
     enabled: Boolean? = true
 ) {
@@ -52,11 +54,21 @@ fun UICard(
                     fontWeight = FontWeight.Medium
                 )
                 Spacer(modifier = Modifier.height(8.dp))
-                Text(
-                    text = description,
-                    style = MaterialTheme.typography.bodySmall
-                )
+                description?.let {
+                    Text(
+                        text = it,
+                        style = MaterialTheme.typography.bodySmall
+                    )
+                }
+                extraDescription?.let {
+                    Text(
+                        text = it,
+                        style = MaterialTheme.typography.bodySmall
+                    )
+                }
             }
+
+            rightActionButton()
 
             rightIcon?.let {
                 Icon(
