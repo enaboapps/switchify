@@ -1,7 +1,7 @@
 package com.enaboapps.switchify.screens.settings.scanning
 
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.mutableIntStateOf
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.platform.LocalContext
 import androidx.navigation.NavController
@@ -16,10 +16,10 @@ import com.enaboapps.switchify.preferences.PreferenceManager
 fun ItemScanSettingsScreen(navController: NavController) {
     val preferenceManager = PreferenceManager(LocalContext.current)
     var currentScanCycles = remember {
-        mutableIntStateOf(
-            preferenceManager.getIntegerValue(
+        mutableStateOf(
+            preferenceManager.getStringValue(
                 PreferenceManager.Keys.PREFERENCE_KEY_SCAN_CYCLES,
-                3
+                "3"
             )
         )
     }
@@ -61,12 +61,12 @@ fun ItemScanSettingsScreen(navController: NavController) {
 
             Picker(
                 title = "Scan cycles",
-                selectedItem = currentScanCycles.intValue,
-                items = listOf(1, 2, 3, 4, 5, 6, 7, 8, 9, 10),
+                selectedItem = currentScanCycles.value,
+                items = listOf("1", "2", "3", "4", "5", "6", "7", "8", "9", "10"),
                 onItemSelected = { item ->
-                    currentScanCycles.intValue = item
-                    preferenceManager.setIntegerValue(
-                        PreferenceManager.PREFERENCE_KEY_SCAN_CYCLES,
+                    currentScanCycles.value = item
+                    preferenceManager.setStringValue(
+                        PreferenceManager.Keys.PREFERENCE_KEY_SCAN_CYCLES,
                         item
                     )
                 },
