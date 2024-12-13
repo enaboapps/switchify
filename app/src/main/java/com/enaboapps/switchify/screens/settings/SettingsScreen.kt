@@ -53,20 +53,7 @@ fun SettingsScreen(navController: NavController) {
 @Composable
 fun GeneralSettingsTab(settingsScreenModel: SettingsScreenModel, navController: NavController) {
     ScrollableView {
-        NavRouteLink(
-            title = "Switches",
-            summary = "Configure your switches",
-            navController = navController,
-            route = NavigationRoute.Switches.name
-        )
-        Spacer(modifier = Modifier.height(16.dp))
-        NavRouteLink(
-            title = "Switch Stability",
-            summary = "Configure switch stability settings",
-            navController = navController,
-            route = NavigationRoute.SwitchStability.name
-        )
-        Spacer(modifier = Modifier.height(16.dp))
+        InputSection(navController)
         MenuSection(settingsScreenModel, navController)
         LockScreenSection(navController)
         ActionsSection(navController)
@@ -133,6 +120,24 @@ fun ScanningSettingsTab(navController: NavController) {
 fun SelectionSettingsTab(settingsScreenModel: SettingsScreenModel) {
     ScrollableView {
         SelectionSection(settingsScreenModel)
+    }
+}
+
+@Composable
+private fun InputSection(navController: NavController) {
+    Section(title = "Input") {
+        NavRouteLink(
+            title = "Switches",
+            summary = "Configure your switches",
+            navController = navController,
+            route = NavigationRoute.Switches.name
+        )
+        NavRouteLink(
+            title = "Switch Stability",
+            summary = "Configure switch stability settings",
+            navController = navController,
+            route = NavigationRoute.SwitchStability.name
+        )
     }
 }
 
