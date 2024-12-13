@@ -157,7 +157,6 @@ private fun MenuSection(screenModel: SettingsScreenModel, navController: NavCont
             navController = navController,
             route = NavigationRoute.MenuItemCustomization.name
         )
-        Spacer(modifier = Modifier.height(16.dp))
         NavRouteLink(
             title = "Menu Size",
             summary = "Change the size of the menu",
