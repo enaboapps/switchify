@@ -1,10 +1,7 @@
 package com.enaboapps.switchify.screens.settings.menu
 
-import androidx.compose.foundation.layout.*
 import androidx.compose.runtime.*
-import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import com.enaboapps.switchify.components.BaseView
 import com.enaboapps.switchify.components.PreferenceSwitch
@@ -26,26 +23,19 @@ fun MenuItemCustomizationScreen(navController: NavController) {
 
     BaseView(
         title = "Customize Menu Items",
-        navController = navController,
-        enableScroll = false
+        navController = navController
     ) {
-        Column(
-            modifier = Modifier
-                .padding(16.dp)
-                .fillMaxSize()
-        ) {
-            uniqueItems.forEach { menuItem ->
-                val isVisible = remember { mutableStateOf(menuItem.isVisible(context)) }
-                PreferenceSwitch(
-                    title = menuItem.text,
-                    summary = if (isVisible.value) "Shown" else "Hidden",
-                    checked = isVisible.value,
-                    onCheckedChange = {
-                        isVisible.value = it
-                        preferenceManager.setMenuItemVisibility(menuItem.id, it)
-                    }
-                )
-            }
+        uniqueItems.forEach { menuItem ->
+            val isVisible = remember { mutableStateOf(menuItem.isVisible(context)) }
+            PreferenceSwitch(
+                title = menuItem.text,
+                summary = if (isVisible.value) "Shown" else "Hidden",
+                checked = isVisible.value,
+                onCheckedChange = {
+                    isVisible.value = it
+                    preferenceManager.setMenuItemVisibility(menuItem.id, it)
+                }
+            )
         }
     }
 }
