@@ -19,12 +19,13 @@ class Node(
     private var nodeInfo: AccessibilityNodeInfo? = null
     private var x: Int = 0
     private var y: Int = 0
-    private var contentDescription: String = ""
     private var centerX: Int = 0
     private var centerY: Int = 0
     private var width: Int = 0
     private var height: Int = 0
     private var highlighted: Boolean = false
+
+    var contentDescription: String = ""
 
 
     companion object {

@@ -74,6 +74,7 @@ class NodeScanner {
         startTimeoutToRevertToCursor()
         scanTree = ScanTree(context = context, stopScanningOnSelect = true)
         screenWatcher.register(context)
+        NodeSpeaker.init(context)
         registerEventReceivers(context)
     }
 
