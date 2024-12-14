@@ -233,9 +233,12 @@ class SwitchifyKeyboardService : InputMethodService(), KeyboardLayoutListener, P
                         }
                     }
                     if (getDrawableResource(type) != null) {
-                        setKeyContent(drawable = getDrawableResource(type))
+                        setKeyContent(
+                            drawable = getDrawableResource(type),
+                            contentDescription = type.toString()
+                        )
                     } else {
-                        setKeyContent(text = type.toString())
+                        setKeyContent(text = type.toString(), contentDescription = type.toString())
                     }
                     if (type is KeyType.ShiftCaps) {
                         setPinned(KeyboardLayoutManager.currentLayoutState != KeyboardLayoutState.Lower)
