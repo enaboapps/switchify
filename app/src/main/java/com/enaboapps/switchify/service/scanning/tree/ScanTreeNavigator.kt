@@ -340,7 +340,7 @@ class ScanTreeNavigator(
      * Gets the current ScanTreeItem.
      * @return The current ScanTreeItem.
      */
-    private fun getCurrentItem(): ScanTreeItem = tree[currentTreeItem]
+    fun getCurrentItem(): ScanTreeItem = tree[currentTreeItem]
 
     /**
      * Swaps the scanning direction between vertical and horizontal.

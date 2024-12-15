@@ -1,6 +1,7 @@
 package com.enaboapps.switchify.service.scanning.tree
 
 import com.enaboapps.switchify.service.methods.nodes.NodeScannerUI
+import com.enaboapps.switchify.service.methods.nodes.NodeSpeaker
 import com.enaboapps.switchify.service.scanning.ScanNodeInterface
 
 /**
@@ -62,6 +63,24 @@ class ScanTreeItem(
 
             else -> throw IllegalArgumentException("Invalid unhighlight parameters")
         }
+    }
+
+    /**
+     * This function speaks the row or group of nodes
+     * @param isGroup Whether the nodes are part of a group
+     */
+    fun speakNodes(isGroup: Boolean) {
+        NodeSpeaker.speakNodes(children, isGroup)
+    }
+
+    /**
+     * This function speaks an individual node
+     * @param nodeIndex The index of the node to speak
+     */
+    fun speakNode(nodeIndex: Int) {
+        children.getOrNull(nodeIndex)?.let { node ->
+            NodeSpeaker.speakNode(node)
+        } ?: println("Node not found")
     }
 
     fun getX(): Int = children.minOf { it.getLeft() }

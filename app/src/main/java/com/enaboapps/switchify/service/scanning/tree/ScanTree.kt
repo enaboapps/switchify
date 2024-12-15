@@ -185,6 +185,30 @@ class ScanTree(
     }
 
     /**
+     * Speak during the scan
+     * Determines if the scan is a row or group and calls the appropriate function
+     * Only called if item scan speech is enabled
+     */
+    private fun speakDuringScan() {
+        if (scanSettings.isItemScanSpeechEnabled()) {
+            println("Speaking during scan")
+            val currentItem = navigator.getCurrentItem()
+            val groupsEnabled = scanSettings.isGroupScanEnabled()
+            val inGroup = navigator.isScanningGroups
+            if (groupsEnabled && inGroup) {
+                currentItem.speakNodes(true)
+                return
+            }
+            val inItem = navigator.isInTreeItem
+            if (!inItem) {
+                currentItem.speakNodes(false)
+            } else {
+                currentItem.speakNode(navigator.currentColumn)
+            }
+        }
+    }
+
+    /**
      * Manually steps forward in the scanning tree.
      * This method is used for manual navigation through the tree.
      */
@@ -286,6 +310,8 @@ class ScanTree(
             navigator.isInTreeItem,
             navigator.isScanningGroups
         )
+
+        speakDuringScan()
     }
 
     /**

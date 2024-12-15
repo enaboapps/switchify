@@ -25,7 +25,7 @@ class Node(
     private var height: Int = 0
     private var highlighted: Boolean = false
 
-    var contentDescription: String = ""
+    private var contentDescription: String = ""
 
 
     companion object {
@@ -79,6 +79,11 @@ class Node(
             node.centerY = menuItem.y + menuItem.height / 2
             node.width = menuItem.width
             node.height = menuItem.height
+            if (menuItem.text.isNotEmpty()) {
+                node.contentDescription = menuItem.text
+            } else if (menuItem.drawableDescription.isNotEmpty()) {
+                node.contentDescription = menuItem.drawableDescription
+            }
             return node
         }
     }
@@ -140,6 +145,10 @@ class Node(
 
     override fun getHeight(): Int {
         return height
+    }
+
+    override fun getContentDescription(): String {
+        return contentDescription
     }
 
     override fun highlight() {

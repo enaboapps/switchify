@@ -41,6 +41,12 @@ interface ScanNodeInterface {
     fun getHeight(): Int
 
     /**
+     * This function gets the content description of the node
+     * @return The content description of the node
+     */
+    fun getContentDescription(): String
+
+    /**
      * This function highlights the node
      */
     fun highlight()

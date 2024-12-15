@@ -4,6 +4,7 @@ import android.content.Context
 import android.os.Bundle
 import android.speech.tts.TextToSpeech
 import android.speech.tts.UtteranceProgressListener
+import com.enaboapps.switchify.service.scanning.ScanNodeInterface
 import java.util.Locale
 import java.util.UUID
 
@@ -33,7 +34,7 @@ object NodeSpeaker {
         onInitialized: (() -> Unit)? = null,
         onError: ((Int) -> Unit)? = null
     ) {
-        tts = TextToSpeech(context) { status ->
+        tts = TextToSpeech(context.applicationContext) { status ->
             isInitialized = status == TextToSpeech.SUCCESS
 
             if (isInitialized) {
@@ -84,11 +85,14 @@ object NodeSpeaker {
      * @return The utterance ID if speaking was initiated, null otherwise.
      */
     fun speakNode(
-        node: Node,
+        node: ScanNodeInterface,
         queueMode: Int = TextToSpeech.QUEUE_FLUSH,
         onComplete: ((String) -> Unit)? = null
     ): String? {
-        if (!isInitialized) return null
+        if (!isInitialized) {
+            println("TTS not initialized")
+            return null
+        }
 
         val utteranceId = UUID.randomUUID().toString()
         val params = Bundle().apply {
@@ -99,7 +103,8 @@ object NodeSpeaker {
             onSpeakCompleteListener = callback
         }
 
-        val content = node.contentDescription
+        val content = node.getContentDescription()
+        println("Speaking: $content")
 
         tts?.speak(content, queueMode, params, utteranceId)
 
@@ -107,10 +112,53 @@ object NodeSpeaker {
     }
 
     /**
+     * Speaks a row or group of nodes with specified parameters.
+     * Announces the first node and number of nodes in the group.
+     *
+     * @param nodes The list of nodes to speak.
+     * @param isGroup Whether the nodes are part of a group.
+     * @param queueMode The queue mode to use (QUEUE_FLUSH or QUEUE_ADD).
+     * @param onComplete Callback triggered when speaking is complete.
+     * @return The utterance ID if speaking was initiated, null otherwise.
+     */
+    fun speakNodes(
+        nodes: List<ScanNodeInterface>,
+        isGroup: Boolean,
+        queueMode: Int = TextToSpeech.QUEUE_FLUSH,
+        onComplete: ((String) -> Unit)? = null
+    ) {
+        if (!isInitialized || nodes.isEmpty()) {
+            println("TTS not initialized or nodes are empty")
+            return
+        }
+
+        val utteranceId = UUID.randomUUID().toString()
+        val params = Bundle().apply {
+            putFloat(TextToSpeech.Engine.KEY_PARAM_VOLUME, 1.0f)
+        }
+
+        onComplete?.let { callback ->
+            onSpeakCompleteListener = callback
+        }
+
+        var spokeText =
+            if (isGroup) "Group of ${nodes.size} items" else "Row of ${nodes.size} items"
+        val firstNode = nodes.first()
+        spokeText += " starting at ${firstNode.getContentDescription()}"
+        println("Speaking: $spokeText")
+
+        tts?.speak(spokeText, queueMode, params, utteranceId)
+    }
+
+    /**
      * Stops speaking immediately.
      */
     fun stopSpeaking() {
-        tts?.stop()
+        if (isInitialized) {
+            tts?.stop()
+        } else {
+            println("TTS not initialized")
+        }
     }
 
     /**

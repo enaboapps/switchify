@@ -36,6 +36,17 @@ class ScanSettings(context: Context) {
     }
 
     /**
+     * Check if item scan speech is enabled
+     * @return true if item scan speech is enabled, false otherwise
+     */
+    fun isItemScanSpeechEnabled(): Boolean {
+        return preferenceManager.getBooleanValue(
+            PreferenceManager.Keys.PREFERENCE_KEY_ITEM_SCAN_SPEECH,
+            false
+        )
+    }
+
+    /**
      * Get the scan cycles
      * @return The scan cycles
      */

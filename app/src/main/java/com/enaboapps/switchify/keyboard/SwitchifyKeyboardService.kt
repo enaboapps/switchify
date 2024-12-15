@@ -235,10 +235,13 @@ class SwitchifyKeyboardService : InputMethodService(), KeyboardLayoutListener, P
                     if (getDrawableResource(type) != null) {
                         setKeyContent(
                             drawable = getDrawableResource(type),
-                            contentDescription = type.toString()
+                            contentDescription = getContentDescriptionOfKey(type)
                         )
                     } else {
-                        setKeyContent(text = type.toString(), contentDescription = type.toString())
+                        setKeyContent(
+                            text = type.toString(),
+                            contentDescription = getContentDescriptionOfKey(type)
+                        )
                     }
                     if (type is KeyType.ShiftCaps) {
                         setPinned(KeyboardLayoutManager.currentLayoutState != KeyboardLayoutState.Lower)
@@ -248,6 +251,39 @@ class SwitchifyKeyboardService : InputMethodService(), KeyboardLayoutListener, P
             }
 
             keyboardLayout.addView(rowLayout)
+        }
+    }
+
+    /**
+     * This function returns the correct content description for the given key type.
+     *
+     * @param keyType the key type.
+     * @return the content description.
+     */
+    private fun getContentDescriptionOfKey(keyType: KeyType): String {
+        return when (keyType) {
+            is KeyType.Character -> keyType.char.toString()
+            is KeyType.Special -> keyType.symbol
+            is KeyType.Prediction -> keyType.prediction
+            is KeyType.Backspace -> "Backspace"
+            is KeyType.DeleteWord -> "Delete Word"
+            is KeyType.Clear -> "Clear"
+            is KeyType.ImeAction -> "IME Action"
+            is KeyType.Return -> "Return"
+            is KeyType.Tab -> "Tab"
+            is KeyType.LeftArrow -> "Left Arrow"
+            is KeyType.RightArrow -> "Right Arrow"
+            is KeyType.UpArrow -> "Up Arrow"
+            is KeyType.DownArrow -> "Down Arrow"
+            is KeyType.Cut -> "Cut"
+            is KeyType.Copy -> "Copy"
+            is KeyType.Paste -> "Paste"
+            is KeyType.SelectAll -> "Select All"
+            is KeyType.SwitchToNextInput -> "Switch to Next Input"
+            is KeyType.ShiftCaps -> "Shift Caps"
+            is KeyType.SwitchToMenu -> "Switch to Menu"
+            is KeyType.CloseMenu -> "Close Menu"
+            else -> "Unknown"
         }
     }
 

@@ -30,7 +30,7 @@ class MenuItem(
     val id: String,
     val text: String = "",
     private val drawableId: Int = 0,
-    private val drawableDescription: String = "",
+    val drawableDescription: String = "",
     val closeOnSelect: Boolean = true,
     var isLinkToMenu: Boolean = false,
     var isMenuHierarchyManipulator: Boolean = false,
