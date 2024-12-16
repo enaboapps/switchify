@@ -7,7 +7,6 @@ import android.content.IntentFilter
 import android.util.Log
 import androidx.localbroadcastmanager.content.LocalBroadcastManager
 import com.enaboapps.switchify.preferences.PreferenceManager
-import com.enaboapps.switchify.service.scanning.ScanSettings
 import com.enaboapps.switchify.service.scanning.ScanningManager
 import com.enaboapps.switchify.service.selection.SelectionHandler
 import com.enaboapps.switchify.switches.SwitchEvent
@@ -19,12 +18,10 @@ import com.enaboapps.switchify.switches.SwitchEventStore
  *
  * @property context Application context used for accessing system services and resources
  * @property scanningManager Manages the scanning interface for switch-based navigation
- * @property scanSettings Contains configuration for scanning behavior and switch interactions
  */
 class SwitchListener(
     private val context: Context,
-    private val scanningManager: ScanningManager,
-    private val scanSettings: ScanSettings
+    private val scanningManager: ScanningManager
 ) {
     private val preferenceManager = PreferenceManager(context)
     private val switchEventStore = SwitchEventStore(context)
@@ -57,17 +54,6 @@ class SwitchListener(
     }
 
     /**
-     * Determines if pause-on-hold functionality should be enabled based on preferences
-     * and scanning settings.
-     *
-     * @return true if scanning should pause when a switch is held down
-     */
-    private fun isPauseEnabled(): Boolean {
-        return preferenceManager.getBooleanValue(PreferenceManager.PREFERENCE_KEY_PAUSE_SCAN_ON_SWITCH_HOLD) ||
-                scanSettings.isPauseScanOnSwitchHoldRequired()
-    }
-
-    /**
      * Handles switch press events. This is the main entry point for processing
      * switch interactions.
      *
@@ -78,9 +64,8 @@ class SwitchListener(
         val switchEvent = findSwitchEvent(keyCode) ?: return false
         switchEvent.log()
 
-        if (handleSwitchPressedRepeat(keyCode)) return true
-
-        return processSwitchPressedActions(switchEvent)
+        processSwitchPressedActions(switchEvent)
+        return true
     }
 
     /**
@@ -92,6 +77,18 @@ class SwitchListener(
     fun onSwitchReleased(keyCode: Int): Boolean {
         val switchEvent = findSwitchEvent(keyCode) ?: return false
         val absorbedAction = latestAction?.takeIf { it.switchEvent == switchEvent } ?: return true
+
+        if (scanningManager.stopMoveRepeat()) return true
+        SwitchLongPressHandler.stopLongPress(scanningManager)
+
+        if (handleSwitchPressedRepeat(keyCode)) {
+            return true
+        }
+
+        if (SelectionHandler.isAutoSelectInProgress()) {
+            SelectionHandler.performSelectionAction()
+            return true
+        }
 
         processSwitchReleasedActions(switchEvent, absorbedAction)
         return true
@@ -130,47 +127,22 @@ class SwitchListener(
      * @param switchEvent The switch event to process
      * @return true if the event was processed successfully
      */
-    private fun processSwitchPressedActions(switchEvent: SwitchEvent): Boolean {
+    private fun processSwitchPressedActions(switchEvent: SwitchEvent) {
         latestAction = AbsorbedSwitchAction(switchEvent, System.currentTimeMillis())
-        val pauseEnabled = isPauseEnabled()
-
-        return when {
-            scanningManager.startMoveRepeat(switchEvent.pressAction) -> true
-            switchEvent.holdActions.isEmpty() && !pauseEnabled -> {
-                handleImmediatePressAction(switchEvent)
-                true
-            }
-
-            else -> handleLongPressAction(switchEvent, pauseEnabled)
+        if (scanningManager.startMoveRepeat(switchEvent.pressAction)) {
+            return
         }
-    }
-
-    /**
-     * Handles immediate (non-hold) press actions for a switch event.
-     *
-     * @param switchEvent The switch event to handle
-     */
-    private fun handleImmediatePressAction(switchEvent: SwitchEvent) {
-        if (SelectionHandler.isAutoSelectInProgress()) {
-            SelectionHandler.performSelectionAction()
-        } else {
-            scanningManager.performAction(switchEvent.pressAction)
-        }
+        handleLongPressAction(switchEvent)
     }
 
     /**
      * Handles long press actions for a switch event.
      *
      * @param switchEvent The switch event to handle
-     * @param pauseEnabled Whether scanning should pause during the hold
-     * @return true if the long press was handled successfully
      */
-    private fun handleLongPressAction(switchEvent: SwitchEvent, pauseEnabled: Boolean): Boolean {
+    private fun handleLongPressAction(switchEvent: SwitchEvent) {
         SwitchLongPressHandler.startLongPress(context, switchEvent.holdActions)
-        if (pauseEnabled) {
-            scanningManager.pauseScanning()
-        }
-        return true
+        scanningManager.pauseScanning()
     }
 
     /**
@@ -183,37 +155,24 @@ class SwitchListener(
         switchEvent: SwitchEvent,
         absorbedAction: AbsorbedSwitchAction
     ) {
-        if (scanningManager.stopMoveRepeat()) return
-        SwitchLongPressHandler.stopLongPress(scanningManager)
-
         val timeElapsed = System.currentTimeMillis() - absorbedAction.time
-        handleSwitchReleaseActions(switchEvent, timeElapsed)
-    }
 
-    /**
-     * Handles actions for switch release based on hold time and settings.
-     *
-     * @param switchEvent The switch event being released
-     * @param timeElapsed Time elapsed since the initial press
-     */
-    private fun handleSwitchReleaseActions(switchEvent: SwitchEvent, timeElapsed: Long) {
         val switchHoldTime =
             preferenceManager.getLongValue(PreferenceManager.PREFERENCE_KEY_SWITCH_HOLD_TIME)
-        val pauseEnabled = isPauseEnabled()
 
-        if (pauseEnabled && !SelectionHandler.isAutoSelectInProgress()) {
+        if (!SelectionHandler.isAutoSelectInProgress()) {
             scanningManager.resumeScanning()
         }
 
         when {
             SelectionHandler.isAutoSelectInProgress() &&
-                    (switchEvent.holdActions.isNotEmpty() || pauseEnabled) ->
+                    switchEvent.holdActions.isNotEmpty() ->
                 SelectionHandler.performSelectionAction()
 
-            switchEvent.holdActions.isEmpty() && pauseEnabled ->
+            switchEvent.holdActions.isEmpty() ->
                 scanningManager.performAction(switchEvent.pressAction)
 
-            switchEvent.holdActions.isNotEmpty() && timeElapsed < switchHoldTime ->
+            timeElapsed < switchHoldTime ->
                 scanningManager.performAction(switchEvent.pressAction)
         }
     }
