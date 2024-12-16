@@ -2,6 +2,7 @@ package com.enaboapps.switchify.service.scanning.tree
 
 import android.content.Context
 import android.util.Log
+import com.enaboapps.switchify.service.methods.nodes.NodeSpeaker
 import com.enaboapps.switchify.service.scanning.ScanMethodBase
 import com.enaboapps.switchify.service.scanning.ScanNodeInterface
 import com.enaboapps.switchify.service.scanning.ScanSettings
@@ -193,17 +194,53 @@ class ScanTree(
         if (scanSettings.isItemScanSpeechEnabled()) {
             println("Speaking during scan")
             val currentItem = navigator.getCurrentItem()
+            val rowColumnEnabled = scanSettings.isRowColumnScanEnabled()
             val groupsEnabled = scanSettings.isGroupScanEnabled()
-            val inGroup = navigator.isScanningGroups
-            if (groupsEnabled && inGroup) {
-                currentItem.speakNodes(true)
-                return
-            }
+            val inGroup = navigator.isInGroup
             val inItem = navigator.isInTreeItem
-            if (!inItem) {
-                currentItem.speakNodes(false)
-            } else {
-                currentItem.speakNode(navigator.currentColumn)
+
+            when {
+                // Speak the node if row column is disabled
+                !rowColumnEnabled -> {
+                    navigator.getCurrentNode()?.let { node ->
+                        NodeSpeaker.speakNode(node)
+                    }
+                }
+
+                // Speak item if it's a single node
+                currentItem.isSingleNode() -> {
+                    currentItem.speakNode(null, navigator.currentColumn)
+                }
+
+                // Speak the node if row column is enabled but the item is not grouped
+                groupsEnabled && !currentItem.isGrouped() && inItem -> {
+                    currentItem.speakNode(null, navigator.currentColumn)
+                }
+
+                // Speak the node in the current group
+                inGroup && groupsEnabled && currentItem.isGrouped() && inItem -> {
+                    currentItem.speakNode(navigator.currentGroup, navigator.currentColumn)
+                }
+
+                // Speak the row
+                !inItem && !inGroup -> {
+                    currentItem.speakNodes(false)
+                }
+
+                // Speak the row if group scan is enabled but the item is not grouped
+                groupsEnabled && !currentItem.isGrouped() && inItem -> {
+                    currentItem.speakNodes(false)
+                }
+
+                // Speak the group
+                !inGroup && groupsEnabled -> {
+                    currentItem.speakGroup(navigator.currentGroup)
+                }
+
+                // Speak the node
+                else -> {
+                    currentItem.speakNode(null, navigator.currentColumn)
+                }
             }
         }
     }

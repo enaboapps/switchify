@@ -74,11 +74,25 @@ class ScanTreeItem(
     }
 
     /**
+     * This function speaks the a specific group of nodes
+     * @param groupIndex The index of the group to speak
+     */
+    fun speakGroup(groupIndex: Int) {
+        val group = groups.getOrNull(groupIndex) ?: return
+        NodeSpeaker.speakNodes(group, true)
+    }
+
+    /**
      * This function speaks an individual node
+     * @param groupIndex The index of the group to speak (null if not in group scanning mode)
      * @param nodeIndex The index of the node to speak
      */
-    fun speakNode(nodeIndex: Int) {
-        children.getOrNull(nodeIndex)?.let { node ->
+    fun speakNode(groupIndex: Int?, nodeIndex: Int) {
+        val node = children.getOrNull(nodeIndex) ?: return
+        if (groupIndex != null) {
+            val nodeInGroup = groups.getOrNull(groupIndex)?.getOrNull(nodeIndex) ?: return
+            NodeSpeaker.speakNode(nodeInGroup)
+        } else {
             NodeSpeaker.speakNode(node)
         } ?: println("Node not found")
     }
