@@ -76,7 +76,7 @@ class SwitchifyAccessibilityService : AccessibilityService() {
 
         scanSettings = ScanSettings(this)
 
-        switchListener = SwitchListener(this, scanningManager, scanSettings)
+        switchListener = SwitchListener(this, scanningManager)
 
         GestureManager.getInstance().setup(this)
         SelectionHandler.init(this)
