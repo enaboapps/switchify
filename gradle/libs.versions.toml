@@ -21,7 +21,7 @@ espresso-core = "3.6.1"
 google-services = "4.4.2"
 firebase-crashlytics-gradle = "3.0.2"
 app-update = "2.1.0"
-switchifykeyboardscanlib = "1.0.2"
+switchifykeyboardscanlib = "1.1.0"
 
 [libraries]
 core-ktx = { group = "androidx.core", name = "core-ktx", version.ref = "core-ktx" }

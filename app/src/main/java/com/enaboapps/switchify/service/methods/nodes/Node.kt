@@ -8,7 +8,7 @@ import com.enaboapps.switchify.service.gestures.GesturePoint
 import com.enaboapps.switchify.service.menu.MenuItem
 import com.enaboapps.switchify.service.scanning.ScanNodeInterface
 import com.enaboapps.switchify.service.selection.SelectionHandler
-import com.enaboapps.switchifykeyboardscanlib.KeyboardSwitchifyInfo
+import com.enaboapps.switchifykeyboardscanlib.KeyboardNodeInfo
 
 /**
  * This class represents a node
@@ -25,6 +25,8 @@ class Node(
     private var height: Int = 0
     private var highlighted: Boolean = false
 
+    private var contentDescription: String = ""
+
 
     companion object {
         /**
@@ -39,6 +41,7 @@ class Node(
             node.nodeInfo = nodeInfo
             node.x = rect.left
             node.y = rect.top
+            node.contentDescription = nodeInfo.contentDescription?.toString() ?: ""
             node.centerX = rect.centerX()
             node.centerY = rect.centerY()
             node.width = rect.width()
@@ -47,18 +50,19 @@ class Node(
         }
 
         /**
-         * This function creates a node from a KeyboardSwitchifyInfo object
-         * @param keyboardSwitchifyInfo The KeyboardSwitchifyInfo object
+         * This function creates a node from a [KeyboardNodeInfo] object
+         * @param keyboardSwitchifyNode The [KeyboardNodeInfo] object
          * @return The node
          */
-        fun fromKeyInfo(keyboardSwitchifyInfo: KeyboardSwitchifyInfo): Node {
+        fun fromKeyboardSwitchifyNode(keyboardSwitchifyNode: KeyboardNodeInfo): Node {
             val node = Node()
-            node.x = keyboardSwitchifyInfo.x
-            node.y = keyboardSwitchifyInfo.y
-            node.centerX = keyboardSwitchifyInfo.x + keyboardSwitchifyInfo.width / 2
-            node.centerY = keyboardSwitchifyInfo.y + keyboardSwitchifyInfo.height / 2
-            node.width = keyboardSwitchifyInfo.width
-            node.height = keyboardSwitchifyInfo.height
+            node.x = keyboardSwitchifyNode.x.toInt()
+            node.y = keyboardSwitchifyNode.y.toInt()
+            node.centerX = (keyboardSwitchifyNode.x + keyboardSwitchifyNode.width / 2).toInt()
+            node.centerY = (keyboardSwitchifyNode.y + keyboardSwitchifyNode.height / 2).toInt()
+            node.width = keyboardSwitchifyNode.width.toInt()
+            node.height = keyboardSwitchifyNode.height.toInt()
+            node.contentDescription = keyboardSwitchifyNode.contentDescription
             return node
         }
 
@@ -75,6 +79,11 @@ class Node(
             node.centerY = menuItem.y + menuItem.height / 2
             node.width = menuItem.width
             node.height = menuItem.height
+            if (menuItem.text.isNotEmpty()) {
+                node.contentDescription = menuItem.text
+            } else if (menuItem.drawableDescription.isNotEmpty()) {
+                node.contentDescription = menuItem.drawableDescription
+            }
             return node
         }
     }
@@ -136,6 +145,14 @@ class Node(
 
     override fun getHeight(): Int {
         return height
+    }
+
+    override fun getContentDescription(): String {
+        return contentDescription
+    }
+
+    fun setContentDescription(contentDescription: String) {
+        this.contentDescription = contentDescription
     }
 
     override fun highlight() {

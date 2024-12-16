@@ -18,6 +18,7 @@ import kotlin.math.sqrt
 /**
  * NodeExaminer is responsible for examining accessibility nodes within an application's UI.
  * It provides methods to find, filter, and analyze nodes, as well as to observe changes in the node structure.
+ * This implementation includes deep content description analysis for nodes with empty content.
  */
 object NodeExaminer {
     /** Holds the list of all nodes. */
@@ -39,24 +40,29 @@ object NodeExaminer {
     /**
      * Initiates the process of finding and updating the list of nodes.
      * It flattens the accessibility tree starting from the rootNode, filters out nodes not on the screen,
-     * and emits an update if the actionable nodes have changed.
+     * and emits an update if the actionable nodes have changed. Includes deep content examination for empty nodes.
      *
      * @param rootNode The root node to start the examination from.
      * @param context The current context, used to get screen dimensions for filtering nodes.
      * @param coroutineScope The CoroutineScope in which to perform the node examination.
      */
-    suspend fun findNodes(
+    fun findNodes(
         rootNode: AccessibilityNodeInfo,
         context: Context,
         coroutineScope: CoroutineScope
     ) {
         coroutineScope.launch(Dispatchers.Default) {
             val newNodeInfos = flattenTree(rootNode)
-            allNodes = newNodeInfos.map { Node.fromAccessibilityNodeInfo(it) }
 
+            // Enhanced node examination for all nodes
+            allNodes = newNodeInfos.map { nodeInfo ->
+                examineNodeContent(nodeInfo)
+            }
+
+            // Enhanced node examination for actionable nodes
             val newActionableNodes = newNodeInfos
                 .filter { it.isClickable || it.isLongClickable }
-                .map { Node.fromAccessibilityNodeInfo(it) }
+                .map { examineNodeContent(it) }
 
             val width = ScreenUtils.getWidth(context)
             val height = ScreenUtils.getHeight(context)
@@ -73,6 +79,64 @@ object NodeExaminer {
             }
         }
     }
+
+    /**
+     * Examines a node's content thoroughly, looking into child nodes if necessary.
+     * If the node has empty content description, attempts to build content from its children.
+     *
+     * @param node The AccessibilityNodeInfo to examine.
+     * @return A Node object with populated content description where possible.
+     */
+    private suspend fun examineNodeContent(node: AccessibilityNodeInfo): Node {
+        val baseNode = Node.fromAccessibilityNodeInfo(node)
+
+        // If content description is empty, try to build it from child nodes
+        if (baseNode.getContentDescription().isEmpty()) {
+            val contentFromChildren = buildContentFromChildren(node)
+            if (contentFromChildren.isNotEmpty()) {
+                val newNode = baseNode.apply { setContentDescription(contentFromChildren) }
+                return newNode
+            }
+        }
+
+        return baseNode
+    }
+
+    /**
+     * Recursively builds content description from child nodes.
+     * Examines both content descriptions and text of child nodes.
+     *
+     * @param node The AccessibilityNodeInfo whose children to examine.
+     * @return A string containing combined content from child nodes.
+     */
+    private suspend fun buildContentFromChildren(node: AccessibilityNodeInfo): String =
+        withContext(Dispatchers.Default) {
+            val contentParts = mutableListOf<String>()
+
+            for (i in 0 until node.childCount) {
+                node.getChild(i)?.let { childNode ->
+                    // Check child's content description
+                    childNode.contentDescription?.toString()?.let {
+                        contentParts.add(it)
+                    }
+
+                    // Check child's text
+                    childNode.text?.toString()?.let {
+                        contentParts.add(it)
+                    }
+
+                    // If child also has no content, go deeper
+                    if (contentParts.isEmpty()) {
+                        val childContent = buildContentFromChildren(childNode)
+                        if (childContent.isNotEmpty()) {
+                            contentParts.add(childContent)
+                        }
+                    }
+                }
+            }
+
+            contentParts.joinToString(" ")
+        }
 
     /**
      * Flattens the given tree of AccessibilityNodeInfo objects into a list.

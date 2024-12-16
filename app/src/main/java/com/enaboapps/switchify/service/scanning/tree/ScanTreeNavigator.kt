@@ -22,13 +22,16 @@ class ScanTreeNavigator(
     /** The index of the current group within the current tree item. */
     var currentGroup = 0
 
+    /** Indicates whether the scanning is currently within a group. */
+    var isInGroup = false
+
     /** The index of the current column within the current group or the current node in non-row-column mode. */
     var currentColumn = 0
 
     /** Indicates whether the scanning is currently within a tree item. */
     var isInTreeItem = false
 
-    /* Tracks the current cycle of the scanning tree */
+    /** Tracks the current cycle of the scanning tree */
     var currentCycle = 0
 
     /** Indicates whether we're scanning groups or items within a group. */
@@ -250,6 +253,7 @@ class ScanTreeNavigator(
      */
     private fun resetGroupAndColumn() {
         currentGroup = 0
+        isInGroup = false
         currentColumn = if (isRowColumnScanEnabled) 0 else currentColumn
         isScanningGroups = scanSettings.isGroupScanEnabled()
     }
@@ -278,6 +282,7 @@ class ScanTreeNavigator(
         if (shouldEscapeItem) {
             shouldEscapeItem = false
             isInTreeItem = false
+            isInGroup = false
             scanDirection = ScanDirection.DOWN
             if (!isRowColumnScanEnabled) {
                 currentColumn = 0
@@ -289,6 +294,7 @@ class ScanTreeNavigator(
         if (shouldEscapeGroup) {
             shouldEscapeGroup = false
             isScanningGroups = true
+            isInGroup = false
             scanDirection = ScanDirection.RIGHT
             currentColumn = 0
             currentGroup = 0
@@ -340,7 +346,7 @@ class ScanTreeNavigator(
      * Gets the current ScanTreeItem.
      * @return The current ScanTreeItem.
      */
-    private fun getCurrentItem(): ScanTreeItem = tree[currentTreeItem]
+    fun getCurrentItem(): ScanTreeItem = tree[currentTreeItem]
 
     /**
      * Swaps the scanning direction between vertical and horizontal.
@@ -362,6 +368,8 @@ class ScanTreeNavigator(
         if (isRowColumnScanEnabled && scanSettings.isGroupScanEnabled()) {
             isScanningGroups = false
             currentColumn = 0
+            scanDirection = ScanDirection.RIGHT
+            isInGroup = true
         }
     }
 
@@ -374,6 +382,7 @@ class ScanTreeNavigator(
         currentColumn = 0
         currentCycle = 0
         isInTreeItem = false
+        isInGroup = false
         isScanningGroups = scanSettings.isGroupScanEnabled()
         shouldEscapeItem = false
         shouldEscapeGroup = false

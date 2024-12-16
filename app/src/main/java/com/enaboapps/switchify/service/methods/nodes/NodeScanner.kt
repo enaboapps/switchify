@@ -74,6 +74,7 @@ class NodeScanner {
         startTimeoutToRevertToCursor()
         scanTree = ScanTree(context = context, stopScanningOnSelect = true)
         screenWatcher.register(context)
+        NodeSpeaker.init(context)
         registerEventReceivers(context)
     }
 
@@ -115,7 +116,7 @@ class NodeScanner {
      * @param layoutInfo KeyboardLayoutInfo instance.
      */
     private fun updateNodesWithLayoutInfo(layoutInfo: KeyboardSwitchifyLayoutInfo) {
-        val newNodes = layoutInfo.keys.map { Node.fromKeyInfo(it) }
+        val newNodes = layoutInfo.keys.map { Node.fromKeyboardSwitchifyNode(it) }
         setKeyboardNodes(newNodes)
     }
 

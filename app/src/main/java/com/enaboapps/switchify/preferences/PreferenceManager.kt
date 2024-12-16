@@ -27,6 +27,7 @@ class PreferenceManager(context: Context) {
         const val PREFERENCE_KEY_ASSISTED_SELECTION = "assisted_selection"
         const val PREFERENCE_KEY_CURSOR_MODE = "cursor_mode"
         const val PREFERENCE_KEY_ROW_COLUMN_SCAN = "row_column_scan"
+        const val PREFERENCE_KEY_ITEM_SCAN_SPEECH = "item_scan_speech"
         const val PREFERENCE_KEY_PAUSE_SCAN_ON_SWITCH_HOLD = "pause_scan_on_switch_hold"
         const val PREFERENCE_KEY_SWITCH_IGNORE_REPEAT = "switch_ignore_repeat"
         const val PREFERENCE_KEY_SWITCH_IGNORE_REPEAT_DELAY = "switch_ignore_repeat_delay"

@@ -90,9 +90,7 @@ class ScanTreeSelector(
      * @return True if a selection was made, false otherwise.
      */
     private fun selectCurrentGroup(): Boolean {
-        navigator.currentColumn = 0
-        navigator.scanDirection = ScanDirection.RIGHT
-        navigator.isScanningGroups = false
+        navigator.selectGroup()
         return false
     }
 

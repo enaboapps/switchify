@@ -39,7 +39,10 @@ class PredictionView : LinearLayout {
         removeAllViews()
         for (prediction in predictions) {
             val predictionKey = KeyboardKey(context).apply {
-                setKeyContent(prediction)
+                setKeyContent(
+                    text = prediction,
+                    contentDescription = "Prediction: $prediction"
+                )
                 tapAction = { onPredictionTapped(KeyType.Prediction(prediction)) }
                 layoutParams = LayoutParams(0, LayoutParams.MATCH_PARENT, 1f)
             }
@@ -52,7 +55,10 @@ class PredictionView : LinearLayout {
             CapsModeHandler.getCapitalizedText(prediction)
         }
         for (i in 0 until childCount) {
-            (getChildAt(i) as KeyboardKey).setKeyContent(modifiedPredictions[i])
+            (getChildAt(i) as KeyboardKey).setKeyContent(
+                text = modifiedPredictions[i],
+                contentDescription = "Prediction: ${modifiedPredictions[i]}"
+            )
         }
     }
 }

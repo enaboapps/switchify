@@ -14,7 +14,7 @@ import android.widget.LinearLayout
 import android.widget.TextView.AUTO_SIZE_TEXT_TYPE_NONE
 import androidx.core.content.res.ResourcesCompat
 import com.enaboapps.switchify.R
-import com.enaboapps.switchifykeyboardscanlib.KeyboardNodePosition
+import com.enaboapps.switchifykeyboardscanlib.KeyboardNodeInfo
 import com.enaboapps.switchifykeyboardscanlib.KeyboardSwitchifyNode
 
 class KeyboardKey @JvmOverloads constructor(
@@ -23,6 +23,8 @@ class KeyboardKey @JvmOverloads constructor(
 
     var tapAction: (() -> Unit)? = null
     var holdAction: (() -> Unit)? = null
+
+    private var contentDescription: String = ""
 
     private var button: Button? = null
     private var imageButton: ImageButton? = null
@@ -75,8 +77,13 @@ class KeyboardKey @JvmOverloads constructor(
         orientation = VERTICAL
     }
 
-    fun setKeyContent(text: String? = null, drawable: Drawable? = null) {
+    fun setKeyContent(
+        text: String? = null,
+        drawable: Drawable? = null,
+        contentDescription: String
+    ) {
         removeAllViews() // Clear previous content
+        this.contentDescription = contentDescription
         when {
             text != null -> addTextView(text)
             drawable != null -> addImageView(drawable)
@@ -138,14 +145,15 @@ class KeyboardKey @JvmOverloads constructor(
         }
     }
 
-    override fun getPosition(): KeyboardNodePosition {
+    override fun getSwitchifyKeyboardNodeInfo(): KeyboardNodeInfo {
         val position = IntArray(2)
         getLocationOnScreen(position)
-        return KeyboardNodePosition(
+        return KeyboardNodeInfo(
             position[0].toFloat(),
             position[1].toFloat(),
             width.toFloat(),
-            height.toFloat()
+            height.toFloat(),
+            contentDescription
         )
     }
 }

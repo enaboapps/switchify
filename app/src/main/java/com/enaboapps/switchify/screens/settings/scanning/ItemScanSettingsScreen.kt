@@ -59,6 +59,21 @@ fun ItemScanSettingsScreen(navController: NavController) {
                 }
             )
 
+            PreferenceSwitch(
+                title = "Speak items while scanning",
+                summary = "Speak the item content description while scanning",
+                checked = preferenceManager.getBooleanValue(
+                    PreferenceManager.PREFERENCE_KEY_ITEM_SCAN_SPEECH,
+                    false
+                ),
+                onCheckedChange = {
+                    preferenceManager.setBooleanValue(
+                        PreferenceManager.PREFERENCE_KEY_ITEM_SCAN_SPEECH,
+                        it
+                    )
+                }
+            )
+
             Picker(
                 title = "Scan cycles",
                 selectedItem = currentScanCycles.value,
