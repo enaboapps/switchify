@@ -151,6 +151,10 @@ class Node(
         return contentDescription
     }
 
+    fun setContentDescription(contentDescription: String) {
+        this.contentDescription = contentDescription
+    }
+
     override fun highlight() {
         NodeScannerUI.instance.showItemBounds(x, y, width, height)
         highlighted = true
