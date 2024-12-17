@@ -112,6 +112,7 @@ dependencies {
     implementation(libs.credentials)
     implementation(libs.google.id)
     implementation(libs.switchifykeyboardscanlib)
+    implementation(libs.revenuecat)
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.test.ext.junit)
     androidTestImplementation(libs.espresso.core)
