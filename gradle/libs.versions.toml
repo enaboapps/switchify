@@ -54,6 +54,7 @@ app-update = { group = "com.google.android.play", name = "app-update-ktx", versi
 play-services-auth = { group = "com.google.android.gms", name = "play-services-auth", version.ref = "play-services-auth" }
 switchifykeyboardscanlib = { group = "com.github.enaboapps", name = "SwitchifyKeyboardScanLib", version.ref = "switchifykeyboardscanlib" }
 revenuecat = { group = "com.revenuecat.purchases", name = "purchases", version.ref = "revenuecat" }
+revenuecat-ui = { group = "com.revenuecat.purchases", name = "purchases-ui", version.ref = "revenuecat" }
 
 [plugins]
 compose-compiler = { id = "org.jetbrains.kotlin.plugin.compose", version.ref = "kotlin" }

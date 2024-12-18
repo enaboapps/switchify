@@ -10,7 +10,7 @@ import android.widget.TextView.AUTO_SIZE_TEXT_TYPE_NONE
 import androidx.core.content.res.ResourcesCompat
 import androidx.core.graphics.drawable.DrawableCompat
 import com.enaboapps.switchify.R
-import com.enaboapps.switchify.preferences.PreferenceManager
+import com.enaboapps.switchify.backend.preferences.PreferenceManager
 import com.enaboapps.switchify.service.utils.ScreenUtils
 import kotlin.properties.Delegates
 

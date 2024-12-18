@@ -1,7 +1,7 @@
 package com.enaboapps.switchify.service.methods.cursor
 
 import android.content.Context
-import com.enaboapps.switchify.preferences.PreferenceManager
+import com.enaboapps.switchify.backend.preferences.PreferenceManager
 
 object CursorMode {
 

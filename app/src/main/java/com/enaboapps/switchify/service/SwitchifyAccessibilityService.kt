@@ -3,7 +3,7 @@ package com.enaboapps.switchify.service
 import android.accessibilityservice.AccessibilityService
 import android.view.KeyEvent
 import android.view.accessibility.AccessibilityEvent
-import com.enaboapps.switchify.preferences.PreferenceManager
+import com.enaboapps.switchify.backend.preferences.PreferenceManager
 import com.enaboapps.switchify.service.gestures.GestureManager
 import com.enaboapps.switchify.service.lockscreen.LockScreenView
 import com.enaboapps.switchify.service.methods.nodes.NodeExaminer

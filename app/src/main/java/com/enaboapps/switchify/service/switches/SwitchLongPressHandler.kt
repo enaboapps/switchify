@@ -1,7 +1,7 @@
 package com.enaboapps.switchify.service.switches
 
 import android.content.Context
-import com.enaboapps.switchify.preferences.PreferenceManager
+import com.enaboapps.switchify.backend.preferences.PreferenceManager
 import com.enaboapps.switchify.service.gestures.GestureManager
 import com.enaboapps.switchify.service.scanning.ScanningManager
 import com.enaboapps.switchify.service.window.ServiceMessageHUD
