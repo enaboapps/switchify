@@ -15,9 +15,9 @@ import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import com.enaboapps.switchify.auth.AuthManager
 import com.enaboapps.switchify.auth.GoogleAuthHandler
+import com.enaboapps.switchify.backend.preferences.PreferenceManager
 import com.enaboapps.switchify.components.*
 import com.enaboapps.switchify.nav.NavigationRoute
-import com.enaboapps.switchify.backend.preferences.PreferenceManager
 import com.enaboapps.switchify.service.custom.actions.store.ActionStore
 import kotlinx.coroutines.launch
 
@@ -90,7 +90,10 @@ fun SignInScreen(navController: NavController) {
                     AuthManager.instance.signInWithEmailAndPassword(
                         email, password,
                         onSuccess = {
-                            navController.popBackStack()
+                            navController.popBackStack(
+                                navController.graph.startDestinationId,
+                                false
+                            )
                             onSignIn()
                         },
                         onFailure = { exception ->
@@ -124,7 +127,10 @@ fun SignInScreen(navController: NavController) {
                         result.fold(
                             onSuccess = { authResult ->
                                 if (authResult.user != null) {
-                                    navController.popBackStack()
+                                    navController.popBackStack(
+                                        navController.graph.startDestinationId,
+                                        false
+                                    )
                                     onSignIn()
                                 } else {
                                     errorMessage = "Sign in failed"
