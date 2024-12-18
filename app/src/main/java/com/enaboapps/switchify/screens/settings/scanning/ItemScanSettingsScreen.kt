@@ -5,12 +5,12 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.platform.LocalContext
 import androidx.navigation.NavController
+import com.enaboapps.switchify.backend.preferences.PreferenceManager
 import com.enaboapps.switchify.components.BaseView
 import com.enaboapps.switchify.components.Picker
 import com.enaboapps.switchify.components.PreferenceSwitch
 import com.enaboapps.switchify.components.PreferenceTimeStepper
 import com.enaboapps.switchify.components.Section
-import com.enaboapps.switchify.backend.preferences.PreferenceManager
 
 @Composable
 fun ItemScanSettingsScreen(navController: NavController) {
@@ -62,6 +62,7 @@ fun ItemScanSettingsScreen(navController: NavController) {
             PreferenceSwitch(
                 title = "Speak items while scanning",
                 summary = "Speak the item content description while scanning",
+                isRestrictedToPro = true,
                 checked = preferenceManager.getBooleanValue(
                     PreferenceManager.PREFERENCE_KEY_ITEM_SCAN_SPEECH,
                     false
