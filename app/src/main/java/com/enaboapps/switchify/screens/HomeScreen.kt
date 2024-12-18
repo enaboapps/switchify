@@ -51,10 +51,13 @@ fun HomeScreen(navController: NavController, serviceUtils: ServiceUtils = Servic
     val isSwitchifyKeyboardEnabled = KeyboardUtils.isSwitchifyKeyboardEnabled(context)
     val isSetupComplete = PreferenceManager(context).isSetupComplete()
     val isPro = remember { mutableStateOf(false) }
+    val signedIn = AuthManager.instance.isUserSignedIn()
 
     LaunchedEffect(Unit) {
-        if (!isSetupComplete) {
+        if (!isSetupComplete && !signedIn) {
             navController.navigate(NavigationRoute.Setup.name)
+        } else if (signedIn) {
+            PreferenceManager(context).setSetupComplete()
         }
         isPro.value = IAPHandler.hasPurchasedPro()
     }
