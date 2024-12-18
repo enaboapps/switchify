@@ -32,6 +32,8 @@ android {
         val localPropertiesFile = rootProject.file("local.properties")
         if (localPropertiesFile.exists()) {
             localProperties.load(localPropertiesFile.inputStream())
+        } else {
+            throw GradleException("local.properties file not found")
         }
 
         if (localProperties.getProperty(
