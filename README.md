@@ -19,13 +19,15 @@ To quickly get started with Switchify, read [this guide](https://remarkable-seah
 - Android 12 (API level 31) and above
 
 ## Features
-- [x] Full control of the device using a single switch or multiple switches
+- [x] Full control of the device using switches
 - [x] Customizable switch actions
-- [x] A sequential scanner for selecting items on the screen
-- [x] A quadrant-based scanner for selecting items on the screen
+- [x] Sequential scanner for selecting items on the screen
+- [x] Quadrant-based scanner for selecting items on the screen
 - [x] Menus for performing gestures
 - [x] Menus for performing device actions (e.g. back, home, recent apps)
 - [x] Accounts for saving user settings
+
+Some advanced features require Switchify Pro. You can upgrade to Pro directly within the app.
 
 ## How to contribute
 1. Fork this repository
