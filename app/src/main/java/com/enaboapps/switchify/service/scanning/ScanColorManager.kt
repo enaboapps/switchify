@@ -1,7 +1,7 @@
 package com.enaboapps.switchify.service.scanning
 
 import android.content.Context
-import com.enaboapps.switchify.preferences.PreferenceManager
+import com.enaboapps.switchify.backend.preferences.PreferenceManager
 
 /**
  * This class manages the scan colors

@@ -14,7 +14,7 @@ import android.widget.LinearLayout
 import android.widget.TextView
 import android.widget.TextView.AUTO_SIZE_TEXT_TYPE_NONE
 import com.enaboapps.switchify.R
-import com.enaboapps.switchify.preferences.PreferenceManager
+import com.enaboapps.switchify.backend.preferences.PreferenceManager
 import com.enaboapps.switchify.service.window.SwitchifyAccessibilityWindow
 
 class LockScreenView(

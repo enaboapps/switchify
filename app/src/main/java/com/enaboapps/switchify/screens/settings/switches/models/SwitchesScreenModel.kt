@@ -2,6 +2,7 @@ package com.enaboapps.switchify.screens.settings.switches.models
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.enaboapps.switchify.backend.iap.IAPHandler
 import com.enaboapps.switchify.switches.SwitchEvent
 import com.enaboapps.switchify.switches.SwitchEventStore
 import com.enaboapps.switchify.switches.SwitchEventStore.RemoteSwitchInfo
@@ -17,8 +18,27 @@ class SwitchesScreenModel(private val store: SwitchEventStore) : ViewModel() {
     private val _uiState = MutableStateFlow(SwitchesUiState())
     val uiState: StateFlow<SwitchesUiState> = _uiState
 
+    private val numberOfSwitchesLimit = 3
+
     init {
         loadEvents()
+        checkProStatus()
+    }
+
+    private fun checkProStatus() {
+        viewModelScope.launch {
+            val isPro = IAPHandler.hasPurchasedPro()
+            _uiState.value = _uiState.value.copy(
+                shouldLimitSwitches = !isPro
+            )
+        }
+    }
+
+    fun isAnotherSwitchAllowed(): Boolean {
+        if (!_uiState.value.shouldLimitSwitches) {
+            return true
+        }
+        return _uiState.value.localSwitches.size < numberOfSwitchesLimit
     }
 
     /**
@@ -47,11 +67,28 @@ class SwitchesScreenModel(private val store: SwitchEventStore) : ViewModel() {
         }
     }
 
+    fun showProAlert() {
+        _uiState.value = _uiState.value.copy(
+            showProAlert = true
+        )
+    }
+
+    fun hideProAlert() {
+        _uiState.value = _uiState.value.copy(
+            showProAlert = false
+        )
+    }
+
     /**
      * Imports a single remote switch.
      */
     fun importSwitch(remoteSwitch: RemoteSwitchInfo) {
         viewModelScope.launch {
+            if (!isAnotherSwitchAllowed()) {
+                showProAlert()
+                return@launch
+            }
+
             _uiState.value = _uiState.value.copy(
                 importingSwitch = remoteSwitch.code
             )
@@ -105,5 +142,7 @@ data class SwitchesUiState(
     val localSwitches: Set<SwitchEvent> = emptySet(),
     val remoteSwitches: List<RemoteSwitchInfo> = emptyList(),
     val isLoading: Boolean = false,
+    val shouldLimitSwitches: Boolean = false,
+    val showProAlert: Boolean = false,
     val importingSwitch: String? = null
 )

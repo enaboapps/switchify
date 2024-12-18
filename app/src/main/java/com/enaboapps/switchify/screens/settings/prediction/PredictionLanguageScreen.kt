@@ -15,6 +15,7 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import co.thingthing.fleksy.lib.languages.RemoteLanguage
+import com.enaboapps.switchify.backend.iap.IAPHandler
 import com.enaboapps.switchify.components.BaseView
 import com.enaboapps.switchify.components.UICard
 import com.enaboapps.switchify.keyboard.prediction.PredictionLanguageManager
@@ -32,7 +33,16 @@ fun PredictionLanguageScreen(navController: NavController) {
     }
 
     LaunchedEffect(Unit) {
-        loadLanguages()
+        if (IAPHandler.hasPurchasedPro()) {
+            loadLanguages()
+        } else {
+            Toast.makeText(
+                context,
+                "This feature is only available to Pro users.",
+                Toast.LENGTH_SHORT
+            ).show()
+            navController.popBackStack()
+        }
     }
 
     BaseView(

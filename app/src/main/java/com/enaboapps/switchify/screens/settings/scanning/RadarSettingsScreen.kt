@@ -6,7 +6,7 @@ import androidx.navigation.NavController
 import com.enaboapps.switchify.components.BaseView
 import com.enaboapps.switchify.components.PreferenceTimeStepper
 import com.enaboapps.switchify.components.Section
-import com.enaboapps.switchify.preferences.PreferenceManager
+import com.enaboapps.switchify.backend.preferences.PreferenceManager
 
 @Composable
 fun RadarSettingsScreen(navController: NavController) {

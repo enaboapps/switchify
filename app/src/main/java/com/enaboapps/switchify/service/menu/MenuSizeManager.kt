@@ -1,7 +1,7 @@
 package com.enaboapps.switchify.service.menu
 
 import android.content.Context
-import com.enaboapps.switchify.preferences.PreferenceManager
+import com.enaboapps.switchify.backend.preferences.PreferenceManager
 
 class MenuSizeManager(context: Context) {
     private val preferenceManager = PreferenceManager(context)

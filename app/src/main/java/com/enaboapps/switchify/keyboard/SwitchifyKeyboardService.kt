@@ -11,6 +11,7 @@ import android.view.inputmethod.EditorInfo
 import android.widget.LinearLayout
 import androidx.core.content.res.ResourcesCompat
 import com.enaboapps.switchify.R
+import com.enaboapps.switchify.backend.iap.IAPHandler
 import com.enaboapps.switchify.keyboard.prediction.PredictionListener
 import com.enaboapps.switchify.keyboard.prediction.PredictionManager
 import com.enaboapps.switchify.keyboard.prediction.PredictionView
@@ -52,6 +53,9 @@ class SwitchifyKeyboardService : InputMethodService(), KeyboardLayoutListener, P
 
         // Initialize the keyboard Switchify link
         keyboardSwitchifyLink = KeyboardSwitchifyLink(this)
+
+        // Initialize IAPHandler
+        IAPHandler.initialize(this)
 
         // Set the layout listener
         KeyboardLayoutManager.listener = this

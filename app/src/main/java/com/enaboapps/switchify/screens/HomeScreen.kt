@@ -26,12 +26,13 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import com.enaboapps.switchify.auth.AuthManager
+import com.enaboapps.switchify.backend.iap.IAPHandler
+import com.enaboapps.switchify.backend.preferences.PreferenceManager
 import com.enaboapps.switchify.components.BaseView
 import com.enaboapps.switchify.components.NavBarAction
 import com.enaboapps.switchify.components.NavRouteLink
 import com.enaboapps.switchify.keyboard.utils.KeyboardUtils
 import com.enaboapps.switchify.nav.NavigationRoute
-import com.enaboapps.switchify.preferences.PreferenceManager
 import com.enaboapps.switchify.service.utils.ServiceUtils
 import com.enaboapps.switchify.switches.SwitchConfigInvalidBanner
 import com.enaboapps.switchify.switches.SwitchEventStore
@@ -49,11 +50,13 @@ fun HomeScreen(navController: NavController, serviceUtils: ServiceUtils = Servic
     val isAccessibilityServiceEnabled = serviceUtils.isAccessibilityServiceEnabled(context)
     val isSwitchifyKeyboardEnabled = KeyboardUtils.isSwitchifyKeyboardEnabled(context)
     val isSetupComplete = PreferenceManager(context).isSetupComplete()
+    val isPro = remember { mutableStateOf(false) }
 
-    LaunchedEffect(isSetupComplete) {
+    LaunchedEffect(Unit) {
         if (!isSetupComplete) {
             navController.navigate(NavigationRoute.Setup.name)
         }
+        isPro.value = IAPHandler.hasPurchasedPro()
     }
 
     var showUpdateDialog by remember { mutableStateOf(false) }
@@ -170,6 +173,15 @@ fun HomeScreen(navController: NavController, serviceUtils: ServiceUtils = Servic
             navController = navController,
             route = NavigationRoute.HowToUse.name
         )
+
+        if (!isPro.value) {
+            NavRouteLink(
+                title = "Upgrade to Pro",
+                summary = "Upgrade to Pro to unlock new features and support Switchify.",
+                navController = navController,
+                route = NavigationRoute.Paywall.name
+            )
+        }
 
         AccountCard(navController)
 

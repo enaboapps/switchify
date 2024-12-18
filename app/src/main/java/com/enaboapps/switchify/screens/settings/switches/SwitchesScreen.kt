@@ -58,7 +58,8 @@ fun SwitchesScreen(navController: NavController) {
         floatingActionButton = {
             FloatingActionButton(
                 onClick = {
-                    navController.navigate(NavigationRoute.AddNewSwitch.name)
+                    if (!switchesScreenModel.isAnotherSwitchAllowed()) switchesScreenModel.showProAlert()
+                    else navController.navigate(NavigationRoute.AddNewSwitch.name)
                 }
             ) {
                 Icon(
@@ -114,6 +115,31 @@ fun SwitchesScreen(navController: NavController) {
                     }
                 }
             }
+        }
+
+        if (uiState.showProAlert) {
+            AlertDialog(
+                onDismissRequest = { switchesScreenModel.hideProAlert() },
+                title = { Text("Pro Feature") },
+                text = { Text("To add another switch, you need to purchase Switchify Pro.") },
+                confirmButton = {
+                    TextButton(
+                        onClick = {
+                            switchesScreenModel.hideProAlert()
+                            navController.navigate(NavigationRoute.Paywall.name)
+                        }
+                    ) {
+                        Text("Purchase")
+                    }
+                },
+                dismissButton = {
+                    TextButton(
+                        onClick = { switchesScreenModel.hideProAlert() }
+                    ) {
+                        Text("Cancel")
+                    }
+                }
+            )
         }
     }
 }

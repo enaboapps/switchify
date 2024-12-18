@@ -1,4 +1,4 @@
-package com.enaboapps.switchify.preferences
+package com.enaboapps.switchify.backend.preferences
 
 import android.content.Context
 import android.content.SharedPreferences
@@ -7,6 +7,7 @@ class PreferenceManager(context: Context) {
 
     companion object Keys {
         const val PREFERENCE_KEY_SETUP_COMPLETE = "setup_complete"
+        const val PREFERENCE_KEY_PRO = "pro"
         const val PREFERENCE_KEY_SCAN_MODE = "scan_mode"
         const val PREFERENCE_KEY_SCAN_RATE = "scan_rate"
         const val PREFERENCE_KEY_SCAN_CYCLES = "scan_cycles"

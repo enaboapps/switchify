@@ -20,15 +20,18 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
+import com.enaboapps.switchify.backend.iap.IAPHandler
 
 @Composable
 fun PreferenceSwitch(
     title: String,
     summary: String,
     checked: Boolean,
+    isRestrictedToPro: Boolean = false,
     onCheckedChange: (Boolean) -> Unit
 ) {
     var isChecked by remember { mutableStateOf(checked) }
+    val isPro = IAPHandler.hasPurchasedPro()
 
     Card(
         modifier = Modifier
@@ -49,6 +52,15 @@ fun PreferenceSwitch(
                 )
                 Spacer(modifier = Modifier.height(4.dp))
                 Text(text = summary, style = MaterialTheme.typography.bodySmall)
+
+                if (isRestrictedToPro && !isPro) {
+                    Spacer(modifier = Modifier.height(8.dp))
+                    Text(
+                        text = "This feature is only available to Pro users.",
+                        style = MaterialTheme.typography.bodySmall,
+                        color = MaterialTheme.colorScheme.error
+                    )
+                }
             }
             Spacer(modifier = Modifier.weight(1f))
             Switch(
@@ -57,6 +69,7 @@ fun PreferenceSwitch(
                     isChecked = it
                     onCheckedChange(it)
                 },
+                enabled = !isRestrictedToPro || isPro,
                 colors = SwitchDefaults.colors(
                     checkedThumbColor = MaterialTheme.colorScheme.primary,
                     checkedTrackColor = MaterialTheme.colorScheme.primary.copy(alpha = 0.5f)

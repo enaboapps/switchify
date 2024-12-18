@@ -5,8 +5,9 @@ import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.navigation.compose.rememberNavController
 import com.enaboapps.switchify.activities.ui.theme.SwitchifyTheme
+import com.enaboapps.switchify.backend.iap.IAPHandler
 import com.enaboapps.switchify.nav.NavGraph
-import com.enaboapps.switchify.preferences.PreferenceManager
+import com.enaboapps.switchify.backend.preferences.PreferenceManager
 import com.enaboapps.switchify.service.custom.actions.store.ActionStore
 import com.enaboapps.switchify.utils.Logger
 
@@ -40,5 +41,8 @@ class MainActivity : ComponentActivity() {
         // Initialize ActionStore
         actionStore = ActionStore(this)
         actionStore.pullActionsFromFirestore()
+
+        // Initialize IAP
+        IAPHandler.initialize(this)
     }
 }

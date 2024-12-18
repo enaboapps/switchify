@@ -1,6 +1,10 @@
 package com.enaboapps.switchify.service.scanning
 
-import com.enaboapps.switchify.preferences.PreferenceManager
+import android.os.Handler
+import android.os.Looper
+import com.enaboapps.switchify.backend.iap.IAPHandler
+import com.enaboapps.switchify.backend.preferences.PreferenceManager
+import com.enaboapps.switchify.service.window.ServiceMessageHUD
 
 interface ScanMethodObserver {
     fun onScanMethodChanged(type: String)
@@ -97,5 +101,26 @@ object ScanMethod {
             value
         )
         observer?.onScanMethodChanged(value)
+
+        // If radar and not pro, start the timer to switch to cursor
+        if (value == MethodType.RADAR && !IAPHandler.hasPurchasedPro()) {
+            startRadarTrialTimer()
+        }
+    }
+
+    /**
+     * Starts the radar trial timer.
+     * 20 seconds after the radar scan is selected, it switches to the cursor scan if the user is not a pro.
+     */
+    private fun startRadarTrialTimer() {
+        Handler(Looper.getMainLooper()).postDelayed({
+            if (getType() == MethodType.RADAR && !IAPHandler.hasPurchasedPro()) {
+                setType(MethodType.CURSOR)
+                ServiceMessageHUD.instance.showMessage(
+                    "Radar is a premium feature. Please purchase Switchify Pro to use it.",
+                    ServiceMessageHUD.MessageType.DISAPPEARING
+                )
+            }
+        }, 20000)
     }
 }

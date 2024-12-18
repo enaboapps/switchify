@@ -34,15 +34,43 @@ android {
             localProperties.load(localPropertiesFile.inputStream())
         }
 
+        if (localProperties.getProperty(
+                "fleksy.apiSecret",
+                ""
+            ).isEmpty()
+        ) {
+            throw GradleException("Fleksy API secret is not set in local.properties")
+        }
         buildConfigField(
             "String",
             "FLEKSY_API_KEY",
-            "\"${localProperties.getProperty("fleksy.apiKey", "defaultApiKey")}\""
+            "\"${localProperties.getProperty("fleksy.apiKey", "")}\""
         )
+
+        if (localProperties.getProperty(
+                "fleksy.apiSecret",
+                ""
+            ).isEmpty()
+        ) {
+            throw GradleException("Fleksy API secret is not set in local.properties")
+        }
         buildConfigField(
             "String",
             "FLEKSY_API_SECRET",
-            "\"${localProperties.getProperty("fleksy.apiSecret", "defaultApiSecret")}\""
+            "\"${localProperties.getProperty("fleksy.apiSecret", "")}\""
+        )
+
+        if (localProperties.getProperty(
+                "revenuecat.publicKey",
+                ""
+            ).isEmpty()
+        ) {
+            throw GradleException("RevenueCat public key is not set in local.properties")
+        }
+        buildConfigField(
+            "String",
+            "REVENUECAT_PUBLIC_KEY",
+            "\"${localProperties.getProperty("revenuecat.publicKey", "")}\""
         )
     }
 
@@ -112,6 +140,8 @@ dependencies {
     implementation(libs.credentials)
     implementation(libs.google.id)
     implementation(libs.switchifykeyboardscanlib)
+    implementation(libs.revenuecat)
+    implementation(libs.revenuecat.ui)
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.test.ext.junit)
     androidTestImplementation(libs.espresso.core)

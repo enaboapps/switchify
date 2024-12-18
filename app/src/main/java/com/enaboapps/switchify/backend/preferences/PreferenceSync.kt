@@ -1,4 +1,4 @@
-package com.enaboapps.switchify.preferences
+package com.enaboapps.switchify.backend.preferences
 
 import android.content.SharedPreferences
 import android.util.Log
@@ -26,6 +26,7 @@ class PreferenceSync(private val sharedPreferences: SharedPreferences) {
         private const val DOCUMENT_PREFERENCES = "preferences"
         private const val COLLECTION_USERS = "users"
         private val BLACKLISTED_KEYS = setOf(
+            PreferenceManager.Keys.PREFERENCE_KEY_PRO,
             PreferenceManager.Keys.PREFERENCE_KEY_SCAN_METHOD,
             PreferenceManager.Keys.PREFERENCE_KEY_LOCK_SCREEN,
             PreferenceManager.Keys.PREFERENCE_KEY_LOCK_SCREEN_CODE
