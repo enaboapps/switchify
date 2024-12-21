@@ -5,6 +5,7 @@ import android.os.Looper
 import com.enaboapps.switchify.backend.iap.IAPHandler
 import com.enaboapps.switchify.backend.preferences.PreferenceManager
 import com.enaboapps.switchify.service.window.ServiceMessageHUD
+import com.enaboapps.switchify.utils.Logger
 
 interface ScanMethodObserver {
     fun onScanMethodChanged(type: String)
@@ -106,6 +107,8 @@ object ScanMethod {
         if (value == MethodType.RADAR && !IAPHandler.hasPurchasedPro()) {
             startRadarTrialTimer()
         }
+
+        Logger.logEvent("Scan method changed to: $value")
     }
 
     /**
@@ -120,6 +123,7 @@ object ScanMethod {
                     "Radar is a premium feature. Please purchase Switchify Pro to use it.",
                     ServiceMessageHUD.MessageType.DISAPPEARING
                 )
+                Logger.logEvent("Radar trial timer expired")
             }
         }, 20000)
     }

@@ -9,6 +9,7 @@ import com.enaboapps.switchify.auth.AuthManager
 import com.enaboapps.switchify.backend.data.FirestoreManager
 import com.enaboapps.switchify.backend.preferences.PreferenceManager
 import com.enaboapps.switchify.service.scanning.ScanMode
+import com.enaboapps.switchify.utils.Logger
 import com.google.gson.Gson
 import com.google.gson.reflect.TypeToken
 import kotlinx.coroutines.CoroutineScope
@@ -138,9 +139,10 @@ class SwitchEventStore(private val context: Context) {
                 saveToFile()
 
                 Log.d(tag, "Successfully imported switch: ${switchEvent.name}")
+                Logger.logEvent("Imported switch: $code")
                 Result.success(switchEvent)
             } catch (e: Exception) {
-                Log.e(tag, "Error importing switch $code", e)
+                Logger.logEvent("Error importing switch: $code, ${e.message}")
                 Result.failure(e)
             }
         }
@@ -217,8 +219,9 @@ class SwitchEventStore(private val context: Context) {
                     }
                 }
                 Log.i(tag, "Successfully pushed ${switchEvents.size} switch events to Firestore")
+                Logger.logEvent("Pushed ${switchEvents.size} switch events to Firestore")
             } catch (e: Exception) {
-                Log.e(tag, "Error pushing to Firestore: ${e.message}")
+                Logger.logEvent("Error pushing to Firestore: ${e.message}")
             }
         }
     }
@@ -238,6 +241,7 @@ class SwitchEventStore(private val context: Context) {
                         path = path,
                         data = switchEvent.toMap()
                     )
+                    Logger.logEvent("Added switch: ${switchEvent.name}")
                 }
             }
         }
@@ -260,6 +264,7 @@ class SwitchEventStore(private val context: Context) {
                         path = path,
                         data = switchEvent.toMap()
                     )
+                    Logger.logEvent("Updated switch: ${switchEvent.name}")
                 }
             }
         }
@@ -273,6 +278,7 @@ class SwitchEventStore(private val context: Context) {
     fun remove(switchEvent: SwitchEvent) {
         if (switchEvents.remove(switchEvent)) {
             saveToFile()
+            Logger.logEvent("Removed switch: ${switchEvent.name}")
         }
     }
 
@@ -294,9 +300,11 @@ class SwitchEventStore(private val context: Context) {
                 )
                 switchEvents.removeIf { it.code == code }
                 saveToFile()
+                Logger.logEvent("Removed remote switch: $code")
                 Result.success(Unit)
             } catch (e: Exception) {
                 Log.e(tag, "Error removing remote switch $code", e)
+                Logger.logEvent("Error removing remote switch: $code, ${e.message}")
                 Result.failure(e)
             }
         }

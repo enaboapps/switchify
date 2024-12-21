@@ -83,6 +83,7 @@ class AppLauncher(private val context: Context) {
             if (intent != null) {
                 intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
                 context.startActivity(intent)
+                Logger.logEvent("Launched app: $packageName")
             } else {
                 Log.e("AppLauncher", "Unable to launch app: $packageName")
             }
@@ -103,6 +104,7 @@ class AppLauncher(private val context: Context) {
                 addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
             }
             context.startActivity(intent)
+            Logger.logEvent("Opened Play Store search for: $searchQuery")
         } catch (e: Exception) {
             Log.e("AppLauncher", "Error opening Play Store: ${e.message}")
         }

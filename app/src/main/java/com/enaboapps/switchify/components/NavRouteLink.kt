@@ -7,6 +7,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
+import com.enaboapps.switchify.utils.Logger
 
 @Composable
 fun NavRouteLink(
@@ -22,5 +23,6 @@ fun NavRouteLink(
         rightIcon = Icons.AutoMirrored.Filled.ArrowForward,
         onClick = {
             navController.navigate(route)
+            Logger.logEvent("Navigated to: $route")
         })
 }
