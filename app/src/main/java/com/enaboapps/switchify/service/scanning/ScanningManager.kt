@@ -21,6 +21,7 @@ import com.enaboapps.switchify.service.methods.radar.RadarManager
 import com.enaboapps.switchify.service.selection.SelectionHandler
 import com.enaboapps.switchify.service.window.SwitchifyAccessibilityWindow
 import com.enaboapps.switchify.switches.SwitchAction
+import com.enaboapps.switchify.utils.Logger
 
 /**
  * ScanningManager is responsible for managing the scanning process in the application.
@@ -61,6 +62,7 @@ class ScanningManager(
 
     override fun onScanMethodChanged(type: String) {
         cleanupInactiveScanningMethods(type)
+        Logger.logEvent("Scan method changed to: $type")
     }
 
     override fun onMenuStateChanged(isInMenu: Boolean) {

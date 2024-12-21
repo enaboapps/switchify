@@ -18,6 +18,7 @@ import com.enaboapps.switchify.keyboard.prediction.PredictionView
 import com.enaboapps.switchify.keyboard.utils.CapsModeHandler
 import com.enaboapps.switchify.keyboard.utils.TextParser
 import com.enaboapps.switchify.service.utils.ScreenUtils
+import com.enaboapps.switchify.utils.Logger
 import com.enaboapps.switchifykeyboardscanlib.KeyboardSwitchifyLink
 
 /**
@@ -50,6 +51,9 @@ class SwitchifyKeyboardService : InputMethodService(), KeyboardLayoutListener, P
      */
     override fun onCreate() {
         super.onCreate()
+
+        Logger.init(this)
+        Logger.logEvent("Switchify Keyboard Service Created")
 
         // Initialize the keyboard Switchify link
         keyboardSwitchifyLink = KeyboardSwitchifyLink(this)

@@ -74,6 +74,19 @@ android {
             "REVENUECAT_PUBLIC_KEY",
             "\"${localProperties.getProperty("revenuecat.publicKey", "")}\""
         )
+
+        if (localProperties.getProperty(
+                "amplitude.apiKey",
+                ""
+            ).isEmpty()
+        ) {
+            throw GradleException("Amplitude API key is not set in local.properties")
+        }
+        buildConfigField(
+            "String",
+            "AMPLITUDE_API_KEY",
+            "\"${localProperties.getProperty("amplitude.apiKey", "")}\""
+        )
     }
 
     buildTypes {
@@ -144,6 +157,7 @@ dependencies {
     implementation(libs.switchifykeyboardscanlib)
     implementation(libs.revenuecat)
     implementation(libs.revenuecat.ui)
+    implementation(libs.amplitude.analytics)
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.test.ext.junit)
     androidTestImplementation(libs.espresso.core)

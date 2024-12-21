@@ -6,8 +6,8 @@ import androidx.activity.compose.setContent
 import androidx.navigation.compose.rememberNavController
 import com.enaboapps.switchify.activities.ui.theme.SwitchifyTheme
 import com.enaboapps.switchify.backend.iap.IAPHandler
-import com.enaboapps.switchify.nav.NavGraph
 import com.enaboapps.switchify.backend.preferences.PreferenceManager
+import com.enaboapps.switchify.nav.NavGraph
 import com.enaboapps.switchify.service.custom.actions.store.ActionStore
 import com.enaboapps.switchify.utils.Logger
 
@@ -19,7 +19,7 @@ class MainActivity : ComponentActivity() {
         super.onCreate(savedInstanceState)
         initializeManagers()
 
-        Logger.log(this, "Launched Switchify")
+        Logger.logEvent("Launched Switchify")
 
         setContent {
             val navController = rememberNavController()
@@ -31,12 +31,13 @@ class MainActivity : ComponentActivity() {
     }
 
     private fun initializeManagers() {
-        // Initialize PreferenceManager
+        // Initialize PreferenceManager and Logger
         preferenceManager = PreferenceManager(this)
         preferenceManager.preferenceSync.apply {
             retrieveSettingsFromFirestore()
             listenForSettingsChangesOnRemote()
         }
+        Logger.init(this)
 
         // Initialize ActionStore
         actionStore = ActionStore(this)

@@ -13,6 +13,7 @@ import com.enaboapps.switchify.R
 import com.enaboapps.switchify.components.BaseView
 import com.enaboapps.switchify.components.FullWidthButton
 import com.enaboapps.switchify.service.utils.ServiceUtils
+import com.enaboapps.switchify.utils.Logger
 
 @Composable
 fun EnableAccessibilityServiceScreen(navController: NavController) {
@@ -35,6 +36,7 @@ fun EnableAccessibilityServiceScreen(navController: NavController) {
         )
         FullWidthButton(text = "Take Me There", onClick = {
             ServiceUtils().openAccessibilitySettings(context)
+            Logger.logEvent("Opened Accessibility Settings")
         })
         FullWidthButton(text = "I've Enabled It", onClick = {
             navController.popBackStack()
