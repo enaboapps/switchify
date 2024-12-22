@@ -12,6 +12,7 @@ import androidx.core.graphics.drawable.DrawableCompat
 import com.enaboapps.switchify.R
 import com.enaboapps.switchify.backend.preferences.PreferenceManager
 import com.enaboapps.switchify.service.utils.ScreenUtils
+import com.enaboapps.switchify.utils.Logger
 import kotlin.properties.Delegates
 
 /**
@@ -23,7 +24,6 @@ import kotlin.properties.Delegates
  * @property closeOnSelect Whether the menu should close when the item is selected
  * @property isLinkToMenu Whether the item is a link to another menu
  * @property isMenuHierarchyManipulator Whether the item manipulates the menu hierarchy
- * @property page The page of the menu item
  * @property action The action to perform when the item is selected
  */
 class MenuItem(
@@ -34,7 +34,6 @@ class MenuItem(
     val closeOnSelect: Boolean = true,
     var isLinkToMenu: Boolean = false,
     var isMenuHierarchyManipulator: Boolean = false,
-    private var page: Int = 0,
     private val action: () -> Unit
 ) {
     /**
@@ -178,6 +177,8 @@ class MenuItem(
             MenuManager.getInstance().closeMenuHierarchy()
         }
         action()
+
+        Logger.logEvent("Menu item selected: $id")
     }
 
     /**
