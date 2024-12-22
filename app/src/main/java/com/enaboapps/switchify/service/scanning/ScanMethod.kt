@@ -107,8 +107,6 @@ object ScanMethod {
         if (value == MethodType.RADAR && !IAPHandler.hasPurchasedPro()) {
             startRadarTrialTimer()
         }
-
-        Logger.logEvent("Scan method changed to: $value")
     }
 
     /**
