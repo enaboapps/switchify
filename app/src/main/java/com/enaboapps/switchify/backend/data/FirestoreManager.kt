@@ -1,6 +1,7 @@
 package com.enaboapps.switchify.backend.data
 
 import android.util.Log
+import com.enaboapps.switchify.auth.AuthManager
 import com.google.firebase.firestore.*
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.tasks.await
@@ -32,6 +33,9 @@ class FirestoreManager {
         path: String,
         data: Map<String, Any>
     ) = withContext(Dispatchers.IO) {
+        if (!AuthManager.instance.isUserSignedIn()) {
+            return@withContext
+        }
         try {
             val docRef = firestoreDb.document(path)
             val options = SetOptions.merge()
@@ -49,6 +53,9 @@ class FirestoreManager {
     suspend fun getDocument(
         path: String
     ): Map<String, Any>? = withContext(Dispatchers.IO) {
+        if (!AuthManager.instance.isUserSignedIn()) {
+            return@withContext null
+        }
         try {
             val docRef = firestoreDb.document(path)
             val snapshot = docRef.get().await()
@@ -66,6 +73,9 @@ class FirestoreManager {
         path: String,
         updates: Map<String, Any>
     ) = withContext(Dispatchers.IO) {
+        if (!AuthManager.instance.isUserSignedIn()) {
+            return@withContext
+        }
         try {
             val docRef = firestoreDb.document(path)
             docRef.update(updates).await()
@@ -82,6 +92,9 @@ class FirestoreManager {
     suspend fun deleteDocument(
         path: String
     ) = withContext(Dispatchers.IO) {
+        if (!AuthManager.instance.isUserSignedIn()) {
+            return@withContext
+        }
         try {
             val docRef = firestoreDb.document(path)
             docRef.delete().await()
@@ -125,6 +138,9 @@ class FirestoreManager {
         orderBy: List<OrderBy> = emptyList(),
         limit: Int? = null
     ): List<Map<String, Any>> = withContext(Dispatchers.IO) {
+        if (!AuthManager.instance.isUserSignedIn()) {
+            return@withContext emptyList()
+        }
         try {
             var query: Query = firestoreDb.collection(collectionPath)
 
