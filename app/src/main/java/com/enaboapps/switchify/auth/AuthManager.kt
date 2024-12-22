@@ -52,6 +52,23 @@ class AuthManager {
     }
 
     /**
+     * Delete the current user.
+     *
+     * @param onSuccess Callback to be executed on success.
+     * @param onFailure Callback to be executed on failure.
+     */
+    fun deleteUser(onSuccess: () -> Unit, onFailure: (Exception) -> Unit) {
+        auth.currentUser?.delete()
+            ?.addOnCompleteListener { task ->
+                if (task.isSuccessful) {
+                    onSuccess()
+                } else {
+                    onFailure(task.exception!!)
+                }
+            }
+    }
+
+    /**
      * Sign out the current user.
      */
     fun signOut() {
