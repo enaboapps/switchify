@@ -43,6 +43,8 @@ import com.google.android.play.core.install.InstallStateUpdatedListener
 import com.google.android.play.core.install.model.AppUpdateType
 import com.google.android.play.core.install.model.InstallStatus
 import com.google.android.play.core.install.model.UpdateAvailability
+import com.google.android.play.core.review.ReviewManager
+import com.google.android.play.core.review.ReviewManagerFactory
 
 @Composable
 fun HomeScreen(navController: NavController, serviceUtils: ServiceUtils = ServiceUtils()) {
@@ -120,10 +122,13 @@ fun HomeScreen(navController: NavController, serviceUtils: ServiceUtils = Servic
         }
     }
 
+    val reviewManager = remember { ReviewManagerFactory.create(context) }
+
     LaunchedEffect(Unit) {
         appUpdateManager.registerListener(installStateUpdatedListener)
         checkForUpdates(context, appUpdateManager, updateResultLauncher)
         checkForDownloadedUpdate(appUpdateManager) { showUpdateDialog = it }
+        requestReview(context, reviewManager)
     }
 
     DisposableEffect(Unit) {
@@ -289,4 +294,21 @@ fun AccountCard(navController: NavController) {
         navController = navController,
         route = if (isUserSignedIn) NavigationRoute.Account.name else NavigationRoute.SignIn.name
     )
+}
+
+private fun requestReview(context: Context, reviewManager: ReviewManager) {
+    val request = reviewManager.requestReviewFlow()
+    request.addOnCompleteListener { task ->
+        if (task.isSuccessful) {
+            val reviewInfo = task.result
+            reviewManager.launchReviewFlow(context as Activity, reviewInfo)
+                .addOnCompleteListener {
+                    // The flow has finished. The API does not indicate whether the user
+                    // reviewed or not, or even whether the review dialog was shown.
+                    Log.d("HomeScreen", "Review flow completed")
+                }
+        } else {
+            Log.e("HomeScreen", "Error requesting review flow", task.exception)
+        }
+    }
 }

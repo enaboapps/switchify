@@ -152,6 +152,8 @@ dependencies {
     implementation(libs.androidx.material3.android)
     implementation(libs.app.update)
     implementation(libs.play.services.auth)
+    implementation(libs.play.services.reviews)
+    implementation(libs.play.services.reviews.ktx)
     implementation(libs.credentials)
     implementation(libs.google.id)
     implementation(libs.switchifykeyboardscanlib)
