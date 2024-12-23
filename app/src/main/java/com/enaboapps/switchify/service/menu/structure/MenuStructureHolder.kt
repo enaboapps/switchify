@@ -448,6 +448,30 @@ class MenuStructureHolder(private val accessibilityService: SwitchifyAccessibili
                             )
                         }
                     }
+                ),
+                MenuItem(
+                    id = "half_volume",
+                    text = "Half Volume",
+                    closeOnSelect = false,
+                    action = {
+                        if (IAPHandler.hasPurchasedPro()) {
+                            accessibilityService?.let { service ->
+                                val audioManager =
+                                    service.getSystemService(Context.AUDIO_SERVICE) as AudioManager
+                                val halfVolume = audioManager.getStreamMaxVolume(AudioManager.STREAM_ACCESSIBILITY) / 2
+                                audioManager.setStreamVolume(
+                                    AudioManager.STREAM_ACCESSIBILITY,
+                                    halfVolume,
+                                    AudioManager.FLAG_SHOW_UI
+                                )
+                            }
+                        } else {
+                            ServiceMessageHUD.instance.showMessage(
+                                "Volume control is a pro feature. Please purchase Switchify Pro to use it.",
+                                ServiceMessageHUD.MessageType.DISAPPEARING
+                            )
+                        }
+                    }
                 )
             )
         )
