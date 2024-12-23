@@ -305,7 +305,16 @@ class MenuStructureHolder(private val accessibilityService: SwitchifyAccessibili
                 MenuItem(
                     id = "recent_apps",
                     text = "Recent Apps",
-                    action = { accessibilityService?.performGlobalAction(AccessibilityService.GLOBAL_ACTION_RECENTS) }
+                    action = {
+                        if (IAPHandler.hasPurchasedPro()) {
+                            accessibilityService?.performGlobalAction(AccessibilityService.GLOBAL_ACTION_RECENTS)
+                        } else {
+                            ServiceMessageHUD.instance.showMessage(
+                                "Recent Apps is a pro feature. Please purchase Switchify Pro to use it.",
+                                ServiceMessageHUD.MessageType.DISAPPEARING
+                            )
+                        }
+                    }
                 ),
                 MenuItem(
                     id = "notifications",
