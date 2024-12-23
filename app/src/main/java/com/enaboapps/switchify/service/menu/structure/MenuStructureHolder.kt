@@ -17,6 +17,8 @@ import com.enaboapps.switchify.service.menu.MenuManager
 import com.enaboapps.switchify.service.methods.nodes.Node
 import com.enaboapps.switchify.service.methods.nodes.NodeExaminer
 import com.enaboapps.switchify.service.scanning.ScanMethod
+import com.enaboapps.switchify.backend.iap.IAPHandler
+import com.enaboapps.switchify.service.window.ServiceMessageHUD
 
 class MenuStructureHolder(private val accessibilityService: SwitchifyAccessibilityService? = null) {
     private val tapMenuItem = MenuItem(
@@ -351,13 +353,20 @@ class MenuStructureHolder(private val accessibilityService: SwitchifyAccessibili
                     text = "Volume Up",
                     closeOnSelect = false,
                     action = {
-                        accessibilityService?.let { service ->
-                            val audioManager =
-                                service.getSystemService(Context.AUDIO_SERVICE) as AudioManager
-                            audioManager.adjustStreamVolume(
-                                AudioManager.STREAM_ACCESSIBILITY,
-                                AudioManager.ADJUST_RAISE,
-                                AudioManager.FLAG_SHOW_UI
+                        if (IAPHandler.hasPurchasedPro()) {
+                            accessibilityService?.let { service ->
+                                val audioManager =
+                                    service.getSystemService(Context.AUDIO_SERVICE) as AudioManager
+                                audioManager.adjustStreamVolume(
+                                    AudioManager.STREAM_ACCESSIBILITY,
+                                    AudioManager.ADJUST_RAISE,
+                                    AudioManager.FLAG_SHOW_UI
+                                )
+                            }
+                        } else {
+                            ServiceMessageHUD.instance.showMessage(
+                                "Volume control is a pro feature. Please purchase Switchify Pro to use it.",
+                                ServiceMessageHUD.MessageType.DISAPPEARING
                             )
                         }
                     }
@@ -367,13 +376,20 @@ class MenuStructureHolder(private val accessibilityService: SwitchifyAccessibili
                     text = "Volume Down",
                     closeOnSelect = false,
                     action = {
-                        accessibilityService?.let { service ->
-                            val audioManager =
-                                service.getSystemService(Context.AUDIO_SERVICE) as AudioManager
-                            audioManager.adjustStreamVolume(
-                                AudioManager.STREAM_ACCESSIBILITY,
-                                AudioManager.ADJUST_LOWER,
-                                AudioManager.FLAG_SHOW_UI
+                        if (IAPHandler.hasPurchasedPro()) {
+                            accessibilityService?.let { service ->
+                                val audioManager =
+                                    service.getSystemService(Context.AUDIO_SERVICE) as AudioManager
+                                audioManager.adjustStreamVolume(
+                                    AudioManager.STREAM_ACCESSIBILITY,
+                                    AudioManager.ADJUST_LOWER,
+                                    AudioManager.FLAG_SHOW_UI
+                                )
+                            }
+                        } else {
+                            ServiceMessageHUD.instance.showMessage(
+                                "Volume control is a pro feature. Please purchase Switchify Pro to use it.",
+                                ServiceMessageHUD.MessageType.DISAPPEARING
                             )
                         }
                     }
@@ -383,13 +399,20 @@ class MenuStructureHolder(private val accessibilityService: SwitchifyAccessibili
                     text = "Full Volume",
                     closeOnSelect = false,
                     action = {
-                        accessibilityService?.let { service ->
-                            val audioManager =
-                                service.getSystemService(Context.AUDIO_SERVICE) as AudioManager
-                            audioManager.setStreamVolume(
-                                AudioManager.STREAM_ACCESSIBILITY,
-                                audioManager.getStreamMaxVolume(AudioManager.STREAM_ACCESSIBILITY),
-                                AudioManager.FLAG_SHOW_UI
+                        if (IAPHandler.hasPurchasedPro()) {
+                            accessibilityService?.let { service ->
+                                val audioManager =
+                                    service.getSystemService(Context.AUDIO_SERVICE) as AudioManager
+                                audioManager.setStreamVolume(
+                                    AudioManager.STREAM_ACCESSIBILITY,
+                                    audioManager.getStreamMaxVolume(AudioManager.STREAM_ACCESSIBILITY),
+                                    AudioManager.FLAG_SHOW_UI
+                                )
+                            }
+                        } else {
+                            ServiceMessageHUD.instance.showMessage(
+                                "Volume control is a pro feature. Please purchase Switchify Pro to use it.",
+                                ServiceMessageHUD.MessageType.DISAPPEARING
                             )
                         }
                     }
@@ -399,13 +422,20 @@ class MenuStructureHolder(private val accessibilityService: SwitchifyAccessibili
                     text = "Mute",
                     closeOnSelect = false,
                     action = {
-                        accessibilityService?.let { service ->
-                            val audioManager =
-                                service.getSystemService(Context.AUDIO_SERVICE) as AudioManager
-                            audioManager.setStreamVolume(
-                                AudioManager.STREAM_ACCESSIBILITY,
-                                0,
-                                AudioManager.FLAG_SHOW_UI
+                        if (IAPHandler.hasPurchasedPro()) {
+                            accessibilityService?.let { service ->
+                                val audioManager =
+                                    service.getSystemService(Context.AUDIO_SERVICE) as AudioManager
+                                audioManager.setStreamVolume(
+                                    AudioManager.STREAM_ACCESSIBILITY,
+                                    0,
+                                    AudioManager.FLAG_SHOW_UI
+                                )
+                            }
+                        } else {
+                            ServiceMessageHUD.instance.showMessage(
+                                "Volume control is a pro feature. Please purchase Switchify Pro to use it.",
+                                ServiceMessageHUD.MessageType.DISAPPEARING
                             )
                         }
                     }
