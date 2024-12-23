@@ -1,5 +1,6 @@
 package com.enaboapps.switchify.service.gestures
 
+import com.enaboapps.switchify.backend.iap.IAPHandler
 import com.enaboapps.switchify.service.gestures.data.GestureData
 import com.enaboapps.switchify.service.gestures.data.GestureType
 import com.enaboapps.switchify.service.scanning.ScanMethod
@@ -11,6 +12,14 @@ class GestureLockManager {
 
     // Function to lock/unlock the gesture lock, showing a message to the user
     fun toggleGestureLock() {
+        if (!IAPHandler.hasPurchasedPro()) {
+            ServiceMessageHUD.instance.showMessage(
+                "Gesture lock is a Pro feature. Please upgrade to Pro to use this feature.",
+                ServiceMessageHUD.MessageType.DISAPPEARING
+            )
+            return
+        }
+
         isLocked = !isLocked
         if (isLocked) {
             ServiceMessageHUD.instance.showMessage(
