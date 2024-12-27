@@ -27,10 +27,11 @@ import com.enaboapps.switchify.screens.settings.scanning.ItemScanSettingsScreen
 import com.enaboapps.switchify.screens.settings.scanning.OtherScanSettingsScreen
 import com.enaboapps.switchify.screens.settings.scanning.RadarSettingsScreen
 import com.enaboapps.switchify.screens.settings.scanning.ScanColorSelectionScreen
-import com.enaboapps.switchify.screens.settings.switches.AddEditSwitchScreen
+import com.enaboapps.switchify.screens.settings.switches.AddEditExternalSwitchScreen
 import com.enaboapps.switchify.screens.settings.switches.SwitchStabilityScreen
 import com.enaboapps.switchify.screens.settings.switches.SwitchesScreen
 import com.enaboapps.switchify.screens.setup.SetupScreen
+import com.enaboapps.switchify.screens.settings.switches.AddEditCameraSwitchScreen
 
 @Composable
 fun NavGraph(navController: NavHostController) {
@@ -80,15 +81,15 @@ fun NavGraph(navController: NavHostController) {
         composable(NavigationRoute.Switches.name) {
             SwitchesScreen(navController)
         }
-        composable(NavigationRoute.AddNewSwitch.name) {
-            AddEditSwitchScreen(navController)
+        composable(NavigationRoute.AddNewExternalSwitch.name) {
+            AddEditExternalSwitchScreen(navController)
         }
         composable(NavigationRoute.TestSwitches.name) {
             TestSwitchesScreen(navController)
         }
-        composable("${NavigationRoute.EditSwitch.name}/{code}") {
+        composable("${NavigationRoute.EditExternalSwitch.name}/{code}") {
             it.arguments?.getString("code")?.let { code ->
-                AddEditSwitchScreen(navController, code)
+                AddEditExternalSwitchScreen(navController, code)
             }
         }
         composable(NavigationRoute.MenuItemCustomization.name) {
@@ -125,6 +126,14 @@ fun NavGraph(navController: NavHostController) {
         }
         composable(NavigationRoute.RadarSettings.name) {
             RadarSettingsScreen(navController)
+        }
+        composable(NavigationRoute.AddNewCameraSwitch.name) {
+            AddEditCameraSwitchScreen(navController)
+        }
+        composable("${NavigationRoute.EditCameraSwitch.name}/{code}") {
+            it.arguments?.getString("code")?.let { code ->
+                AddEditCameraSwitchScreen(navController, code)
+            }
         }
     }
 }

@@ -59,11 +59,13 @@ class SwitchEventStore(private val context: Context) {
     /**
      * Represents a remote switch that can be imported to the device.
      *
+     * @property type The type of the switch
      * @property name The name of the switch
      * @property code The unique identifier code for the switch
      * @property isOnDevice Indicates if the switch is already present on the device
      */
     data class RemoteSwitchInfo(
+        val type: String,
         val name: String,
         val code: String,
         val isOnDevice: Boolean
@@ -91,6 +93,7 @@ class SwitchEventStore(private val context: Context) {
                     try {
                         val event = gson.fromJson(gson.toJson(data), SwitchEvent::class.java)
                         RemoteSwitchInfo(
+                            type = event.type,
                             name = event.name,
                             code = event.code,
                             isOnDevice = switchEvents.any { it.code == event.code }

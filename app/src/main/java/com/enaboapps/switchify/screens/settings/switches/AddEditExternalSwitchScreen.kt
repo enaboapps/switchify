@@ -31,47 +31,47 @@ import com.enaboapps.switchify.components.BaseView
 import com.enaboapps.switchify.components.FullWidthButton
 import com.enaboapps.switchify.components.TextArea
 import com.enaboapps.switchify.screens.settings.switches.actions.SwitchActionPicker
-import com.enaboapps.switchify.screens.settings.switches.models.AddEditSwitchScreenModel
+import com.enaboapps.switchify.screens.settings.switches.models.AddEditExternalSwitchScreenModel
 import com.enaboapps.switchify.switches.SwitchAction
 import com.enaboapps.switchify.switches.SwitchEventStore
 
 @Composable
-fun AddEditSwitchScreen(navController: NavController, code: String? = null) {
+fun AddEditExternalSwitchScreen(navController: NavController, code: String? = null) {
     val context = LocalContext.current
     val switchEventStore = SwitchEventStore(context)
-    val addEditSwitchScreenModel = remember {
-        AddEditSwitchScreenModel().apply {
+    val addEditExternalSwitchScreenModel = remember {
+        AddEditExternalSwitchScreenModel().apply {
             init(code, switchEventStore, context)
         }
     }
-    val shouldSave by addEditSwitchScreenModel.shouldSave.observeAsState()
-    val isValid by addEditSwitchScreenModel.isValid.observeAsState()
+    val shouldSave by addEditExternalSwitchScreenModel.shouldSave.observeAsState()
+    val isValid by addEditExternalSwitchScreenModel.isValid.observeAsState()
     val editing = code != null
-    val captured by addEditSwitchScreenModel.switchCaptured.observeAsState()
+    val captured by addEditExternalSwitchScreenModel.switchCaptured.observeAsState()
     val screenTitle = if (editing) "Edit Switch" else "Add New Switch"
     val showDeleteConfirmation = remember { mutableStateOf(false) }
 
     if (!captured!!) {
         SwitchListener(navController = navController, onKeyEvent = { keyEvent: KeyEvent ->
-            addEditSwitchScreenModel.processKeyCode(keyEvent.key, context)
+            addEditExternalSwitchScreenModel.processKeyCode(keyEvent.key, context)
         })
     } else {
         BaseView(
             title = screenTitle,
             navController = navController
         ) {
-            SwitchName(name = addEditSwitchScreenModel.name, onNameChange = {
-                addEditSwitchScreenModel.updateName(it)
+            SwitchName(name = addEditExternalSwitchScreenModel.name, onNameChange = {
+                addEditExternalSwitchScreenModel.updateName(it)
             })
             Column(
                 modifier = Modifier
                     .fillMaxWidth()
                     .padding(16.dp), horizontalAlignment = Alignment.CenterHorizontally
             ) {
-                SwitchActionSection(addEditSwitchScreenModel)
+                SwitchActionSection(addEditExternalSwitchScreenModel)
                 if (shouldSave!!) {
                     FullWidthButton(text = "Save", enabled = isValid!!, onClick = {
-                        addEditSwitchScreenModel.save()
+                        addEditExternalSwitchScreenModel.save()
                         navController.popBackStack()
                     })
                 }
@@ -91,7 +91,7 @@ fun AddEditSwitchScreen(navController: NavController, code: String? = null) {
                         TextButton(
                             onClick = {
                                 showDeleteConfirmation.value = false
-                                addEditSwitchScreenModel.delete {
+                                addEditExternalSwitchScreenModel.delete {
                                     navController.popBackStack()
                                 }
                             }
@@ -169,7 +169,7 @@ fun SwitchName(
 }
 
 @Composable
-fun SwitchActionSection(viewModel: AddEditSwitchScreenModel) {
+fun SwitchActionSection(viewModel: AddEditExternalSwitchScreenModel) {
     val allowLongPress = viewModel.allowLongPress.observeAsState()
     val longPressActions = viewModel.longPressActions.observeAsState()
     val refreshingLongPressActions = viewModel.refreshingLongPressActions.observeAsState()

@@ -20,8 +20,8 @@ sealed class NavigationRoute(val name: String) {
     data object OtherScanSettings : NavigationRoute("OtherScanSettings")
     data object RadarSettings : NavigationRoute("RadarSettings")
     data object Switches : NavigationRoute("Switches")
-    data object AddNewSwitch : NavigationRoute("AddNewSwitch")
-    data object EditSwitch : NavigationRoute("EditSwitch")
+    data object AddNewExternalSwitch : NavigationRoute("AddNewExternalSwitch")
+    data object EditExternalSwitch : NavigationRoute("EditExternalSwitch")
     data object TestSwitches : NavigationRoute("TestSwitches")
     data object MenuItemCustomization : NavigationRoute("MenuItemCustomization")
     data object MenuSize : NavigationRoute("MenuSize")
@@ -31,5 +31,7 @@ sealed class NavigationRoute(val name: String) {
     data object EditMyActionsMenuItem : NavigationRoute("EditMyActionsMenuItem")
     data object EnableAccessibilityService : NavigationRoute("EnableAccessibilityService")
     data object EnableSwitchifyKeyboard : NavigationRoute("EnableSwitchifyKeyboard")
+    data object AddNewCameraSwitch : NavigationRoute("AddNewCameraSwitch")
+    data object EditCameraSwitch : NavigationRoute("EditCameraSwitch")
 
 }

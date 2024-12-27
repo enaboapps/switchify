@@ -3,7 +3,11 @@ package com.enaboapps.switchify.switches
 import com.google.gson.Gson
 import com.google.gson.annotations.SerializedName
 
+const val SWITCH_EVENT_TYPE_EXTERNAL = "external"
+const val SWITCH_EVENT_TYPE_CAMERA = "camera"
+
 data class SwitchEvent(
+    @SerializedName("type") val type: String = SWITCH_EVENT_TYPE_EXTERNAL,
     @SerializedName("name") val name: String,
     @SerializedName("code") val code: String,
     @SerializedName("press_action") val pressAction: SwitchAction,
@@ -12,6 +16,7 @@ data class SwitchEvent(
     fun toJson(): String = Gson().toJson(this)
 
     fun toMap(): Map<String, Any> = mapOf(
+        "type" to type,
         "name" to name,
         "code" to code,
         "press_action" to pressAction.toMap(),
@@ -19,7 +24,13 @@ data class SwitchEvent(
     )
 
     fun log() {
-        println("SwitchEvent: $name, $code, ${pressAction.id}, ${holdActions.joinToString(separator = ";") { it.id.toString() }}")
+        println(
+            "SwitchEvent: $type, $name, $code, ${pressAction.id}, ${
+                holdActions.joinToString(
+                    separator = ";"
+                ) { it.id.toString() }
+            }"
+        )
     }
 
     fun containsAction(actionId: Int): Boolean {
