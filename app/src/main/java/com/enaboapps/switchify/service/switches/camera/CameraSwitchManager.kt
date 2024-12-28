@@ -155,10 +155,12 @@ class CameraSwitchManager(
                         Log.d(TAG, "Last blink state: $lastBlinkState")
                     } else {
                         Log.d(TAG, "No faces detected")
+                        reset()
                     }
                 }
                 .addOnFailureListener { e ->
                     Log.e(TAG, "Face detection failed", e)
+                    reset()
                 }
                 .addOnCompleteListener {
                     imageProxy.close()
@@ -166,6 +168,15 @@ class CameraSwitchManager(
         } else {
             imageProxy.close()
         }
+    }
+
+    private fun reset() {
+        lastSmileState = false
+        lastLeftEyeState = true
+        lastRightEyeState = true
+        lastBlinkState = true
+
+        scanningManager.resumeScanning()
     }
 
     fun stopCamera() {
