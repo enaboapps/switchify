@@ -11,12 +11,13 @@ data class SwitchEvent(
     @SerializedName("name") val name: String,
     @SerializedName("code") val code: String,
     @SerializedName("press_action") val pressAction: SwitchAction,
-    @SerializedName("hold_actions") val holdActions: List<SwitchAction>
+    @SerializedName("hold_actions") val holdActions: List<SwitchAction>,
+    var isOnDevice: Boolean = false
 ) {
     fun toJson(): String = Gson().toJson(this)
 
     fun toMap(): Map<String, Any> = mapOf(
-        "type" to type,
+        "type" to (type.takeIf { it.isNotEmpty() } ?: SWITCH_EVENT_TYPE_EXTERNAL),
         "name" to name,
         "code" to code,
         "press_action" to pressAction.toMap(),
@@ -29,7 +30,7 @@ data class SwitchEvent(
                 holdActions.joinToString(
                     separator = ";"
                 ) { it.id.toString() }
-            }"
+            }, isOnDevice: $isOnDevice"
         )
     }
 

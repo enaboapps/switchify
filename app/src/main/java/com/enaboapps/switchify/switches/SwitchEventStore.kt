@@ -277,11 +277,21 @@ class SwitchEventStore(private val context: Context) {
      * Removes a switch event from both local storage and Firestore.
      *
      * @param switchEvent The switch event to remove
+     * @param handler The handler to be called after the switch event is removed
      */
-    fun remove(switchEvent: SwitchEvent) {
-        if (switchEvents.remove(switchEvent)) {
-            saveToFile()
-            Logger.logEvent("Removed switch: ${switchEvent.name}")
+    fun remove(switchEvent: SwitchEvent, handler: ((Boolean) -> Unit)) {
+        if (switchEvents.removeIf { it.code == switchEvent.code }) {
+            try {
+                saveToFile()
+                Logger.logEvent("Removed switch: ${switchEvent.name}")
+                handler(true)
+            } catch (e: Exception) {
+                handler(false)
+                Log.e(tag, "Error removing switch event", e)
+            }
+        } else {
+            handler(false)
+            Log.e(tag, "Switch event not found")
         }
     }
 
@@ -325,6 +335,36 @@ class SwitchEventStore(private val context: Context) {
             Log.d(tag, "Found switch event for code $code")
         } ?: run {
             Log.d(tag, "No switch event found for code $code")
+            null
+        }
+
+    /**
+     * Finds an external switch event by its code.
+     *
+     * @param code The code of the switch event to find
+     * @return The found switch event or null if not found
+     */
+    fun findExternal(code: String): SwitchEvent? =
+        switchEvents.find { it.type == SWITCH_EVENT_TYPE_EXTERNAL && it.code == code && it.isOnDevice }
+            ?.also {
+                Log.d(tag, "Found external switch event for code $code")
+            } ?: run {
+            Log.d(tag, "No external switch event found for code $code")
+            null
+        }
+
+    /**
+     * Finds a camera switch event by its code.
+     *
+     * @param code The code of the switch event to find
+     * @return The found switch event or null if not found
+     */
+    fun findCamera(code: String): SwitchEvent? =
+        switchEvents.find { it.type == SWITCH_EVENT_TYPE_CAMERA && it.code == code && it.isOnDevice }
+            ?.also {
+                Log.d(tag, "Found camera switch event for code $code")
+            } ?: run {
+            Log.d(tag, "No camera switch event found for code $code")
             null
         }
 
@@ -395,6 +435,8 @@ class SwitchEventStore(private val context: Context) {
                 val events: Set<SwitchEvent> = gson.fromJson(file.readText(), type)
                 switchEvents.clear()
                 switchEvents.addAll(events)
+                switchEvents.forEach { it.isOnDevice = true }
+                switchEvents.forEach { it.log() }
             } catch (e: Exception) {
                 Log.e(tag, "Error reading from file", e)
                 deleteFile()

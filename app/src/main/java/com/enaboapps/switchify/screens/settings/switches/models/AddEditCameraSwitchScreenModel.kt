@@ -11,14 +11,14 @@ class AddEditCameraSwitchScreenModel : ViewModel() {
     val action = mutableStateOf(SwitchAction(SwitchAction.ACTION_SELECT))
     val isValid = mutableStateOf(false)
     val showDeleteConfirmation = mutableStateOf(false)
-    
+
     private lateinit var store: SwitchEventStore
     private var code: String? = null
 
     fun init(code: String?, context: Context) {
         store = SwitchEventStore(context)
         this.code = code
-        
+
         if (code != null) {
             val event = store.find(code)
             event?.let {
@@ -48,9 +48,9 @@ class AddEditCameraSwitchScreenModel : ViewModel() {
     }
 
     private fun validate() {
-        isValid.value = name.isNotBlank() && 
-                       selectedGesture.value != null && 
-                       action.value != null
+        isValid.value = name.isNotBlank() &&
+                selectedGesture.value != null &&
+                action.value != null
     }
 
     fun save() {
@@ -69,11 +69,16 @@ class AddEditCameraSwitchScreenModel : ViewModel() {
         }
     }
 
-    fun delete(completion: () -> Unit) {
+    fun delete(completion: (Boolean) -> Unit) {
         val event = store.find(code ?: "")
         event?.let {
-            store.remove(it)
-            completion()
+            store.remove(it) { success ->
+                if (success) {
+                    completion(true)
+                } else {
+                    completion(false)
+                }
+            }
         }
     }
 } 

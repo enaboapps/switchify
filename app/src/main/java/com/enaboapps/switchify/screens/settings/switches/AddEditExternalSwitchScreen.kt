@@ -1,5 +1,6 @@
 package com.enaboapps.switchify.screens.settings.switches
 
+import android.widget.Toast
 import androidx.compose.foundation.focusable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -91,8 +92,17 @@ fun AddEditExternalSwitchScreen(navController: NavController, code: String? = nu
                         TextButton(
                             onClick = {
                                 showDeleteConfirmation.value = false
-                                addEditExternalSwitchScreenModel.delete {
-                                    navController.popBackStack()
+                                addEditExternalSwitchScreenModel.delete { success ->
+                                    if (success) {
+                                        navController.popBackStack()
+                                    } else {
+                                        Toast.makeText(
+                                            context,
+                                            "Error deleting switch",
+                                            Toast.LENGTH_SHORT
+                                        )
+                                            .show()
+                                    }
                                 }
                             }
                         ) {

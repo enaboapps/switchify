@@ -3,6 +3,7 @@ package com.enaboapps.switchify.screens.settings.switches
 import android.content.Intent
 import android.net.Uri
 import android.provider.Settings
+import android.widget.Toast
 import androidx.compose.foundation.layout.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Camera
@@ -137,8 +138,13 @@ private fun MainContent(
                 TextButton(
                     onClick = {
                         viewModel.showDeleteConfirmation.value = false
-                        viewModel.delete {
-                            navController.popBackStack()
+                        viewModel.delete { success ->
+                            if (success) {
+                                navController.popBackStack()
+                            } else {
+                                Toast.makeText(context, "Error deleting switch", Toast.LENGTH_SHORT)
+                                    .show()
+                            }
                         }
                     }
                 ) {

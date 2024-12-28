@@ -158,11 +158,16 @@ class AddEditExternalSwitchScreenModel() : ViewModel() {
         }
     }
 
-    fun delete(completion: () -> Unit) {
+    fun delete(completion: (Boolean) -> Unit) {
         val event = store.find(code ?: "")
         event?.let {
-            store.remove(it)
-            completion()
+            store.remove(it) { success ->
+                if (success) {
+                    completion(true)
+                } else {
+                    completion(false)
+                }
+            }
         }
     }
 }

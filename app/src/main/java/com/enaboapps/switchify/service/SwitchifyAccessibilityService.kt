@@ -3,7 +3,11 @@ package com.enaboapps.switchify.service
 import android.accessibilityservice.AccessibilityService
 import android.view.KeyEvent
 import android.view.accessibility.AccessibilityEvent
+import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.LifecycleOwner
+import androidx.lifecycle.LifecycleRegistry
 import com.enaboapps.switchify.backend.preferences.PreferenceManager
+import com.enaboapps.switchify.service.camera.CameraManager
 import com.enaboapps.switchify.service.gestures.GestureManager
 import com.enaboapps.switchify.service.lockscreen.LockScreenView
 import com.enaboapps.switchify.service.methods.nodes.NodeExaminer
@@ -11,6 +15,7 @@ import com.enaboapps.switchify.service.scanning.ScanMethod
 import com.enaboapps.switchify.service.scanning.ScanSettings
 import com.enaboapps.switchify.service.scanning.ScanningManager
 import com.enaboapps.switchify.service.selection.SelectionHandler
+import com.enaboapps.switchify.service.switches.SwitchEventProvider
 import com.enaboapps.switchify.service.switches.SwitchListener
 import com.enaboapps.switchify.service.utils.KeyboardBridge
 import com.enaboapps.switchify.service.utils.ScreenWatcher
@@ -24,14 +29,68 @@ import kotlinx.coroutines.launch
  * This is the main service class for the Switchify application.
  * It extends the AccessibilityService class to provide accessibility features.
  */
-class SwitchifyAccessibilityService : AccessibilityService() {
+class SwitchifyAccessibilityService : AccessibilityService(), LifecycleOwner {
 
     private lateinit var scanningManager: ScanningManager
     private lateinit var switchListener: SwitchListener
+    private lateinit var cameraManager: CameraManager
+    private lateinit var lifecycleRegistry: LifecycleRegistry
     private lateinit var screenWatcher: ScreenWatcher
     private lateinit var lockScreenView: LockScreenView
     private lateinit var scanSettings: ScanSettings
     private val serviceScope = CoroutineScope(SupervisorJob() + Dispatchers.Main)
+
+    override fun onCreate() {
+        super.onCreate()
+
+        setup()
+
+        Logger.logEvent("Service Created")
+
+        lifecycleRegistry.handleLifecycleEvent(Lifecycle.Event.ON_CREATE)
+    }
+
+    private fun setup() {
+        Logger.init(this)
+
+        ScanMethod.preferenceManager = PreferenceManager(this.applicationContext)
+
+        scanningManager = ScanningManager(this, this)
+
+        lifecycleRegistry = LifecycleRegistry(this)
+        cameraManager = CameraManager(this, scanningManager)
+
+        lockScreenView = LockScreenView(this)
+        lockScreenView.setup(this)
+
+        screenWatcher = ScreenWatcher(
+            onScreenWake = {
+                lockScreenView.show()
+                if (SwitchEventProvider.hasCameraSwitch) {
+                    cameraManager.startCamera(this@SwitchifyAccessibilityService)
+                }
+            },
+            onScreenSleep = {
+                switchListener.reset()
+                scanningManager.reset()
+                lockScreenView.hide()
+                if (SwitchEventProvider.hasCameraSwitch) {
+                    cameraManager.stopCamera()
+                }
+            },
+            onOrientationChanged = { scanningManager.reset() }
+        )
+        screenWatcher.register(this)
+
+        scanSettings = ScanSettings(this)
+
+        switchListener = SwitchListener(this, scanningManager)
+
+        GestureManager.getInstance().setup(this)
+        SelectionHandler.init(this)
+
+        SwitchEventProvider.initialize(this)
+    }
 
     /**
      * This method is called when an AccessibilityEvent is fired.
@@ -50,40 +109,29 @@ class SwitchifyAccessibilityService : AccessibilityService() {
 
     /**
      * This method is called when the service is connected.
-     * It sets up the scanning manager, switch listener, screen watcher, lock screen view, gesture manager, and auto selection handler.
-     * It also finds nodes in the active window and updates the keyboard state.
      */
     override fun onServiceConnected() {
         super.onServiceConnected()
-
-        Logger.init(this)
         Logger.logEvent("Service Connected")
 
-        ScanMethod.preferenceManager = PreferenceManager(this.applicationContext)
+        lifecycleRegistry.handleLifecycleEvent(Lifecycle.Event.ON_START)
 
-        scanningManager = ScanningManager(this, this)
+        if (SwitchEventProvider.hasCameraSwitch) {
+            cameraManager.startCamera(this)
+        }
+
         scanningManager.setup()
 
-        lockScreenView = LockScreenView(this)
-        lockScreenView.setup(this)
-
-        screenWatcher = ScreenWatcher(
-            onScreenWake = { lockScreenView.show() },
-            onScreenSleep = {
-                switchListener.reset()
-                scanningManager.reset()
-                lockScreenView.hide()
-            },
-            onOrientationChanged = { scanningManager.reset() }
-        )
-        screenWatcher.register(this)
-
-        scanSettings = ScanSettings(this)
-
-        switchListener = SwitchListener(this, scanningManager)
-
-        GestureManager.getInstance().setup(this)
-        SelectionHandler.init(this)
+        SwitchEventProvider.addCameraSwitchListener(object :
+            SwitchEventProvider.CameraSwitchListener {
+            override fun onCameraSwitchAvailabilityChanged(available: Boolean) {
+                if (available) {
+                    cameraManager.startCamera(this@SwitchifyAccessibilityService)
+                } else {
+                    cameraManager.stopCamera()
+                }
+            }
+        })
 
         rootInActiveWindow?.let { rootNode ->
             serviceScope.launch {
@@ -103,6 +151,22 @@ class SwitchifyAccessibilityService : AccessibilityService() {
         lockScreenView.show()
     }
 
+    override fun onDestroy() {
+        super.onDestroy()
+
+        lifecycleRegistry.handleLifecycleEvent(Lifecycle.Event.ON_DESTROY)
+
+        cameraManager.stopCamera()
+
+        scanningManager.shutdown()
+
+        lockScreenView.hide()
+
+        SwitchEventProvider.cleanup()
+
+        Logger.logEvent("Service Destroyed")
+    }
+
     override fun onKeyEvent(event: KeyEvent?): Boolean {
         event?.let { handleSwitchEvent(it) }
         return true
@@ -119,4 +183,7 @@ class SwitchifyAccessibilityService : AccessibilityService() {
             else -> false
         }
     }
+
+    override val lifecycle: Lifecycle
+        get() = lifecycleRegistry
 }
