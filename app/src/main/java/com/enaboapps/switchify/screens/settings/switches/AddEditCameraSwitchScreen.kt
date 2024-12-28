@@ -18,7 +18,7 @@ import androidx.navigation.NavController
 import com.enaboapps.switchify.components.*
 import com.enaboapps.switchify.screens.settings.switches.actions.SwitchActionPicker
 import com.enaboapps.switchify.screens.settings.switches.models.AddEditCameraSwitchScreenModel
-import com.enaboapps.switchify.switches.FacialGesture
+import com.enaboapps.switchify.switches.CameraSwitchFacialGesture
 import com.google.accompanist.permissions.ExperimentalPermissionsApi
 import com.google.accompanist.permissions.isGranted
 import com.google.accompanist.permissions.rememberPermissionState
@@ -81,10 +81,10 @@ private fun MainContent(
         // Facial Gesture Selection
         Section(title = "Facial Gesture") {
             val gestures = listOf(
-                FacialGesture(FacialGesture.SMILE),
-                FacialGesture(FacialGesture.LEFT_WINK),
-                FacialGesture(FacialGesture.RIGHT_WINK),
-                FacialGesture(FacialGesture.BLINK)
+                CameraSwitchFacialGesture(CameraSwitchFacialGesture.SMILE),
+                CameraSwitchFacialGesture(CameraSwitchFacialGesture.LEFT_WINK),
+                CameraSwitchFacialGesture(CameraSwitchFacialGesture.RIGHT_WINK),
+                CameraSwitchFacialGesture(CameraSwitchFacialGesture.BLINK)
             )
 
             gestures.forEach { gesture ->

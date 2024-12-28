@@ -7,7 +7,6 @@ import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.LifecycleRegistry
 import com.enaboapps.switchify.backend.preferences.PreferenceManager
-import com.enaboapps.switchify.service.camera.CameraManager
 import com.enaboapps.switchify.service.gestures.GestureManager
 import com.enaboapps.switchify.service.lockscreen.LockScreenView
 import com.enaboapps.switchify.service.methods.nodes.NodeExaminer
@@ -15,8 +14,9 @@ import com.enaboapps.switchify.service.scanning.ScanMethod
 import com.enaboapps.switchify.service.scanning.ScanSettings
 import com.enaboapps.switchify.service.scanning.ScanningManager
 import com.enaboapps.switchify.service.selection.SelectionHandler
-import com.enaboapps.switchify.service.switches.SwitchEventProvider
-import com.enaboapps.switchify.service.switches.SwitchListener
+import com.enaboapps.switchify.service.switches.camera.CameraSwitchManager
+import com.enaboapps.switchify.service.switches.external.SwitchEventProvider
+import com.enaboapps.switchify.service.switches.external.SwitchListener
 import com.enaboapps.switchify.service.utils.KeyboardBridge
 import com.enaboapps.switchify.service.utils.ScreenWatcher
 import com.enaboapps.switchify.utils.Logger
@@ -33,7 +33,7 @@ class SwitchifyAccessibilityService : AccessibilityService(), LifecycleOwner {
 
     private lateinit var scanningManager: ScanningManager
     private lateinit var switchListener: SwitchListener
-    private lateinit var cameraManager: CameraManager
+    private lateinit var cameraSwitchManager: CameraSwitchManager
     private lateinit var lifecycleRegistry: LifecycleRegistry
     private lateinit var screenWatcher: ScreenWatcher
     private lateinit var lockScreenView: LockScreenView
@@ -58,7 +58,7 @@ class SwitchifyAccessibilityService : AccessibilityService(), LifecycleOwner {
         scanningManager = ScanningManager(this, this)
 
         lifecycleRegistry = LifecycleRegistry(this)
-        cameraManager = CameraManager(this, scanningManager)
+        cameraSwitchManager = CameraSwitchManager(this, scanningManager)
 
         lockScreenView = LockScreenView(this)
         lockScreenView.setup(this)
@@ -67,7 +67,7 @@ class SwitchifyAccessibilityService : AccessibilityService(), LifecycleOwner {
             onScreenWake = {
                 lockScreenView.show()
                 if (SwitchEventProvider.hasCameraSwitch) {
-                    cameraManager.startCamera(this@SwitchifyAccessibilityService)
+                    cameraSwitchManager.startCamera(this@SwitchifyAccessibilityService)
                 }
             },
             onScreenSleep = {
@@ -75,7 +75,7 @@ class SwitchifyAccessibilityService : AccessibilityService(), LifecycleOwner {
                 scanningManager.reset()
                 lockScreenView.hide()
                 if (SwitchEventProvider.hasCameraSwitch) {
-                    cameraManager.stopCamera()
+                    cameraSwitchManager.stopCamera()
                 }
             },
             onOrientationChanged = { scanningManager.reset() }
@@ -117,7 +117,7 @@ class SwitchifyAccessibilityService : AccessibilityService(), LifecycleOwner {
         lifecycleRegistry.handleLifecycleEvent(Lifecycle.Event.ON_START)
 
         if (SwitchEventProvider.hasCameraSwitch) {
-            cameraManager.startCamera(this)
+            cameraSwitchManager.startCamera(this)
         }
 
         scanningManager.setup()
@@ -126,9 +126,9 @@ class SwitchifyAccessibilityService : AccessibilityService(), LifecycleOwner {
             SwitchEventProvider.CameraSwitchListener {
             override fun onCameraSwitchAvailabilityChanged(available: Boolean) {
                 if (available) {
-                    cameraManager.startCamera(this@SwitchifyAccessibilityService)
+                    cameraSwitchManager.startCamera(this@SwitchifyAccessibilityService)
                 } else {
-                    cameraManager.stopCamera()
+                    cameraSwitchManager.stopCamera()
                 }
             }
         })
@@ -156,7 +156,7 @@ class SwitchifyAccessibilityService : AccessibilityService(), LifecycleOwner {
 
         lifecycleRegistry.handleLifecycleEvent(Lifecycle.Event.ON_DESTROY)
 
-        cameraManager.stopCamera()
+        cameraSwitchManager.stopCamera()
 
         scanningManager.shutdown()
 

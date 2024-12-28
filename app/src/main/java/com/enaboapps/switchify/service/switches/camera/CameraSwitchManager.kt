@@ -1,4 +1,4 @@
-package com.enaboapps.switchify.service.camera
+package com.enaboapps.switchify.service.switches.camera
 
 import android.content.Context
 import android.util.Log
@@ -8,16 +8,16 @@ import androidx.camera.lifecycle.ProcessCameraProvider
 import androidx.core.content.ContextCompat
 import androidx.lifecycle.LifecycleOwner
 import com.enaboapps.switchify.service.scanning.ScanningManager
-import com.enaboapps.switchify.service.switches.SwitchEventProvider
+import com.enaboapps.switchify.service.switches.external.SwitchEventProvider
 import com.enaboapps.switchify.service.window.ServiceMessageHUD
-import com.enaboapps.switchify.switches.FacialGesture
+import com.enaboapps.switchify.switches.CameraSwitchFacialGesture
 import com.enaboapps.switchify.switches.SwitchEvent
 import com.google.common.util.concurrent.ListenableFuture
 import com.google.mlkit.vision.common.InputImage
 import com.google.mlkit.vision.face.FaceDetection
 import com.google.mlkit.vision.face.FaceDetectorOptions
 
-class CameraManager(
+class CameraSwitchManager(
     private val context: Context,
     private val scanningManager: ScanningManager
 ) {
@@ -108,18 +108,33 @@ class CameraManager(
                         if (isSmiling != lastSmileState) {
                             Log.d(TAG, "Smiling: $isSmiling")
                             lastSmileState = isSmiling
+                            if (isSmiling) {
+                                gestureStarted(CameraSwitchFacialGesture(CameraSwitchFacialGesture.SMILE))
+                            } else {
+                                gestureCompleted(CameraSwitchFacialGesture(CameraSwitchFacialGesture.SMILE))
+                            }
                         }
 
                         // Detect left wink
                         if (leftEyeOpen != lastLeftEyeState && rightEyeOpen) {
                             Log.d(TAG, "Left eye open")
                             lastLeftEyeState = leftEyeOpen
+                            if (!leftEyeOpen) {
+                                gestureStarted(CameraSwitchFacialGesture(CameraSwitchFacialGesture.LEFT_WINK))
+                            } else {
+                                gestureCompleted(CameraSwitchFacialGesture(CameraSwitchFacialGesture.LEFT_WINK))
+                            }
                         }
 
                         // Detect right wink
                         if (rightEyeOpen != lastRightEyeState && leftEyeOpen) {
                             Log.d(TAG, "Right eye open")
                             lastRightEyeState = rightEyeOpen
+                            if (!rightEyeOpen) {
+                                gestureStarted(CameraSwitchFacialGesture(CameraSwitchFacialGesture.RIGHT_WINK))
+                            } else {
+                                gestureCompleted(CameraSwitchFacialGesture(CameraSwitchFacialGesture.RIGHT_WINK))
+                            }
                         }
 
                         // Detect blink
@@ -127,6 +142,11 @@ class CameraManager(
                         if (bothEyesOpen != lastBlinkState) {
                             Log.d(TAG, "Both eyes open: $bothEyesOpen")
                             lastBlinkState = bothEyesOpen
+                            if (!bothEyesOpen) {
+                                gestureStarted(CameraSwitchFacialGesture(CameraSwitchFacialGesture.BLINK))
+                            } else {
+                                gestureCompleted(CameraSwitchFacialGesture(CameraSwitchFacialGesture.BLINK))
+                            }
                         }
 
                         Log.d(TAG, "Last smile state: $lastSmileState")
@@ -159,10 +179,29 @@ class CameraManager(
     /**
      * This function is called when a gesture is started.
      */
+    private fun gestureStarted(gesture: CameraSwitchFacialGesture) {
+        Log.d(TAG, "Gesture started: $gesture")
+        // Find the associated switch event for the gesture
+        val switchEvent = findSwitchEventForGesture(gesture)
+        if (switchEvent != null) {
+            scanningManager.pauseScanning()
+        }
+    }
 
     /**
      * This function is called when a gesture is completed.
      */
+    private fun gestureCompleted(gesture: CameraSwitchFacialGesture) {
+        Log.d(TAG, "Gesture completed: $gesture")
+
+        // Find the associated switch event for the gesture
+        val switchEvent = findSwitchEventForGesture(gesture)
+        if (switchEvent != null) {
+            // Perform the switch action
+            scanningManager.performAction(switchEvent.pressAction)
+            scanningManager.resumeScanning()
+        }
+    }
 
     /**
      * This function finds the associated switch event for a given gesture.
@@ -170,12 +209,12 @@ class CameraManager(
      * @param gesture The gesture to find the switch event for.
      * @return The switch event associated with the gesture, or null if not found.
      */
-    private fun findSwitchEventForGesture(gesture: FacialGesture): SwitchEvent? {
+    private fun findSwitchEventForGesture(gesture: CameraSwitchFacialGesture): SwitchEvent? {
         return SwitchEventProvider.findCamera(gesture.id)
     }
 
     companion object {
-        private const val TAG = "CameraManager"
+        private const val TAG = "CameraSwitchManager"
         private const val SMILE_THRESHOLD = 0.7f
         private const val EYE_OPEN_THRESHOLD = 0.5f
     }

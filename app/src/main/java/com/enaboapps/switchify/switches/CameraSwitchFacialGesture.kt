@@ -1,9 +1,12 @@
 package com.enaboapps.switchify.switches
 
 /**
- * An enum representing the different facial gestures.
+ * A class representing a camera switch facial gesture.
+ * Used to identify and react to facial gestures in the camera switch.
+ *
+ * @property id The unique identifier of the gesture.
  */
-class FacialGesture(val id: String) {
+class CameraSwitchFacialGesture(val id: String) {
     companion object {
         const val SMILE = "smile"
         const val LEFT_WINK = "left_wink"

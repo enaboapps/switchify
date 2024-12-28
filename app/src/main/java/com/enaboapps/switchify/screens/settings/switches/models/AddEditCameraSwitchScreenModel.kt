@@ -7,7 +7,7 @@ import com.enaboapps.switchify.switches.*
 
 class AddEditCameraSwitchScreenModel : ViewModel() {
     var name = ""
-    val selectedGesture = mutableStateOf<FacialGesture?>(null)
+    val selectedGesture = mutableStateOf<CameraSwitchFacialGesture?>(null)
     val action = mutableStateOf(SwitchAction(SwitchAction.ACTION_SELECT))
     val isValid = mutableStateOf(false)
     val showDeleteConfirmation = mutableStateOf(false)
@@ -23,7 +23,7 @@ class AddEditCameraSwitchScreenModel : ViewModel() {
             val event = store.find(code)
             event?.let {
                 name = it.name
-                selectedGesture.value = FacialGesture(it.code)
+                selectedGesture.value = CameraSwitchFacialGesture(it.code)
                 action.value = it.pressAction
             }
         } else {
@@ -37,7 +37,7 @@ class AddEditCameraSwitchScreenModel : ViewModel() {
         validate()
     }
 
-    fun setGesture(gesture: FacialGesture) {
+    fun setGesture(gesture: CameraSwitchFacialGesture) {
         selectedGesture.value = gesture
         validate()
     }
