@@ -1,6 +1,5 @@
 package com.enaboapps.switchify.switches
 
-import com.google.gson.Gson
 import com.google.gson.annotations.SerializedName
 
 const val SWITCH_EVENT_TYPE_EXTERNAL = "external"
@@ -12,10 +11,8 @@ data class SwitchEvent(
     @SerializedName("code") val code: String,
     @SerializedName("press_action") val pressAction: SwitchAction,
     @SerializedName("hold_actions") val holdActions: List<SwitchAction>,
-    var isOnDevice: Boolean = false
+    @Transient var isOnDevice: Boolean = false
 ) {
-    fun toJson(): String = Gson().toJson(this)
-
     fun toMap(): Map<String, Any> = mapOf(
         "type" to (type.takeIf { it.isNotEmpty() } ?: SWITCH_EVENT_TYPE_EXTERNAL),
         "name" to name,
@@ -36,9 +33,5 @@ data class SwitchEvent(
 
     fun containsAction(actionId: Int): Boolean {
         return pressAction.id == actionId || holdActions.any { it.id == actionId }
-    }
-
-    companion object {
-        fun fromJson(json: String): SwitchEvent = Gson().fromJson(json, SwitchEvent::class.java)
     }
 }

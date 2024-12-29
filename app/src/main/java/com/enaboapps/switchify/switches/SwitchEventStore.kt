@@ -11,6 +11,7 @@ import com.enaboapps.switchify.backend.preferences.PreferenceManager
 import com.enaboapps.switchify.service.scanning.ScanMode
 import com.enaboapps.switchify.utils.Logger
 import com.google.gson.Gson
+import com.google.gson.GsonBuilder
 import com.google.gson.reflect.TypeToken
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -431,6 +432,9 @@ class SwitchEventStore(private val context: Context) {
     private fun readFile() {
         if (file.exists()) {
             try {
+                val gsonBuilder = GsonBuilder()
+                gsonBuilder.registerTypeAdapter(SwitchEvent::class.java, SwitchEventTypeAdapter())
+                val gson = gsonBuilder.create()
                 val type = object : TypeToken<Set<SwitchEvent>>() {}.type
                 val events: Set<SwitchEvent> = gson.fromJson(file.readText(), type)
                 switchEvents.clear()
