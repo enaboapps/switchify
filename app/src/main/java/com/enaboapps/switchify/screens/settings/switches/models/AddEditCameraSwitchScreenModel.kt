@@ -10,6 +10,7 @@ class AddEditCameraSwitchScreenModel : ViewModel() {
     val selectedGesture = mutableStateOf<CameraSwitchFacialGesture?>(null)
     val action = mutableStateOf(SwitchAction(SwitchAction.ACTION_SELECT))
     val isValid = mutableStateOf(false)
+    val facialGestureTime = mutableStateOf(100L)
     val showDeleteConfirmation = mutableStateOf(false)
 
     private lateinit var store: SwitchEventStore
@@ -25,6 +26,7 @@ class AddEditCameraSwitchScreenModel : ViewModel() {
                 name = it.name
                 selectedGesture.value = CameraSwitchFacialGesture(it.code)
                 action.value = it.pressAction
+                facialGestureTime.value = it.facialGestureTime
             }
         } else {
             name = "Camera Switch ${store.getCount() + 1}"
@@ -42,15 +44,20 @@ class AddEditCameraSwitchScreenModel : ViewModel() {
         validate()
     }
 
-    fun setAction(newAction: SwitchAction, context: Context) {
+    fun setAction(newAction: SwitchAction) {
         action.value = newAction
+        validate()
+    }
+
+    fun setFacialGestureTime(newValue: Long) {
+        facialGestureTime.value = newValue
         validate()
     }
 
     private fun validate() {
         isValid.value = name.isNotBlank() &&
                 selectedGesture.value != null &&
-                action.value != null
+                action.value != SwitchAction(SwitchAction.ACTION_NONE)
     }
 
     fun save() {
@@ -58,6 +65,7 @@ class AddEditCameraSwitchScreenModel : ViewModel() {
             type = SWITCH_EVENT_TYPE_CAMERA,
             name = name.trim(),
             code = selectedGesture.value?.id ?: "",
+            facialGestureTime = facialGestureTime.value,
             pressAction = action.value,
             holdActions = emptyList()
         )

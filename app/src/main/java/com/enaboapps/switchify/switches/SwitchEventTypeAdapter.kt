@@ -19,6 +19,13 @@ class SwitchEventTypeAdapter : JsonDeserializer<SwitchEvent> {
             SWITCH_EVENT_TYPE_EXTERNAL
         }
 
+        // Get facial gesture time with default value if missing
+        val facialGestureTime = if (jsonObject.has("facial_gesture_time")) {
+            jsonObject.get("facial_gesture_time").asLong
+        } else {
+            100L
+        }
+
         // Get required fields
         val name = jsonObject.get("name").asString
         val code = jsonObject.get("code").asString
@@ -35,6 +42,7 @@ class SwitchEventTypeAdapter : JsonDeserializer<SwitchEvent> {
             type = type,
             name = name,
             code = code,
+            facialGestureTime = facialGestureTime,
             pressAction = pressAction,
             holdActions = holdActions
         )

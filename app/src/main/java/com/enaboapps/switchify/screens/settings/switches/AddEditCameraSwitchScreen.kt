@@ -103,7 +103,22 @@ private fun MainContent(
         SwitchActionPicker(
             title = "Action",
             switchAction = viewModel.action.value,
-            onChange = { viewModel.setAction(it, context) }
+            onChange = { viewModel.setAction(it) }
+        )
+
+        Spacer(modifier = Modifier.height(16.dp))
+
+        // Facial Gesture Time
+        PreferenceTimeStepper(
+            value = viewModel.facialGestureTime.value ?: 0,
+            title = "Facial Gesture Time",
+            summary = "The time to wait for a facial gesture to be detected",
+            min = 100,
+            max = 10000,
+            step = 100,
+            onValueChanged = { newValue ->
+                viewModel.setFacialGestureTime(newValue)
+            }
         )
 
         Spacer(modifier = Modifier.height(24.dp))
