@@ -1,6 +1,7 @@
 package com.enaboapps.switchify.screens.settings.switches.models
 
 import android.content.Context
+import androidx.compose.runtime.mutableLongStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.ViewModel
 import com.enaboapps.switchify.switches.*
@@ -10,7 +11,7 @@ class AddEditCameraSwitchScreenModel : ViewModel() {
     val selectedGesture = mutableStateOf<CameraSwitchFacialGesture?>(null)
     val action = mutableStateOf(SwitchAction(SwitchAction.ACTION_SELECT))
     val isValid = mutableStateOf(false)
-    val facialGestureTime = mutableStateOf(100L)
+    val facialGestureTime = mutableLongStateOf(100L)
     val showDeleteConfirmation = mutableStateOf(false)
 
     private lateinit var store: SwitchEventStore
@@ -26,7 +27,7 @@ class AddEditCameraSwitchScreenModel : ViewModel() {
                 name = it.name
                 selectedGesture.value = CameraSwitchFacialGesture(it.code)
                 action.value = it.pressAction
-                facialGestureTime.value = it.facialGestureTime
+                facialGestureTime.longValue = it.facialGestureTime
             }
         } else {
             name = "Camera Switch ${store.getCount() + 1}"
@@ -50,7 +51,7 @@ class AddEditCameraSwitchScreenModel : ViewModel() {
     }
 
     fun setFacialGestureTime(newValue: Long) {
-        facialGestureTime.value = newValue
+        facialGestureTime.longValue = newValue
         validate()
     }
 
@@ -60,20 +61,32 @@ class AddEditCameraSwitchScreenModel : ViewModel() {
                 action.value != SwitchAction(SwitchAction.ACTION_NONE)
     }
 
-    fun save() {
+    fun save(completion: ((Boolean) -> Unit)) {
         val event = SwitchEvent(
             type = SWITCH_EVENT_TYPE_CAMERA,
             name = name.trim(),
             code = selectedGesture.value?.id ?: "",
-            facialGestureTime = facialGestureTime.value,
+            facialGestureTime = facialGestureTime.longValue,
             pressAction = action.value,
             holdActions = emptyList()
         )
 
         if (store.find(event.code) == null) {
-            store.add(event)
+            store.add(event) { success ->
+                if (success) {
+                    completion(true)
+                } else {
+                    completion(false)
+                }
+            }
         } else {
-            store.update(event)
+            store.update(event) { success ->
+                if (success) {
+                    completion(true)
+                } else {
+                    completion(false)
+                }
+            }
         }
     }
 

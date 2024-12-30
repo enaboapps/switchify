@@ -146,13 +146,25 @@ class AddEditExternalSwitchScreenModel() : ViewModel() {
         )
     }
 
-    fun save() {
+    fun save(completion: ((Boolean) -> Unit)) {
         if (shouldSave.value == true) {
             val event = buildSwitchEvent()
             if (store.find(event.code) == null) {
-                store.add(event)
+                store.add(event) { success ->
+                    if (success) {
+                        completion(true)
+                    } else {
+                        completion(false)
+                    }
+                }
             } else {
-                store.update(event)
+                store.update(event) { success ->
+                    if (success) {
+                        completion(true)
+                    } else {
+                        completion(false)
+                    }
+                }
                 shouldSave.value = false
             }
         }

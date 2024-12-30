@@ -72,8 +72,14 @@ fun AddEditExternalSwitchScreen(navController: NavController, code: String? = nu
                 SwitchActionSection(addEditExternalSwitchScreenModel)
                 if (shouldSave!!) {
                     FullWidthButton(text = "Save", enabled = isValid!!, onClick = {
-                        addEditExternalSwitchScreenModel.save()
-                        navController.popBackStack()
+                        addEditExternalSwitchScreenModel.save { success ->
+                            if (success) {
+                                navController.popBackStack()
+                            } else {
+                                Toast.makeText(context, "Error saving switch", Toast.LENGTH_SHORT)
+                                    .show()
+                            }
+                        }
                     })
                 }
                 if (editing) {

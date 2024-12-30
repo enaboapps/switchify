@@ -6,12 +6,12 @@ const val SWITCH_EVENT_TYPE_EXTERNAL = "external"
 const val SWITCH_EVENT_TYPE_CAMERA = "camera"
 
 data class SwitchEvent(
-    @SerializedName("type") val type: String = SWITCH_EVENT_TYPE_EXTERNAL,
-    @SerializedName("name") val name: String,
-    @SerializedName("code") val code: String,
-    @SerializedName("facial_gesture_time") val facialGestureTime: Long = 100L,
-    @SerializedName("press_action") val pressAction: SwitchAction,
-    @SerializedName("hold_actions") val holdActions: List<SwitchAction>,
+    @SerializedName("type") var type: String = SWITCH_EVENT_TYPE_EXTERNAL,
+    @SerializedName("name") var name: String,
+    @SerializedName("code") var code: String,
+    @SerializedName("facial_gesture_time") var facialGestureTime: Long = 100L,
+    @SerializedName("press_action") var pressAction: SwitchAction,
+    @SerializedName("hold_actions") var holdActions: List<SwitchAction>,
     @Transient var isOnDevice: Boolean = false
 ) {
     fun toMap(): Map<String, Any> = mapOf(
@@ -22,6 +22,16 @@ data class SwitchEvent(
         "press_action" to pressAction.toMap(),
         "hold_actions" to holdActions.map { it.toMap() }
     )
+
+    fun setValuesFromOther(other: SwitchEvent) {
+        type = other.type
+        name = other.name
+        code = other.code
+        facialGestureTime = other.facialGestureTime
+        pressAction = other.pressAction
+        holdActions = other.holdActions
+        isOnDevice = other.isOnDevice
+    }
 
     fun log() {
         println(

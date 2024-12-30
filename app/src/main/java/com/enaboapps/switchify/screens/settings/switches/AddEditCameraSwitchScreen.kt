@@ -78,23 +78,32 @@ private fun MainContent(
 
         Spacer(modifier = Modifier.height(16.dp))
 
-        // Facial Gesture Selection
-        Section(title = "Facial Gesture") {
-            val gestures = listOf(
-                CameraSwitchFacialGesture(CameraSwitchFacialGesture.SMILE),
-                CameraSwitchFacialGesture(CameraSwitchFacialGesture.LEFT_WINK),
-                CameraSwitchFacialGesture(CameraSwitchFacialGesture.RIGHT_WINK),
-                CameraSwitchFacialGesture(CameraSwitchFacialGesture.BLINK)
-            )
-
-            gestures.forEach { gesture ->
-                RadioButtonItem(
-                    text = gesture.getName(),
-                    description = gesture.getDescription(),
-                    selected = viewModel.selectedGesture.value?.id == gesture.id,
-                    onSelect = { viewModel.setGesture(gesture) }
+        if (code == null) {
+            // Facial Gesture Selection
+            Section(title = "Facial Gesture") {
+                val gestures = listOf(
+                    CameraSwitchFacialGesture(CameraSwitchFacialGesture.SMILE),
+                    CameraSwitchFacialGesture(CameraSwitchFacialGesture.LEFT_WINK),
+                    CameraSwitchFacialGesture(CameraSwitchFacialGesture.RIGHT_WINK),
+                    CameraSwitchFacialGesture(CameraSwitchFacialGesture.BLINK)
                 )
+
+                gestures.forEach { gesture ->
+                    RadioButtonItem(
+                        text = gesture.getName(),
+                        description = gesture.getDescription(),
+                        selected = viewModel.selectedGesture.value?.id == gesture.id,
+                        onSelect = { viewModel.setGesture(gesture) }
+                    )
+                }
             }
+        } else {
+            Text(
+                text = "This switch is already set up with ${viewModel.selectedGesture.value?.getName()}",
+                style = MaterialTheme.typography.bodyMedium,
+                color = MaterialTheme.colorScheme.onSurface,
+                modifier = Modifier.padding(horizontal = 20.dp)
+            )
         }
 
         Spacer(modifier = Modifier.height(16.dp))
@@ -110,7 +119,7 @@ private fun MainContent(
 
         // Facial Gesture Time
         PreferenceTimeStepper(
-            value = viewModel.facialGestureTime.value ?: 0,
+            value = viewModel.facialGestureTime.longValue,
             title = "Facial Gesture Time",
             summary = "The time to wait for a facial gesture to be detected",
             min = 100,
@@ -128,8 +137,14 @@ private fun MainContent(
             text = "Save",
             enabled = viewModel.isValid.value,
             onClick = {
-                viewModel.save()
-                navController.popBackStack()
+                viewModel.save { success ->
+                    if (success) {
+                        navController.popBackStack()
+                    } else {
+                        Toast.makeText(context, "Error saving switch", Toast.LENGTH_SHORT)
+                            .show()
+                    }
+                }
             }
         )
 

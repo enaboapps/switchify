@@ -234,20 +234,30 @@ class SwitchEventStore(private val context: Context) {
      * Adds a new switch event to both local storage and Firestore.
      *
      * @param switchEvent The switch event to add
+     * @param completion The completion callback to be called after the add is complete
      */
-    fun add(switchEvent: SwitchEvent) {
+    fun add(switchEvent: SwitchEvent, completion: ((Boolean) -> Unit)) {
         if (switchEvents.add(switchEvent)) {
-            saveToFile()
-            coroutineScope.launch {
-                val path = getSwitchPath(switchEvent.code)
-                if (path.isNotEmpty()) {
-                    firestoreManager.saveDocument(
-                        path = path,
-                        data = switchEvent.toMap()
-                    )
-                    Logger.logEvent("Added switch: ${switchEvent.name}")
+            try {
+                saveToFile()
+                completion(true)
+
+                coroutineScope.launch {
+                    val path = getSwitchPath(switchEvent.code)
+                    if (path.isNotEmpty()) {
+                        firestoreManager.saveDocument(
+                            path = path,
+                            data = switchEvent.toMap()
+                        )
+                        Logger.logEvent("Added switch: ${switchEvent.name}")
+                    }
                 }
+            } catch (e: Exception) {
+                completion(false)
+                Log.e(tag, "Error adding switch event", e)
             }
+        } else {
+            completion(false)
         }
     }
 
@@ -255,22 +265,36 @@ class SwitchEventStore(private val context: Context) {
      * Updates an existing switch event in both local storage and Firestore.
      *
      * @param switchEvent The switch event to update
+     * @param completion The completion callback to be called after the update is complete
      */
-    fun update(switchEvent: SwitchEvent) {
-        switchEvents.find { it.code == switchEvent.code }?.let {
-            switchEvents.remove(it)
-            switchEvents.add(switchEvent)
-            saveToFile()
-            coroutineScope.launch {
-                val path = getSwitchPath(switchEvent.code)
-                if (path.isNotEmpty()) {
-                    firestoreManager.saveDocument(
-                        path = path,
-                        data = switchEvent.toMap()
-                    )
-                    Logger.logEvent("Updated switch: ${switchEvent.name}")
+    fun update(switchEvent: SwitchEvent, completion: ((Boolean) -> Unit)) {
+        var index = -1
+        index = switchEvents.indexOfFirst { it.code == switchEvent.code }
+        if (index != -1) {
+            try {
+                switchEvents.forEachIndexed { i, event ->
+                    if (i == index) {
+                        event.setValuesFromOther(switchEvent)
+                    }
                 }
+                saveToFile()
+                completion(true)
+                coroutineScope.launch {
+                    val path = getSwitchPath(switchEvent.code)
+                    if (path.isNotEmpty()) {
+                        firestoreManager.saveDocument(
+                            path = path,
+                            data = switchEvent.toMap()
+                        )
+                        Logger.logEvent("Updated switch: ${switchEvent.name}")
+                    }
+                }
+            } catch (e: Exception) {
+                completion(false)
+                Log.e(tag, "Error updating switch event", e)
             }
+        } else {
+            completion(false)
         }
     }
 
@@ -473,6 +497,7 @@ class SwitchEventStore(private val context: Context) {
             LocalBroadcastManager.getInstance(context).sendBroadcast(Intent(EVENTS_UPDATED))
         } catch (e: Exception) {
             Log.e(tag, "Error saving to file", e)
+            throw e
         }
     }
 
