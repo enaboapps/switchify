@@ -11,6 +11,7 @@ import com.enaboapps.switchify.backend.preferences.PreferenceManager
 import com.enaboapps.switchify.service.scanning.ScanMode
 import com.enaboapps.switchify.utils.Logger
 import com.google.gson.Gson
+import com.google.gson.GsonBuilder
 import com.google.gson.reflect.TypeToken
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -59,11 +60,13 @@ class SwitchEventStore(private val context: Context) {
     /**
      * Represents a remote switch that can be imported to the device.
      *
+     * @property type The type of the switch
      * @property name The name of the switch
      * @property code The unique identifier code for the switch
      * @property isOnDevice Indicates if the switch is already present on the device
      */
     data class RemoteSwitchInfo(
+        val type: String,
         val name: String,
         val code: String,
         val isOnDevice: Boolean
@@ -91,6 +94,7 @@ class SwitchEventStore(private val context: Context) {
                     try {
                         val event = gson.fromJson(gson.toJson(data), SwitchEvent::class.java)
                         RemoteSwitchInfo(
+                            type = event.type,
                             name = event.name,
                             code = event.code,
                             isOnDevice = switchEvents.any { it.code == event.code }
@@ -230,20 +234,30 @@ class SwitchEventStore(private val context: Context) {
      * Adds a new switch event to both local storage and Firestore.
      *
      * @param switchEvent The switch event to add
+     * @param completion The completion callback to be called after the add is complete
      */
-    fun add(switchEvent: SwitchEvent) {
+    fun add(switchEvent: SwitchEvent, completion: ((Boolean) -> Unit)) {
         if (switchEvents.add(switchEvent)) {
-            saveToFile()
-            coroutineScope.launch {
-                val path = getSwitchPath(switchEvent.code)
-                if (path.isNotEmpty()) {
-                    firestoreManager.saveDocument(
-                        path = path,
-                        data = switchEvent.toMap()
-                    )
-                    Logger.logEvent("Added switch: ${switchEvent.name}")
+            try {
+                saveToFile()
+                completion(true)
+
+                coroutineScope.launch {
+                    val path = getSwitchPath(switchEvent.code)
+                    if (path.isNotEmpty()) {
+                        firestoreManager.saveDocument(
+                            path = path,
+                            data = switchEvent.toMap()
+                        )
+                        Logger.logEvent("Added switch: ${switchEvent.name}")
+                    }
                 }
+            } catch (e: Exception) {
+                completion(false)
+                Log.e(tag, "Error adding switch event", e)
             }
+        } else {
+            completion(false)
         }
     }
 
@@ -251,22 +265,36 @@ class SwitchEventStore(private val context: Context) {
      * Updates an existing switch event in both local storage and Firestore.
      *
      * @param switchEvent The switch event to update
+     * @param completion The completion callback to be called after the update is complete
      */
-    fun update(switchEvent: SwitchEvent) {
-        switchEvents.find { it.code == switchEvent.code }?.let {
-            switchEvents.remove(it)
-            switchEvents.add(switchEvent)
-            saveToFile()
-            coroutineScope.launch {
-                val path = getSwitchPath(switchEvent.code)
-                if (path.isNotEmpty()) {
-                    firestoreManager.saveDocument(
-                        path = path,
-                        data = switchEvent.toMap()
-                    )
-                    Logger.logEvent("Updated switch: ${switchEvent.name}")
+    fun update(switchEvent: SwitchEvent, completion: ((Boolean) -> Unit)) {
+        var index = -1
+        index = switchEvents.indexOfFirst { it.code == switchEvent.code }
+        if (index != -1) {
+            try {
+                switchEvents.forEachIndexed { i, event ->
+                    if (i == index) {
+                        event.setValuesFromOther(switchEvent)
+                    }
                 }
+                saveToFile()
+                completion(true)
+                coroutineScope.launch {
+                    val path = getSwitchPath(switchEvent.code)
+                    if (path.isNotEmpty()) {
+                        firestoreManager.saveDocument(
+                            path = path,
+                            data = switchEvent.toMap()
+                        )
+                        Logger.logEvent("Updated switch: ${switchEvent.name}")
+                    }
+                }
+            } catch (e: Exception) {
+                completion(false)
+                Log.e(tag, "Error updating switch event", e)
             }
+        } else {
+            completion(false)
         }
     }
 
@@ -274,11 +302,21 @@ class SwitchEventStore(private val context: Context) {
      * Removes a switch event from both local storage and Firestore.
      *
      * @param switchEvent The switch event to remove
+     * @param handler The handler to be called after the switch event is removed
      */
-    fun remove(switchEvent: SwitchEvent) {
-        if (switchEvents.remove(switchEvent)) {
-            saveToFile()
-            Logger.logEvent("Removed switch: ${switchEvent.name}")
+    fun remove(switchEvent: SwitchEvent, handler: ((Boolean) -> Unit)) {
+        if (switchEvents.removeIf { it.code == switchEvent.code }) {
+            try {
+                saveToFile()
+                Logger.logEvent("Removed switch: ${switchEvent.name}")
+                handler(true)
+            } catch (e: Exception) {
+                handler(false)
+                Log.e(tag, "Error removing switch event", e)
+            }
+        } else {
+            handler(false)
+            Log.e(tag, "Switch event not found")
         }
     }
 
@@ -322,6 +360,36 @@ class SwitchEventStore(private val context: Context) {
             Log.d(tag, "Found switch event for code $code")
         } ?: run {
             Log.d(tag, "No switch event found for code $code")
+            null
+        }
+
+    /**
+     * Finds an external switch event by its code.
+     *
+     * @param code The code of the switch event to find
+     * @return The found switch event or null if not found
+     */
+    fun findExternal(code: String): SwitchEvent? =
+        switchEvents.find { it.type == SWITCH_EVENT_TYPE_EXTERNAL && it.code == code && it.isOnDevice }
+            ?.also {
+                Log.d(tag, "Found external switch event for code $code")
+            } ?: run {
+            Log.d(tag, "No external switch event found for code $code")
+            null
+        }
+
+    /**
+     * Finds a camera switch event by its code.
+     *
+     * @param code The code of the switch event to find
+     * @return The found switch event or null if not found
+     */
+    fun findCamera(code: String): SwitchEvent? =
+        switchEvents.find { it.type == SWITCH_EVENT_TYPE_CAMERA && it.code == code && it.isOnDevice }
+            ?.also {
+                Log.d(tag, "Found camera switch event for code $code")
+            } ?: run {
+            Log.d(tag, "No camera switch event found for code $code")
             null
         }
 
@@ -388,10 +456,15 @@ class SwitchEventStore(private val context: Context) {
     private fun readFile() {
         if (file.exists()) {
             try {
+                val gsonBuilder = GsonBuilder()
+                gsonBuilder.registerTypeAdapter(SwitchEvent::class.java, SwitchEventTypeAdapter())
+                val gson = gsonBuilder.create()
                 val type = object : TypeToken<Set<SwitchEvent>>() {}.type
                 val events: Set<SwitchEvent> = gson.fromJson(file.readText(), type)
                 switchEvents.clear()
                 switchEvents.addAll(events)
+                switchEvents.forEach { it.isOnDevice = true }
+                switchEvents.forEach { it.log() }
             } catch (e: Exception) {
                 Log.e(tag, "Error reading from file", e)
                 deleteFile()
@@ -424,6 +497,7 @@ class SwitchEventStore(private val context: Context) {
             LocalBroadcastManager.getInstance(context).sendBroadcast(Intent(EVENTS_UPDATED))
         } catch (e: Exception) {
             Log.e(tag, "Error saving to file", e)
+            throw e
         }
     }
 

@@ -1,23 +1,10 @@
 package com.enaboapps.switchify.screens.settings.switches
 
-import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Delete
-import androidx.compose.material3.AlertDialog
-import androidx.compose.material3.FloatingActionButton
-import androidx.compose.material3.Icon
-import androidx.compose.material3.IconButton
-import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Text
-import androidx.compose.material3.TextButton
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.collectAsState
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
+import androidx.compose.material3.*
+import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
@@ -25,14 +12,11 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import com.enaboapps.switchify.R
-import com.enaboapps.switchify.components.BaseView
-import com.enaboapps.switchify.components.LoadingIndicator
-import com.enaboapps.switchify.components.NavBarAction
-import com.enaboapps.switchify.components.NavRouteLink
-import com.enaboapps.switchify.components.Section
-import com.enaboapps.switchify.components.UICard
+import com.enaboapps.switchify.components.*
 import com.enaboapps.switchify.nav.NavigationRoute
 import com.enaboapps.switchify.screens.settings.switches.models.SwitchesScreenModel
+import com.enaboapps.switchify.switches.SWITCH_EVENT_TYPE_CAMERA
+import com.enaboapps.switchify.switches.SWITCH_EVENT_TYPE_EXTERNAL
 import com.enaboapps.switchify.switches.SwitchEvent
 import com.enaboapps.switchify.switches.SwitchEventStore
 
@@ -41,7 +25,7 @@ fun SwitchesScreen(navController: NavController) {
     val switchesScreenModel = SwitchesScreenModel(
         SwitchEventStore(LocalContext.current)
     )
-
+    var selectedTabIndex by remember { mutableIntStateOf(0) }
     val uiState by switchesScreenModel.uiState.collectAsState()
 
     BaseView(
@@ -58,8 +42,14 @@ fun SwitchesScreen(navController: NavController) {
         floatingActionButton = {
             FloatingActionButton(
                 onClick = {
-                    if (!switchesScreenModel.isAnotherSwitchAllowed()) switchesScreenModel.showProAlert()
-                    else navController.navigate(NavigationRoute.AddNewSwitch.name)
+                    if (!switchesScreenModel.isAnotherSwitchAllowed()) {
+                        switchesScreenModel.showProAlert()
+                    } else {
+                        when (selectedTabIndex) {
+                            0 -> navController.navigate(NavigationRoute.AddNewExternalSwitch.name)
+                            1 -> navController.navigate(NavigationRoute.AddNewCameraSwitch.name)
+                        }
+                    }
                 }
             ) {
                 Icon(
@@ -69,6 +59,19 @@ fun SwitchesScreen(navController: NavController) {
             }
         }
     ) {
+        TabRow(selectedTabIndex = selectedTabIndex) {
+            Tab(
+                selected = selectedTabIndex == 0,
+                onClick = { selectedTabIndex = 0 },
+                text = { Text("External") }
+            )
+            Tab(
+                selected = selectedTabIndex == 1,
+                onClick = { selectedTabIndex = 1 },
+                text = { Text("Camera") }
+            )
+        }
+
         when {
             uiState.isLoading -> {
                 Box(
@@ -80,29 +83,29 @@ fun SwitchesScreen(navController: NavController) {
             }
 
             else -> {
-                if (uiState.localSwitches.isEmpty()) {
-                    Box(
-                        modifier = Modifier.fillMaxWidth(),
-                        contentAlignment = Alignment.Center
-                    ) {
-                        Text(
-                            text = "No switches found",
-                            style = MaterialTheme.typography.titleMedium
-                        )
-                    }
-                } else {
-                    Section(title = "Switches") {
-                        uiState.localSwitches.forEach { event ->
-                            SwitchEventItem(
-                                navController = navController,
-                                switchEvent = event
-                            )
-                        }
-                    }
+                when (selectedTabIndex) {
+                    0 -> SwitchList(
+                        switches = uiState.localSwitches.filter { it.type == SWITCH_EVENT_TYPE_EXTERNAL },
+                        navController = navController,
+                        emptyMessage = "No external switches found"
+                    )
+
+                    1 -> SwitchList(
+                        switches = uiState.localSwitches.filter { it.type == SWITCH_EVENT_TYPE_CAMERA },
+                        navController = navController,
+                        emptyMessage = "No camera switches found"
+                    )
                 }
 
                 // Display remote switches that aren't on device
-                val availableRemoteSwitches = uiState.remoteSwitches.filter { !it.isOnDevice }
+                val availableRemoteSwitches = uiState.remoteSwitches.filter {
+                    !it.isOnDevice && when (selectedTabIndex) {
+                        0 -> it.type == SWITCH_EVENT_TYPE_EXTERNAL
+                        1 -> it.type == SWITCH_EVENT_TYPE_CAMERA
+                        else -> false
+                    }
+                }
+
                 if (availableRemoteSwitches.isNotEmpty()) {
                     Section(title = "Previously Used Switches") {
                         availableRemoteSwitches.forEach { remoteSwitch ->
@@ -140,6 +143,36 @@ fun SwitchesScreen(navController: NavController) {
                     }
                 }
             )
+        }
+    }
+}
+
+@Composable
+private fun SwitchList(
+    switches: List<SwitchEvent>,
+    navController: NavController,
+    emptyMessage: String
+) {
+    if (switches.isEmpty()) {
+        Box(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(16.dp),
+            contentAlignment = Alignment.Center
+        ) {
+            Text(
+                text = emptyMessage,
+                style = MaterialTheme.typography.titleMedium
+            )
+        }
+    } else {
+        Section(title = "Switches") {
+            switches.forEach { event ->
+                SwitchEventItem(
+                    navController = navController,
+                    switchEvent = event
+                )
+            }
         }
     }
 }
@@ -212,10 +245,16 @@ private fun SwitchEventItem(
     navController: NavController,
     switchEvent: SwitchEvent
 ) {
+    val route = when (switchEvent.type) {
+        SWITCH_EVENT_TYPE_EXTERNAL -> NavigationRoute.EditExternalSwitch.name
+        SWITCH_EVENT_TYPE_CAMERA -> NavigationRoute.EditCameraSwitch.name
+        else -> return
+    }
+
     NavRouteLink(
         title = switchEvent.name,
         summary = "Edit this switch",
         navController = navController,
-        route = "${NavigationRoute.EditSwitch.name}/${switchEvent.code}"
+        route = "$route/${switchEvent.code}"
     )
 }

@@ -1,4 +1,4 @@
-package com.enaboapps.switchify.service.switches
+package com.enaboapps.switchify.service.switches.external
 
 import android.content.Context
 import com.enaboapps.switchify.backend.preferences.PreferenceManager

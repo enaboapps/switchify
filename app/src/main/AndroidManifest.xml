@@ -8,6 +8,11 @@
         </intent>
     </queries>
 
+    <uses-feature
+        android:name="android.hardware.camera"
+        android:required="false" /> <!-- Required for camera switches -->
+    <uses-permission android:name="android.permission.CAMERA" /> <!-- Required for camera switches -->
+
     <application
         android:allowBackup="true"
         android:dataExtractionRules="@xml/data_extraction_rules"

@@ -10,16 +10,17 @@ import androidx.compose.ui.input.key.nativeKeyCode
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import com.enaboapps.switchify.service.scanning.ScanSettings
+import com.enaboapps.switchify.switches.SWITCH_EVENT_TYPE_EXTERNAL
 import com.enaboapps.switchify.switches.SwitchAction
 import com.enaboapps.switchify.switches.SwitchAction.Companion.ACTION_MOVE_TO_NEXT_ITEM
 import com.enaboapps.switchify.switches.SwitchAction.Companion.ACTION_MOVE_TO_PREVIOUS_ITEM
 import com.enaboapps.switchify.switches.SwitchEvent
 import com.enaboapps.switchify.switches.SwitchEventStore
 
-class AddEditSwitchScreenModel() : ViewModel() {
+class AddEditExternalSwitchScreenModel() : ViewModel() {
 
     companion object {
-        private const val TAG = "AddEditSwitchScreenModel"
+        private const val TAG = "AddEditExternalSwitchScreenModel"
     }
 
     private var code: String? = null
@@ -137,6 +138,7 @@ class AddEditSwitchScreenModel() : ViewModel() {
 
     private fun buildSwitchEvent(): SwitchEvent {
         return SwitchEvent(
+            type = SWITCH_EVENT_TYPE_EXTERNAL,
             name = name.trim(),
             code = code ?: "",
             pressAction = pressAction.value!!,
@@ -144,23 +146,40 @@ class AddEditSwitchScreenModel() : ViewModel() {
         )
     }
 
-    fun save() {
+    fun save(completion: ((Boolean) -> Unit)) {
         if (shouldSave.value == true) {
             val event = buildSwitchEvent()
             if (store.find(event.code) == null) {
-                store.add(event)
+                store.add(event) { success ->
+                    if (success) {
+                        completion(true)
+                    } else {
+                        completion(false)
+                    }
+                }
             } else {
-                store.update(event)
+                store.update(event) { success ->
+                    if (success) {
+                        completion(true)
+                    } else {
+                        completion(false)
+                    }
+                }
                 shouldSave.value = false
             }
         }
     }
 
-    fun delete(completion: () -> Unit) {
+    fun delete(completion: (Boolean) -> Unit) {
         val event = store.find(code ?: "")
         event?.let {
-            store.remove(it)
-            completion()
+            store.remove(it) { success ->
+                if (success) {
+                    completion(true)
+                } else {
+                    completion(false)
+                }
+            }
         }
     }
 }

@@ -1,16 +1,11 @@
-package com.enaboapps.switchify.service.switches
+package com.enaboapps.switchify.service.switches.external
 
-import android.content.BroadcastReceiver
 import android.content.Context
-import android.content.Intent
-import android.content.IntentFilter
 import android.util.Log
-import androidx.localbroadcastmanager.content.LocalBroadcastManager
 import com.enaboapps.switchify.backend.preferences.PreferenceManager
 import com.enaboapps.switchify.service.scanning.ScanningManager
 import com.enaboapps.switchify.service.selection.SelectionHandler
 import com.enaboapps.switchify.switches.SwitchEvent
-import com.enaboapps.switchify.switches.SwitchEventStore
 
 /**
  * Manages switch input events and their associated actions in the accessibility service.
@@ -24,7 +19,6 @@ class SwitchListener(
     private val scanningManager: ScanningManager
 ) {
     private val preferenceManager = PreferenceManager(context)
-    private val switchEventStore = SwitchEventStore(context)
 
     /** Tracks the most recent switch action for handling release events */
     private var latestAction: AbsorbedSwitchAction? = null
@@ -34,24 +28,6 @@ class SwitchListener(
 
     /** Key code of the last pressed switch for handling repeat events */
     private var lastSwitchPressedCode: Int = 0
-
-    /**
-     * BroadcastReceiver that listens for updates to switch event configurations
-     * and reloads the switch event store when changes occur.
-     */
-    private val switchEventReceiver = object : BroadcastReceiver() {
-        override fun onReceive(context: Context?, intent: Intent?) {
-            switchEventStore.reload()
-        }
-    }
-
-    init {
-        // Register for switch event configuration updates
-        LocalBroadcastManager.getInstance(context).registerReceiver(
-            switchEventReceiver,
-            IntentFilter(SwitchEventStore.EVENTS_UPDATED)
-        )
-    }
 
     /**
      * Handles switch press events. This is the main entry point for processing
@@ -102,7 +78,7 @@ class SwitchListener(
      */
     private fun findSwitchEvent(keyCode: Int): SwitchEvent? {
         Log.d("SwitchListener", "Finding switch event for keyCode: $keyCode")
-        return switchEventStore.find(keyCode.toString())
+        return SwitchEventProvider.findExternal(keyCode.toString())
     }
 
     /**
