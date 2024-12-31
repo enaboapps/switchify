@@ -169,7 +169,10 @@ class CameraSwitchManager(
         // Only process if the state has changed
         if (currentFaceState != lastProcessedState) {
             // Handle Smile
-            if (currentFaceState.isSmiling != lastProcessedState.isSmiling) {
+            if (currentFaceState.isSmiling != lastProcessedState.isSmiling && SwitchEventProvider.isFacialGestureAssigned(
+                    CameraSwitchFacialGesture.SMILE
+                )
+            ) {
                 handleGestureStateChange(
                     CameraSwitchFacialGesture(CameraSwitchFacialGesture.SMILE),
                     currentFaceState.isSmiling
@@ -177,7 +180,10 @@ class CameraSwitchManager(
             }
 
             // Handle Left Wink (only when right eye is open)
-            if (currentFaceState.leftEyeOpen != lastProcessedState.leftEyeOpen && currentFaceState.rightEyeOpen) {
+            if (currentFaceState.leftEyeOpen != lastProcessedState.leftEyeOpen && currentFaceState.rightEyeOpen && SwitchEventProvider.isFacialGestureAssigned(
+                    CameraSwitchFacialGesture.LEFT_WINK
+                )
+            ) {
                 handleGestureStateChange(
                     CameraSwitchFacialGesture(CameraSwitchFacialGesture.LEFT_WINK),
                     !currentFaceState.leftEyeOpen
@@ -185,7 +191,10 @@ class CameraSwitchManager(
             }
 
             // Handle Right Wink (only when left eye is open)
-            if (currentFaceState.rightEyeOpen != lastProcessedState.rightEyeOpen && currentFaceState.leftEyeOpen) {
+            if (currentFaceState.rightEyeOpen != lastProcessedState.rightEyeOpen && currentFaceState.leftEyeOpen && SwitchEventProvider.isFacialGestureAssigned(
+                    CameraSwitchFacialGesture.RIGHT_WINK
+                )
+            ) {
                 handleGestureStateChange(
                     CameraSwitchFacialGesture(CameraSwitchFacialGesture.RIGHT_WINK),
                     !currentFaceState.rightEyeOpen
@@ -198,13 +207,19 @@ class CameraSwitchManager(
             val previousBothEyesClosed =
                 !lastProcessedState.leftEyeOpen && !lastProcessedState.rightEyeOpen
 
-            if (bothEyesClosed && !previousBothEyesClosed) {
+            if (bothEyesClosed && !previousBothEyesClosed && SwitchEventProvider.isFacialGestureAssigned(
+                    CameraSwitchFacialGesture.BLINK
+                )
+            ) {
                 // Starting blink
                 handleGestureStateChange(
                     CameraSwitchFacialGesture(CameraSwitchFacialGesture.BLINK),
                     true
                 )
-            } else if (bothEyesOpen && previousBothEyesClosed) {
+            } else if (bothEyesOpen && previousBothEyesClosed && SwitchEventProvider.isFacialGestureAssigned(
+                    CameraSwitchFacialGesture.BLINK
+                )
+            ) {
                 // Ending blink
                 handleGestureStateChange(
                     CameraSwitchFacialGesture(CameraSwitchFacialGesture.BLINK),
