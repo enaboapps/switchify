@@ -63,6 +63,11 @@ object SwitchEventProvider {
         cameraSwitchListeners.remove(listener)
     }
 
+    fun isFacialGestureAssigned(gestureId: String): Boolean {
+        return store?.getSwitchEvents()
+            ?.any { it.type == SWITCH_EVENT_TYPE_CAMERA && it.isOnDevice && it.code == gestureId } == true
+    }
+
     private fun checkCameraSwitchAvailability() {
         val hasCamera = store?.getSwitchEvents()
             ?.any { it.type == SWITCH_EVENT_TYPE_CAMERA && it.isOnDevice } == true
