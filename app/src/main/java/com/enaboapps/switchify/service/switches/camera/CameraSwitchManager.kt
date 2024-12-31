@@ -11,6 +11,7 @@ import com.enaboapps.switchify.service.scanning.ScanningManager
 import com.enaboapps.switchify.service.switches.external.SwitchEventProvider
 import com.enaboapps.switchify.service.window.ServiceMessageHUD
 import com.enaboapps.switchify.switches.CameraSwitchFacialGesture
+import com.enaboapps.switchify.switches.SwitchAction
 import com.enaboapps.switchify.switches.SwitchEvent
 import com.google.common.util.concurrent.ListenableFuture
 import com.google.mlkit.vision.common.InputImage
@@ -266,7 +267,9 @@ class CameraSwitchManager(
                     startTime = System.currentTimeMillis()
                 }
                 activeGesture = switchEvent.code
-                scanningManager.pauseScanning()
+                if (switchEvent.pressAction.id == SwitchAction.ACTION_SELECT) {
+                    scanningManager.pauseScanning()
+                }
                 Log.d(TAG, "Activated gesture: ${switchEvent.code}")
             }
         } else {
@@ -280,7 +283,9 @@ class CameraSwitchManager(
         findSwitchEventForGesture(gesture)?.let { switchEvent ->
             // Only process completion if this is the active gesture
             if (activeGesture == switchEvent.code) {
-                scanningManager.resumeScanning()
+                if (switchEvent.pressAction.id == SwitchAction.ACTION_SELECT) {
+                    scanningManager.resumeScanning()
+                }
                 gestureStates[switchEvent.code]?.let { state ->
                     if (state.isActive && state.startTime > 0) {
                         val timeElapsed = System.currentTimeMillis() - state.startTime
