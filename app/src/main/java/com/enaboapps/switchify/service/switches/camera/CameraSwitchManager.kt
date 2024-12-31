@@ -8,7 +8,7 @@ import androidx.camera.lifecycle.ProcessCameraProvider
 import androidx.core.content.ContextCompat
 import androidx.lifecycle.LifecycleOwner
 import com.enaboapps.switchify.service.scanning.ScanningManager
-import com.enaboapps.switchify.service.switches.external.SwitchEventProvider
+import com.enaboapps.switchify.service.switches.SwitchEventProvider
 import com.enaboapps.switchify.service.window.ServiceMessageHUD
 import com.enaboapps.switchify.switches.CameraSwitchFacialGesture
 import com.enaboapps.switchify.switches.SwitchAction

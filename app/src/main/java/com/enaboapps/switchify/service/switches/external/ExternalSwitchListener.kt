@@ -5,6 +5,7 @@ import android.util.Log
 import com.enaboapps.switchify.backend.preferences.PreferenceManager
 import com.enaboapps.switchify.service.scanning.ScanningManager
 import com.enaboapps.switchify.service.selection.SelectionHandler
+import com.enaboapps.switchify.service.switches.SwitchEventProvider
 import com.enaboapps.switchify.switches.SwitchEvent
 
 /**
@@ -14,7 +15,7 @@ import com.enaboapps.switchify.switches.SwitchEvent
  * @property context Application context used for accessing system services and resources
  * @property scanningManager Manages the scanning interface for switch-based navigation
  */
-class SwitchListener(
+class ExternalSwitchListener(
     private val context: Context,
     private val scanningManager: ScanningManager
 ) {
@@ -55,7 +56,7 @@ class SwitchListener(
         val absorbedAction = latestAction?.takeIf { it.switchEvent == switchEvent } ?: return true
 
         if (scanningManager.stopMoveRepeat()) return true
-        SwitchLongPressHandler.stopLongPress(scanningManager)
+        ExternalSwitchLongPressHandler.stopLongPress(scanningManager)
 
         if (handleSwitchPressedRepeat(keyCode)) {
             return true
@@ -77,7 +78,7 @@ class SwitchListener(
      * @return The corresponding SwitchEvent or null if not found
      */
     private fun findSwitchEvent(keyCode: Int): SwitchEvent? {
-        Log.d("SwitchListener", "Finding switch event for keyCode: $keyCode")
+        Log.d("ExternalSwitchListener", "Finding switch event for keyCode: $keyCode")
         return SwitchEventProvider.findExternal(keyCode.toString())
     }
 
@@ -89,7 +90,7 @@ class SwitchListener(
      */
     private fun handleSwitchPressedRepeat(keyCode: Int): Boolean {
         return if (shouldIgnoreSwitchRepeat(keyCode)) {
-            Log.d("SwitchListener", "Ignoring switch repeat: $keyCode")
+            Log.d("ExternalSwitchListener", "Ignoring switch repeat: $keyCode")
             true
         } else {
             updateSwitchPressTime(keyCode)
@@ -117,7 +118,7 @@ class SwitchListener(
      * @param switchEvent The switch event to handle
      */
     private fun handleLongPressAction(switchEvent: SwitchEvent) {
-        SwitchLongPressHandler.startLongPress(context, switchEvent.holdActions)
+        ExternalSwitchLongPressHandler.startLongPress(context, switchEvent.holdActions)
         scanningManager.pauseScanning()
     }
 
@@ -188,7 +189,7 @@ class SwitchListener(
     fun reset() {
         lastSwitchPressedTime = 0
         lastSwitchPressedCode = 0
-        SwitchLongPressHandler.stopLongPress(null)
+        ExternalSwitchLongPressHandler.stopLongPress(null)
     }
 
     /**

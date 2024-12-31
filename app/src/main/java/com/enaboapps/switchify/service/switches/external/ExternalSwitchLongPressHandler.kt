@@ -15,7 +15,7 @@ import kotlinx.coroutines.launch
 /**
  * This object manages the long press actions on a switch.
  */
-object SwitchLongPressHandler {
+object ExternalSwitchLongPressHandler {
     private var longPressJob: Job? = null
     private var holdActions: List<SwitchAction>? = null
     private var actionToPerform: SwitchAction? = null

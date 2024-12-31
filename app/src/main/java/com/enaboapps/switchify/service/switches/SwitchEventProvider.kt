@@ -1,4 +1,4 @@
-package com.enaboapps.switchify.service.switches.external
+package com.enaboapps.switchify.service.switches
 
 import android.annotation.SuppressLint
 import android.content.BroadcastReceiver

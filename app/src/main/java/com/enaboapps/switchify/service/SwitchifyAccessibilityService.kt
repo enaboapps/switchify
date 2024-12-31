@@ -14,9 +14,9 @@ import com.enaboapps.switchify.service.scanning.ScanMethod
 import com.enaboapps.switchify.service.scanning.ScanSettings
 import com.enaboapps.switchify.service.scanning.ScanningManager
 import com.enaboapps.switchify.service.selection.SelectionHandler
+import com.enaboapps.switchify.service.switches.SwitchEventProvider
 import com.enaboapps.switchify.service.switches.camera.CameraSwitchManager
-import com.enaboapps.switchify.service.switches.external.SwitchEventProvider
-import com.enaboapps.switchify.service.switches.external.SwitchListener
+import com.enaboapps.switchify.service.switches.external.ExternalSwitchListener
 import com.enaboapps.switchify.service.utils.KeyboardBridge
 import com.enaboapps.switchify.service.utils.ScreenWatcher
 import com.enaboapps.switchify.utils.Logger
@@ -32,7 +32,7 @@ import kotlinx.coroutines.launch
 class SwitchifyAccessibilityService : AccessibilityService(), LifecycleOwner {
 
     private lateinit var scanningManager: ScanningManager
-    private lateinit var switchListener: SwitchListener
+    private lateinit var externalSwitchListener: ExternalSwitchListener
     private lateinit var cameraSwitchManager: CameraSwitchManager
     private lateinit var lifecycleRegistry: LifecycleRegistry
     private lateinit var screenWatcher: ScreenWatcher
@@ -71,7 +71,7 @@ class SwitchifyAccessibilityService : AccessibilityService(), LifecycleOwner {
                 }
             },
             onScreenSleep = {
-                switchListener.reset()
+                externalSwitchListener.reset()
                 scanningManager.reset()
                 lockScreenView.hide()
                 if (SwitchEventProvider.hasCameraSwitch) {
@@ -84,7 +84,7 @@ class SwitchifyAccessibilityService : AccessibilityService(), LifecycleOwner {
 
         scanSettings = ScanSettings(this)
 
-        switchListener = SwitchListener(this, scanningManager)
+        externalSwitchListener = ExternalSwitchListener(this, scanningManager)
 
         GestureManager.getInstance().setup(this)
         SelectionHandler.init(this)
@@ -178,8 +178,8 @@ class SwitchifyAccessibilityService : AccessibilityService(), LifecycleOwner {
      */
     private fun handleSwitchEvent(event: KeyEvent): Boolean {
         return when (event.action) {
-            KeyEvent.ACTION_DOWN -> switchListener.onSwitchPressed(event.keyCode)
-            KeyEvent.ACTION_UP -> switchListener.onSwitchReleased(event.keyCode)
+            KeyEvent.ACTION_DOWN -> externalSwitchListener.onSwitchPressed(event.keyCode)
+            KeyEvent.ACTION_UP -> externalSwitchListener.onSwitchReleased(event.keyCode)
             else -> false
         }
     }
