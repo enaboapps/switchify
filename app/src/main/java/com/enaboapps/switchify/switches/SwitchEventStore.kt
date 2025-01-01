@@ -33,7 +33,7 @@ import java.io.File
  *
  * @property context The application context used for file operations and preferences
  */
-class SwitchEventStore(private val context: Context) {
+class SwitchEventStore(private val context: Context, private val localOnly: Boolean = false) {
     // Core data storage
     private val switchEvents = mutableSetOf<SwitchEvent>()
     private val fileName = "switch_events.json"
@@ -167,6 +167,10 @@ class SwitchEventStore(private val context: Context) {
      * Pulls all switch events from Firestore and updates local storage.
      */
     private fun pullEventsFromFirestore() {
+        if (localOnly) {
+            return
+        }
+        
         val userId = authManager.getUserId() ?: run {
             Log.e(tag, "Could not get user ID")
             return
@@ -211,6 +215,9 @@ class SwitchEventStore(private val context: Context) {
      * Pushes all local switch events to Firestore.
      */
     private fun pushEventsToFirestore() {
+        if (localOnly) {
+            return
+        }
         coroutineScope.launch {
             try {
                 switchEvents.forEach { event ->

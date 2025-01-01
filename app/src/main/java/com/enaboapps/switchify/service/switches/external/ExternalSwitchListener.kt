@@ -20,6 +20,7 @@ class ExternalSwitchListener(
     private val scanningManager: ScanningManager
 ) {
     private val preferenceManager = PreferenceManager(context)
+    private val switchEventProvider = SwitchEventProvider(context)
 
     /** Tracks the most recent switch action for handling release events */
     private var latestAction: AbsorbedSwitchAction? = null
@@ -79,7 +80,7 @@ class ExternalSwitchListener(
      */
     private fun findSwitchEvent(keyCode: Int): SwitchEvent? {
         Log.d("ExternalSwitchListener", "Finding switch event for keyCode: $keyCode")
-        return SwitchEventProvider.findExternal(keyCode.toString())
+        return switchEventProvider.findExternal(keyCode.toString())
     }
 
     /**
