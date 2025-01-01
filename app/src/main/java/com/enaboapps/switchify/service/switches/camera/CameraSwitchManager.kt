@@ -27,6 +27,7 @@ class CameraSwitchManager(
     private val context: Context,
     private val scanningManager: ScanningManager
 ) {
+    private val switchEventProvider = SwitchEventProvider(context)
     private var cameraProviderFuture: ListenableFuture<ProcessCameraProvider>? = null
     private var cameraProvider: ProcessCameraProvider? = null
     private var imageAnalyzer: ImageAnalysis? = null
@@ -169,7 +170,7 @@ class CameraSwitchManager(
         // Only process if the state has changed
         if (currentFaceState != lastProcessedState) {
             // Handle Smile
-            if (currentFaceState.isSmiling != lastProcessedState.isSmiling && SwitchEventProvider.isFacialGestureAssigned(
+            if (currentFaceState.isSmiling != lastProcessedState.isSmiling && switchEventProvider.isFacialGestureAssigned(
                     CameraSwitchFacialGesture.SMILE
                 )
             ) {
@@ -180,7 +181,7 @@ class CameraSwitchManager(
             }
 
             // Handle Left Wink (only when right eye is open)
-            if (currentFaceState.leftEyeOpen != lastProcessedState.leftEyeOpen && currentFaceState.rightEyeOpen && SwitchEventProvider.isFacialGestureAssigned(
+            if (currentFaceState.leftEyeOpen != lastProcessedState.leftEyeOpen && currentFaceState.rightEyeOpen && switchEventProvider.isFacialGestureAssigned(
                     CameraSwitchFacialGesture.LEFT_WINK
                 )
             ) {
@@ -191,7 +192,7 @@ class CameraSwitchManager(
             }
 
             // Handle Right Wink (only when left eye is open)
-            if (currentFaceState.rightEyeOpen != lastProcessedState.rightEyeOpen && currentFaceState.leftEyeOpen && SwitchEventProvider.isFacialGestureAssigned(
+            if (currentFaceState.rightEyeOpen != lastProcessedState.rightEyeOpen && currentFaceState.leftEyeOpen && switchEventProvider.isFacialGestureAssigned(
                     CameraSwitchFacialGesture.RIGHT_WINK
                 )
             ) {
@@ -203,7 +204,7 @@ class CameraSwitchManager(
 
             // Handle Blink
             val eyesClosed = !currentFaceState.leftEyeOpen && !currentFaceState.rightEyeOpen
-            if (eyesClosed && SwitchEventProvider.isFacialGestureAssigned(
+            if (eyesClosed && switchEventProvider.isFacialGestureAssigned(
                     CameraSwitchFacialGesture.BLINK
                 )
             ) {
@@ -211,7 +212,7 @@ class CameraSwitchManager(
                     CameraSwitchFacialGesture(CameraSwitchFacialGesture.BLINK),
                     true
                 )
-            } else if (!eyesClosed && SwitchEventProvider.isFacialGestureAssigned(
+            } else if (!eyesClosed && switchEventProvider.isFacialGestureAssigned(
                     CameraSwitchFacialGesture.BLINK
                 )
             ) {
@@ -314,7 +315,7 @@ class CameraSwitchManager(
     }
 
     private fun findSwitchEventForGesture(gesture: CameraSwitchFacialGesture): SwitchEvent? =
-        SwitchEventProvider.findCamera(gesture.id)
+        switchEventProvider.findCamera(gesture.id)
 
     companion object {
         private const val TAG = "CameraSwitchManager"

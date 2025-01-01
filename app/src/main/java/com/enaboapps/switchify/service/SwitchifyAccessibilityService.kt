@@ -32,6 +32,7 @@ import kotlinx.coroutines.launch
 class SwitchifyAccessibilityService : AccessibilityService(), LifecycleOwner {
 
     private lateinit var scanningManager: ScanningManager
+    private lateinit var switchEventProvider: SwitchEventProvider
     private lateinit var externalSwitchListener: ExternalSwitchListener
     private lateinit var cameraSwitchManager: CameraSwitchManager
     private lateinit var lifecycleRegistry: LifecycleRegistry
@@ -66,7 +67,7 @@ class SwitchifyAccessibilityService : AccessibilityService(), LifecycleOwner {
         screenWatcher = ScreenWatcher(
             onScreenWake = {
                 lockScreenView.show()
-                if (SwitchEventProvider.hasCameraSwitch) {
+                if (switchEventProvider.hasCameraSwitch) {
                     cameraSwitchManager.startCamera(this@SwitchifyAccessibilityService)
                 }
             },
@@ -74,7 +75,7 @@ class SwitchifyAccessibilityService : AccessibilityService(), LifecycleOwner {
                 externalSwitchListener.reset()
                 scanningManager.reset()
                 lockScreenView.hide()
-                if (SwitchEventProvider.hasCameraSwitch) {
+                if (switchEventProvider.hasCameraSwitch) {
                     cameraSwitchManager.stopCamera()
                 }
             },
@@ -84,12 +85,11 @@ class SwitchifyAccessibilityService : AccessibilityService(), LifecycleOwner {
 
         scanSettings = ScanSettings(this)
 
+        switchEventProvider = SwitchEventProvider(this)
         externalSwitchListener = ExternalSwitchListener(this, scanningManager)
 
         GestureManager.getInstance().setup(this)
         SelectionHandler.init(this)
-
-        SwitchEventProvider.initialize(this)
     }
 
     /**
@@ -116,13 +116,13 @@ class SwitchifyAccessibilityService : AccessibilityService(), LifecycleOwner {
 
         lifecycleRegistry.handleLifecycleEvent(Lifecycle.Event.ON_START)
 
-        if (SwitchEventProvider.hasCameraSwitch) {
+        if (switchEventProvider.hasCameraSwitch) {
             cameraSwitchManager.startCamera(this)
         }
 
         scanningManager.setup()
 
-        SwitchEventProvider.addCameraSwitchListener(object :
+        switchEventProvider.addCameraSwitchListener(object :
             SwitchEventProvider.CameraSwitchListener {
             override fun onCameraSwitchAvailabilityChanged(available: Boolean) {
                 if (available) {
@@ -161,8 +161,6 @@ class SwitchifyAccessibilityService : AccessibilityService(), LifecycleOwner {
         scanningManager.shutdown()
 
         lockScreenView.hide()
-
-        SwitchEventProvider.cleanup()
 
         Logger.logEvent("Service Destroyed")
     }
