@@ -60,7 +60,7 @@ class CameraSwitchManager(
 
     private val faceDetector = FaceDetection.getClient(
         FaceDetectorOptions.Builder()
-            .setPerformanceMode(FaceDetectorOptions.PERFORMANCE_MODE_FAST)
+            .setPerformanceMode(FaceDetectorOptions.PERFORMANCE_MODE_ACCURATE)
             .setLandmarkMode(FaceDetectorOptions.LANDMARK_MODE_ALL)
             .setClassificationMode(FaceDetectorOptions.CLASSIFICATION_MODE_ALL)
             .setMinFaceSize(MIN_FACE_SIZE)
@@ -201,26 +201,20 @@ class CameraSwitchManager(
                 )
             }
 
-            // Handle Blink (both eyes must change together)
-            val bothEyesClosed = !currentFaceState.leftEyeOpen && !currentFaceState.rightEyeOpen
-            val bothEyesOpen = currentFaceState.leftEyeOpen && currentFaceState.rightEyeOpen
-            val previousBothEyesClosed =
-                !lastProcessedState.leftEyeOpen && !lastProcessedState.rightEyeOpen
-
-            if (bothEyesClosed && !previousBothEyesClosed && SwitchEventProvider.isFacialGestureAssigned(
+            // Handle Blink
+            val eyesClosed = !currentFaceState.leftEyeOpen && !currentFaceState.rightEyeOpen
+            if (eyesClosed && SwitchEventProvider.isFacialGestureAssigned(
                     CameraSwitchFacialGesture.BLINK
                 )
             ) {
-                // Starting blink
                 handleGestureStateChange(
                     CameraSwitchFacialGesture(CameraSwitchFacialGesture.BLINK),
                     true
                 )
-            } else if (bothEyesOpen && previousBothEyesClosed && SwitchEventProvider.isFacialGestureAssigned(
+            } else if (!eyesClosed && SwitchEventProvider.isFacialGestureAssigned(
                     CameraSwitchFacialGesture.BLINK
                 )
             ) {
-                // Ending blink
                 handleGestureStateChange(
                     CameraSwitchFacialGesture(CameraSwitchFacialGesture.BLINK),
                     false
@@ -229,14 +223,6 @@ class CameraSwitchManager(
 
             // Update last processed state
             lastProcessedState = currentFaceState.copy()
-        }
-
-        // Safety check - if eyes are open but we think a blink is active, reset it
-        if (currentFaceState.leftEyeOpen && currentFaceState.rightEyeOpen &&
-            activeGesture == CameraSwitchFacialGesture.BLINK
-        ) {
-            Log.d(TAG, "Safety reset - blink state was stuck")
-            reset()
         }
     }
 
@@ -332,8 +318,8 @@ class CameraSwitchManager(
 
     companion object {
         private const val TAG = "CameraSwitchManager"
-        private const val SMILE_THRESHOLD = 0.7f
-        private const val EYE_OPEN_THRESHOLD = 0.5f
+        private const val SMILE_THRESHOLD = 0.5f
+        private const val EYE_OPEN_THRESHOLD = 0.2f
         private const val MIN_FACE_SIZE = 0.2f
     }
 }
