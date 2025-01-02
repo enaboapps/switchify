@@ -51,32 +51,36 @@ object NodeExaminer {
         context: Context,
         coroutineScope: CoroutineScope
     ) {
-        coroutineScope.launch(Dispatchers.Default) {
-            val newNodeInfos = flattenTree(rootNode)
+        try {
+            coroutineScope.launch(Dispatchers.Default) {
+                val newNodeInfos = flattenTree(rootNode)
 
-            // Enhanced node examination for all nodes
-            allNodes = newNodeInfos.map { nodeInfo ->
-                examineNodeContent(nodeInfo)
+                // Enhanced node examination for all nodes
+                allNodes = newNodeInfos.map { nodeInfo ->
+                    examineNodeContent(nodeInfo)
+                }
+
+                // Enhanced node examination for actionable nodes
+                val newActionableNodes = newNodeInfos
+                    .filter { it.isClickable || it.isLongClickable }
+                    .map { examineNodeContent(it) }
+
+                val width = ScreenUtils.getWidth(context)
+                val height = ScreenUtils.getHeight(context)
+
+                val filteredNewActionableNodes = newActionableNodes.filter {
+                    it.getLeft() >= 0 && it.getTop() >= 0 &&
+                            it.getLeft() <= width && it.getTop() <= height &&
+                            it.getWidth() > 0 && it.getHeight() > 0
+                }
+
+                if (actionableNodes != filteredNewActionableNodes) {
+                    actionableNodes = filteredNewActionableNodes
+                    updateFlow.emit(actionableNodes)
+                }
             }
-
-            // Enhanced node examination for actionable nodes
-            val newActionableNodes = newNodeInfos
-                .filter { it.isClickable || it.isLongClickable }
-                .map { examineNodeContent(it) }
-
-            val width = ScreenUtils.getWidth(context)
-            val height = ScreenUtils.getHeight(context)
-
-            val filteredNewActionableNodes = newActionableNodes.filter {
-                it.getLeft() >= 0 && it.getTop() >= 0 &&
-                        it.getLeft() <= width && it.getTop() <= height &&
-                        it.getWidth() > 0 && it.getHeight() > 0
-            }
-
-            if (actionableNodes != filteredNewActionableNodes) {
-                actionableNodes = filteredNewActionableNodes
-                updateFlow.emit(actionableNodes)
-            }
+        } catch (e: Exception) {
+            e.printStackTrace()
         }
     }
 
