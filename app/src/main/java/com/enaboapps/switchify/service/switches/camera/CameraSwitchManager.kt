@@ -245,7 +245,6 @@ class CameraSwitchManager(
         }
         activeGesture = null
         lastProcessedState = FaceState()  // Reset the last processed state
-        scanningManager.resumeScanning()
     }
 
     fun stopCamera() {
