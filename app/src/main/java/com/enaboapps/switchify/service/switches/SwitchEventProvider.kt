@@ -29,6 +29,7 @@ class SwitchEventProvider(context: Context) {
             receiver,
             IntentFilter(SwitchEventStore.EVENTS_UPDATED)
         )
+        checkCameraSwitchAvailability()
     }
 
     fun findExternal(code: String): SwitchEvent? = store.findExternal(code)
