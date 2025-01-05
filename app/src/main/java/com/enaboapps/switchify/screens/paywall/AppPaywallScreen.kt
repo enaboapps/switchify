@@ -6,13 +6,13 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import com.enaboapps.switchify.backend.iap.IAPHandler
+import com.enaboapps.switchify.backend.iap.IAPHandler.PurchaseState
 import com.enaboapps.switchify.components.BaseView
 import com.enaboapps.switchify.components.FullWidthButton
 import com.enaboapps.switchify.screens.paywall.model.AppPaywallScreenModel
@@ -24,17 +24,15 @@ import com.revenuecat.purchases.ui.revenuecatui.PaywallDialogOptions
 @Composable
 fun AppPaywallScreen(navController: NavController) {
     val model = AppPaywallScreenModel()
-    val showingConfirmationState = remember { mutableStateOf(false) }
+
+    val purchaseState = remember { mutableStateOf(IAPHandler.purchaseState.value) }
+
     val options = PaywallDialogOptions.Builder()
         .setListener(model)
         .setDismissRequest { navController.popBackStack() }
         .build()
 
-    LaunchedEffect(Unit) {
-        showingConfirmationState.value = IAPHandler.hasPurchasedPro()
-    }
-
-    if (showingConfirmationState.value == true) {
+    if (purchaseState.value == PurchaseState.Success) {
         BaseView(
             title = "Switchify Pro Is Yours",
             navController = navController,

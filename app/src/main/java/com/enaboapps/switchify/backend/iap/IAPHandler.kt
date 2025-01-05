@@ -28,9 +28,8 @@ object IAPHandler {
      */
     sealed class PurchaseState {
         object Initial : PurchaseState()
-        object Loading : PurchaseState()
-        data class Success(val customerInfo: CustomerInfo) : PurchaseState()
-        data class Error(val error: PurchasesError) : PurchaseState()
+        object Success : PurchaseState()
+        object Error : PurchaseState()
     }
 
     /**
@@ -66,7 +65,7 @@ object IAPHandler {
             object : ReceiveCustomerInfoCallback {
                 override fun onError(error: PurchasesError) {
                     Log.e(TAG, "Error refreshing status: ${error.message}")
-                    _purchaseState.value = PurchaseState.Error(error)
+                    _purchaseState.value = PurchaseState.Error
                 }
 
                 override fun onReceived(customerInfo: CustomerInfo) {
@@ -84,7 +83,7 @@ object IAPHandler {
     private fun handlePurchaseSuccess(customerInfo: CustomerInfo) {
         val hasPro = customerInfo.entitlements[ENTITLEMENT]?.isActive == true
         setProStatus(hasPro)
-        _purchaseState.value = PurchaseState.Success(customerInfo)
+        _purchaseState.value = if (hasPro) PurchaseState.Success else PurchaseState.Initial
         Log.d(TAG, "Pro status updated: $hasPro")
     }
 
