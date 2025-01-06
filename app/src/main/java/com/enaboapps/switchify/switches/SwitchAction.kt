@@ -31,10 +31,21 @@ data class SwitchAction(
         }
 
         val actions: List<SwitchAction> = listOf(
-            ACTION_NONE, ACTION_SELECT, ACTION_STOP_SCANNING, ACTION_CHANGE_SCANNING_DIRECTION,
-            ACTION_MOVE_TO_NEXT_ITEM, ACTION_MOVE_TO_PREVIOUS_ITEM, ACTION_TOGGLE_GESTURE_LOCK,
-            ACTION_SYS_HOME, ACTION_SYS_BACK, ACTION_SYS_RECENTS, ACTION_SYS_QUICK_SETTINGS,
-            ACTION_SYS_NOTIFICATIONS, ACTION_SYS_LOCK_SCREEN, ACTION_PERFORM_USER_ACTION
+            ACTION_NONE,
+            ACTION_SELECT,
+            ACTION_STOP_SCANNING,
+            ACTION_CHANGE_SCANNING_DIRECTION,
+            ACTION_MOVE_TO_NEXT_ITEM,
+            ACTION_MOVE_TO_PREVIOUS_ITEM,
+            ACTION_TOGGLE_GESTURE_LOCK,
+            ACTION_SYS_HOME,
+            ACTION_SYS_BACK,
+            ACTION_SYS_RECENTS,
+            ACTION_SYS_QUICK_SETTINGS,
+            ACTION_SYS_NOTIFICATIONS,
+            ACTION_SYS_LOCK_SCREEN,
+            ACTION_SYS_HEADSET_HOOK,
+            ACTION_PERFORM_USER_ACTION
         ).map { SwitchAction(it) }
 
         const val ACTION_NONE = 0
@@ -50,7 +61,8 @@ data class SwitchAction(
         const val ACTION_SYS_QUICK_SETTINGS = 10
         const val ACTION_SYS_NOTIFICATIONS = 11
         const val ACTION_SYS_LOCK_SCREEN = 12
-        const val ACTION_PERFORM_USER_ACTION = 13
+        const val ACTION_SYS_HEADSET_HOOK = 13
+        const val ACTION_PERFORM_USER_ACTION = 14
     }
 
     fun toMap(): Map<String, Any?> = mapOf(
@@ -86,6 +98,7 @@ data class SwitchAction(
         ACTION_SYS_QUICK_SETTINGS -> "Quick Settings"
         ACTION_SYS_NOTIFICATIONS -> "Notifications"
         ACTION_SYS_LOCK_SCREEN -> "Lock Screen"
+        ACTION_SYS_HEADSET_HOOK -> "Play/Pause Media or Answer/End Call"
         ACTION_PERFORM_USER_ACTION -> "Perform My Own Action"
         else -> "Unknown"
     }
@@ -104,6 +117,7 @@ data class SwitchAction(
         ACTION_SYS_QUICK_SETTINGS -> "Open the quick settings"
         ACTION_SYS_NOTIFICATIONS -> "Open the notifications"
         ACTION_SYS_LOCK_SCREEN -> "Lock the screen"
+        ACTION_SYS_HEADSET_HOOK -> "Play/Pause Media or Answer/End Call"
         ACTION_PERFORM_USER_ACTION -> "Perform an action"
         else -> "Unknown"
     }
