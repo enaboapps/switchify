@@ -2,6 +2,7 @@ package com.enaboapps.switchify.service.scanning
 
 import android.accessibilityservice.AccessibilityService.GLOBAL_ACTION_BACK
 import android.accessibilityservice.AccessibilityService.GLOBAL_ACTION_HOME
+import android.accessibilityservice.AccessibilityService.GLOBAL_ACTION_KEYCODE_HEADSETHOOK
 import android.accessibilityservice.AccessibilityService.GLOBAL_ACTION_LOCK_SCREEN
 import android.accessibilityservice.AccessibilityService.GLOBAL_ACTION_NOTIFICATIONS
 import android.accessibilityservice.AccessibilityService.GLOBAL_ACTION_QUICK_SETTINGS
@@ -189,6 +190,10 @@ class ScanningManager(
 
             SwitchAction.ACTION_SYS_LOCK_SCREEN -> accessibilityService.performGlobalAction(
                 GLOBAL_ACTION_LOCK_SCREEN
+            )
+
+            SwitchAction.ACTION_SYS_HEADSET_HOOK -> accessibilityService.performGlobalAction(
+                GLOBAL_ACTION_KEYCODE_HEADSETHOOK
             )
 
             SwitchAction.ACTION_PERFORM_USER_ACTION -> {
