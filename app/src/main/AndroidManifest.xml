@@ -50,7 +50,8 @@
             android:name=".keyboard.SwitchifyKeyboardService"
             android:exported="true"
             android:permission="android.permission.BIND_INPUT_METHOD"
-            android:label="@string/ime_name">
+            android:label="@string/ime_name"
+            android:description="@string/ime_description">
             <intent-filter>
                 <action android:name="android.view.InputMethod" />
             </intent-filter>
