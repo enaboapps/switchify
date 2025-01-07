@@ -26,7 +26,7 @@ switchifykeyboardscanlib = "1.1.0"
 revenuecat = "8.10.5"
 amplitude-analytics = "1.+"
 camerax = "1.4.1"
-accompanist = "0.31.5-beta"
+accompanist = "0.37.0"
 face-detection = "16.1.7"
 
 [libraries]
