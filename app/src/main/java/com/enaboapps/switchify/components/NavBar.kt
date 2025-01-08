@@ -39,8 +39,8 @@ fun NavBar(
     val canGoBack = navController.previousBackStackEntry != null
 
     Surface(
-        color = MaterialTheme.colorScheme.primaryContainer,
-        contentColor = MaterialTheme.colorScheme.onPrimaryContainer,
+        color = MaterialTheme.colorScheme.primary,
+        contentColor = MaterialTheme.colorScheme.onPrimary,
         shadowElevation = 4.dp
     ) {
         Box(
@@ -76,7 +76,7 @@ fun NavBar(
                     TextButton(
                         onClick = action.onClick,
                         colors = ButtonDefaults.textButtonColors(
-                            contentColor = MaterialTheme.colorScheme.onPrimaryContainer
+                            contentColor = MaterialTheme.colorScheme.onPrimary
                         )
                     ) {
                         Text(action.text)
