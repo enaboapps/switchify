@@ -175,13 +175,6 @@ fun HomeScreen(navController: NavController, serviceUtils: ServiceUtils = Servic
             )
         }
 
-        NavRouteLink(
-            title = "How To Use",
-            summary = "Learn how to use Switchify.",
-            navController = navController,
-            route = NavigationRoute.HowToUse.name
-        )
-
         if (!isPro.value) {
             NavRouteLink(
                 title = "Upgrade to Pro",

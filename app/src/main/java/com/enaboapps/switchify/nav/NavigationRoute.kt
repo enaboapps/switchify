@@ -4,7 +4,6 @@ sealed class NavigationRoute(val name: String) {
 
     data object Home : NavigationRoute("Home")
     data object Setup : NavigationRoute("Setup")
-    data object HowToUse : NavigationRoute("HowToUse")
     data object Paywall : NavigationRoute("Paywall")
     data object SignIn : NavigationRoute("SignIn")
     data object SignUp : NavigationRoute("SignUp")
