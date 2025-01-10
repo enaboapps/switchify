@@ -1,6 +1,7 @@
 package com.enaboapps.switchify.service
 
 import android.accessibilityservice.AccessibilityService
+import android.content.Intent
 import android.view.KeyEvent
 import android.view.accessibility.AccessibilityEvent
 import androidx.lifecycle.Lifecycle
@@ -44,9 +45,7 @@ class SwitchifyAccessibilityService : AccessibilityService(), LifecycleOwner {
     override fun onCreate() {
         super.onCreate()
 
-        setup()
-
-        Logger.logEvent("Service Created")
+        lifecycleRegistry = LifecycleRegistry(this)
 
         lifecycleRegistry.handleLifecycleEvent(Lifecycle.Event.ON_CREATE)
     }
@@ -57,8 +56,6 @@ class SwitchifyAccessibilityService : AccessibilityService(), LifecycleOwner {
         ScanMethod.preferenceManager = PreferenceManager(this.applicationContext)
 
         scanningManager = ScanningManager(this, this)
-
-        lifecycleRegistry = LifecycleRegistry(this)
         cameraSwitchManager = CameraSwitchManager(this, scanningManager)
 
         lockScreenView = LockScreenView(this)
@@ -112,6 +109,9 @@ class SwitchifyAccessibilityService : AccessibilityService(), LifecycleOwner {
      */
     override fun onServiceConnected() {
         super.onServiceConnected()
+
+        setup()
+
         Logger.logEvent("Service Connected")
 
         lifecycleRegistry.handleLifecycleEvent(Lifecycle.Event.ON_START)
@@ -151,9 +151,7 @@ class SwitchifyAccessibilityService : AccessibilityService(), LifecycleOwner {
         lockScreenView.show()
     }
 
-    override fun onDestroy() {
-        super.onDestroy()
-
+    override fun onUnbind(intent: Intent?): Boolean {
         lifecycleRegistry.handleLifecycleEvent(Lifecycle.Event.ON_DESTROY)
 
         cameraSwitchManager.stopCamera()
@@ -162,7 +160,9 @@ class SwitchifyAccessibilityService : AccessibilityService(), LifecycleOwner {
 
         lockScreenView.hide()
 
-        Logger.logEvent("Service Destroyed")
+        Logger.logEvent("Service Unbound")
+
+        return super.onUnbind(intent)
     }
 
     override fun onKeyEvent(event: KeyEvent?): Boolean {
