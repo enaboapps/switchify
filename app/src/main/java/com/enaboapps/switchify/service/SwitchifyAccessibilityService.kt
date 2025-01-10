@@ -166,8 +166,10 @@ class SwitchifyAccessibilityService : AccessibilityService(), LifecycleOwner {
     }
 
     override fun onKeyEvent(event: KeyEvent?): Boolean {
-        event?.let { handleSwitchEvent(it) }
-        return true
+        if (event != null) {
+            return handleSwitchEvent(event)
+        }
+        return false
     }
 
     /**
