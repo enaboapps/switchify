@@ -7,6 +7,7 @@ import android.view.accessibility.AccessibilityEvent
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.LifecycleRegistry
+import com.enaboapps.switchify.backend.iap.IAPHandler
 import com.enaboapps.switchify.backend.preferences.PreferenceManager
 import com.enaboapps.switchify.service.gestures.GestureManager
 import com.enaboapps.switchify.service.lockscreen.LockScreenView
@@ -56,6 +57,8 @@ class SwitchifyAccessibilityService : AccessibilityService(), LifecycleOwner {
         ScanMethod.preferenceManager = PreferenceManager(this.applicationContext)
 
         scanningManager = ScanningManager(this, this)
+        scanningManager.setup()
+
         cameraSwitchManager = CameraSwitchManager(this, scanningManager)
 
         lockScreenView = LockScreenView(this)
@@ -87,6 +90,8 @@ class SwitchifyAccessibilityService : AccessibilityService(), LifecycleOwner {
 
         GestureManager.getInstance().setup(this)
         SelectionHandler.init(this)
+
+        IAPHandler.initialize(this)
     }
 
     /**
@@ -119,8 +124,6 @@ class SwitchifyAccessibilityService : AccessibilityService(), LifecycleOwner {
         if (switchEventProvider.hasCameraSwitch) {
             cameraSwitchManager.startCamera(this)
         }
-
-        scanningManager.setup()
 
         switchEventProvider.addCameraSwitchListener(object :
             SwitchEventProvider.CameraSwitchListener {
