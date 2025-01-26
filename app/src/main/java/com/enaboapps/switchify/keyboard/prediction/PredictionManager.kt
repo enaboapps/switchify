@@ -39,6 +39,10 @@ class PredictionManager(private val context: Context, private val listener: Pred
         fleksyLib = FleksyLib(context.applicationContext, languageFile, config)
     }
 
+    fun destroy() {
+        fleksyLib.destroy()
+    }
+
     fun reloadLanguage() {
         val languageFile = predictionLanguageManager.getFleksyLanguage()
         fleksyLib.reloadLanguageFile(languageFile)
