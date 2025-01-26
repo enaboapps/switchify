@@ -69,6 +69,11 @@ class SwitchifyKeyboardService : InputMethodService(), KeyboardLayoutListener, P
         predictionManager?.initialize()
     }
 
+    override fun onDestroy() {
+        super.onDestroy()
+        predictionManager?.destroy()
+    }
+
     /**
      * This method is called when the input view is created.
      * It initializes the keyboard layout and the keyboard accessibility manager.
